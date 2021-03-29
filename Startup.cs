@@ -12,8 +12,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
-using testwebapi.DataLayer;
-using testwebapi.Managers;
+using GenericDbRestApi.DataLayer;
+using GenericDbRestApi.Managers;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.Formatters;
 

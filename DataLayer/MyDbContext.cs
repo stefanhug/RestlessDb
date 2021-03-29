@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-
-namespace testwebapi.DataLayer
+namespace GenericDbRestApi.DataLayer
 {
     public class MyDbContext : DbContext
     {

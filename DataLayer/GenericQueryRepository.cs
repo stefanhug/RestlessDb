@@ -3,10 +3,11 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
-using testwebapi.Utils;
+using GenericDbRestApi.Utils;
 using System;
+using GenericDbRestApi.Types;
 
-namespace testwebapi.DataLayer
+namespace GenericDbRestApi.DataLayer
 {
     public class GenericQueryRepository
     {

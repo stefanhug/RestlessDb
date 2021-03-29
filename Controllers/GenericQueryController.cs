@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using testwebapi.DataLayer;
-using testwebapi.Managers;
+using GenericDbRestApi.DataLayer;
+using GenericDbRestApi.Managers;
 
 namespace testwebapi.Controllers
 {

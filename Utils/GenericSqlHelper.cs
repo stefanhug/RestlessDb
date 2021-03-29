@@ -4,9 +4,10 @@ using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Data.Common;
-using testwebapi.DataLayer;
+using GenericDbRestApi.DataLayer;
+using GenericDbRestApi.Types;
 
-namespace testwebapi.Utils
+namespace GenericDbRestApi.Utils
 {
     public static class GenericSqlHelper
     {
