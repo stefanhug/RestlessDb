@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace GenericDbRestApi.Types
 {
@@ -17,10 +14,6 @@ namespace GenericDbRestApi.Types
         
     public class GenericQueryResult
     {
-        public GenericQueryResult()
-        {
-        }
-
         public GenericQueryResultStatus Status { get; set; } = GenericQueryResultStatus.OK;
         public string ErrorMessage { get; set; }
         

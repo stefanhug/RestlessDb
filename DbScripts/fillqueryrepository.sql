@@ -4,10 +4,10 @@ values('exammodes', 'Exam modes', 'Exam modes of CCW',
 
 insert into [SYSADM].[TSY_QUERYREPOSITORY]([NAME], [LABEL], [DESCRIPTION], [SQL])
 values('workflowaudit', 'Workflow audit', 'Workflow audit table', 
-	'select * from sysadm.WorkflowAudit order by id')
+	'select * from sysadm.WorkflowAudit order by workflowid')
 
 insert into [SYSADM].[TSY_QUERYREPOSITORY]([NAME], [LABEL], [DESCRIPTION], [SQL])
 values('workflowauditdaterange', 'Workflow audit date range', 'Workflow audit table', 
-	'select * from sysadm.WorkflowAudit where LogDateTime > @DATEFROM and LogDateTime <@DATETO order by id')
+	'select * from sysadm.WorkflowAudit where LogDateTime > @DATEFROM and LogDateTime <@DATETO order by workflowid')
 
 

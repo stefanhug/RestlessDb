@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using GenericDbRestApi.DataLayer;
 using GenericDbRestApi.Managers;
+using System.Net;
+using GenericDBRestApi.Formatters;
 
 namespace testwebapi.Controllers
 {
@@ -13,15 +15,9 @@ namespace testwebapi.Controllers
     [Route("/dbapi/{query}")]
     public class GenericQueryController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "BLAAAH"
-        };
-
         private readonly ILogger<GenericQueryController> logger;
         private readonly GenericQueryManager manager;
         
-
         public GenericQueryController(ILogger<GenericQueryController> logger, GenericQueryManager manager)
         {
             this.logger = logger;
@@ -40,24 +36,28 @@ namespace testwebapi.Controllers
                     parameters.Add(tuple.Key, tuple.Value);
                 }
             }
+            var queryResult = manager.GetQueryResults(query, offset, maxRows, parameters);
+            logger.LogInformation($"query {query} executed; {queryResult.Data.Count()} rows");
 
-            var result = manager.GetQueryResults(query, offset, maxRows, parameters);
 
             outputFormat = outputFormat ?? "json";
 
             if (outputFormat == "json")
             {
-                var ret = new JsonResult(result);
+                var ret = new JsonResult(queryResult);
                 return ret;
             }
             else if (outputFormat == "excel")
             {
-                var ret = new OkObjectResult(result);
+                var ret = new GenericQueryResultExcelConverter(queryResult).GetAsFileResult();
                 return ret;
             }
             else
             {
-                var ret = new NotFoundObjectResult($"Unknown output format '{outputFormat}'");
+                var ret = new ContentResult();
+                ret.Content = $"Unknown output format '{outputFormat}";
+                ret.ContentType = "text/plain";
+                ret.StatusCode = (int)HttpStatusCode.NotAcceptable;
 
                 return ret;
             }
