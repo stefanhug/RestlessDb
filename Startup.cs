@@ -1,5 +1,6 @@
 using GenericDbRestApi.DataLayer;
 using GenericDbRestApi.Managers;
+using GenericDBRestApi.Formatters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +37,12 @@ namespace testwebapi
             services.AddDbContext<MyDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<GenericQueryRepository, GenericQueryRepository>();
             services.AddScoped<GenericQueryManager, GenericQueryManager>();
+
+            //Formatters
+            services.AddSingleton<IQueryFormatter, QueryJsonFormatter>();
+            services.AddSingleton<IQueryFormatter, QueryXmlFormatter>();
+            services.AddSingleton<IQueryFormatter, QueryCsvFormatter>();
+            services.AddSingleton<IQueryFormatter, QueryExcelFormatter>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

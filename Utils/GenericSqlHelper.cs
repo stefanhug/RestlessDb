@@ -39,7 +39,7 @@ namespace GenericDbRestApi.Utils
             }
         }
 
-        public static (IEnumerable<Dictionary<string, object>> data, IEnumerable<QueryColumn> columns)
+        public static (List<Dictionary<string, object>> data, List<QueryColumn> columns)
             QueryAsDictList(string sqlStatement, SqlConnection dbConnection, Dictionary<string, string> parameters = null)
         {
             var data = new List<Dictionary<string, object>>();

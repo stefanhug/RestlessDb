@@ -29,20 +29,23 @@ namespace GenericDbRestApi.DataLayer
                 ret.Status = GenericQueryResultStatus.QRY_NOTFOUND;
                 ret.ErrorMessage = $"No query repository entry with name {queryName} found";
             }
+            else
+            {
+                ret.Name = queryRepositoryRow["Name"] as string;
+                ret.Label = queryRepositoryRow["Label"] as string;
+                ret.Description = queryRepositoryRow["Description"] as string;
+                ret.Offset = offset;
+                ret.MaxRows = maxRows;
 
-            ret.Name = queryRepositoryRow["Name"] as string;
-            ret.Label = queryRepositoryRow["Label"] as string;
-            ret.Description = queryRepositoryRow["Description"] as string;
-            ret.Offset = offset;
-            ret.MaxRows = maxRows;
+                string sqlStmt = (string)queryRepositoryRow["SQL"];
+                string sql = $"{sqlStmt} offset {offset} rows fetch next {maxRows} rows only";
 
-            string sqlStmt = (string)queryRepositoryRow["SQL"];
-            string sql = $"{sqlStmt} offset {offset} rows fetch next {maxRows} rows only";
-            
-            logger.LogInformation("GetQueryResults SQL: {0}", sql);
+                logger.LogInformation("GetQueryResults SQL: {0}", sql);
 
-            (ret.Data, ret.Columns) = GenericSqlHelper.QueryAsDictList(sql, DbConnection, queryParameters);
-          
+                (ret.Data, ret.Columns) = GenericSqlHelper.QueryAsDictList(sql, DbConnection, queryParameters);
+            }
+
+
             return ret;
         }
 

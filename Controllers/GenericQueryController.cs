@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GenericDbRestApi.Managers;
+using GenericDbRestApi.Types;
+using GenericDBRestApi.Formatters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using GenericDbRestApi.DataLayer;
-using GenericDbRestApi.Managers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
-using GenericDBRestApi.Formatters;
 
 namespace testwebapi.Controllers
 {
@@ -17,16 +16,20 @@ namespace testwebapi.Controllers
     {
         private readonly ILogger<GenericQueryController> logger;
         private readonly GenericQueryManager manager;
-        
-        public GenericQueryController(ILogger<GenericQueryController> logger, GenericQueryManager manager)
+        private readonly IEnumerable<IQueryFormatter> queryFormatters;
+
+        public GenericQueryController(ILogger<GenericQueryController> logger, GenericQueryManager manager,
+            IEnumerable<IQueryFormatter> queryFormatters)
         {
             this.logger = logger;
             this.manager = manager;
+            this.queryFormatters = queryFormatters;
         }
 
         [HttpGet]
         public IActionResult Get(string query, [FromQuery(Name = "offset")] int? offset, 
-            [FromQuery(Name = "maxrows")] int? maxRows, [FromQuery(Name = "outputformat")] string outputFormat)
+            [FromQuery(Name = "maxrows")] int? maxRows, 
+            [FromQuery(Name = "outputformat")] string outputFormat)
         {
             Dictionary<string, string> parameters = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
             foreach (var tuple in HttpContext.Request.Query)
@@ -37,32 +40,31 @@ namespace testwebapi.Controllers
                 }
             }
             var queryResult = manager.GetQueryResults(query, offset, maxRows, parameters);
-            logger.LogInformation($"query {query} executed; {queryResult.Data.Count()} rows");
 
-
-            outputFormat = outputFormat ?? "json";
-
-            if (outputFormat == "json")
+            if (queryResult.Status == GenericQueryResultStatus.OK)
             {
-                var ret = new JsonResult(queryResult);
-                return ret;
-            }
-            else if (outputFormat == "excel")
-            {
-                var ret = new GenericQueryResultExcelConverter(queryResult).GetAsFileResult();
-                return ret;
+                logger.LogInformation($"query {query} executed OK; {queryResult.Data.Count()} rows");
+                outputFormat = outputFormat ?? "json";
+
+                var formatter = queryFormatters.First(f => outputFormat.Equals(f.OutputFormat, StringComparison.InvariantCultureIgnoreCase));
+                if(formatter != null)
+                {
+                    return formatter.GetActionResult(queryResult);
+                }
+                else
+                {
+                    return new ContentResult()
+                    {
+                        Content = $"Unknown output format '{outputFormat}'",
+                        ContentType = "text/plain",
+                        StatusCode = (int)HttpStatusCode.NotAcceptable
+                    };
+                }
             }
             else
             {
-                var ret = new ContentResult();
-                ret.Content = $"Unknown output format '{outputFormat}";
-                ret.ContentType = "text/plain";
-                ret.StatusCode = (int)HttpStatusCode.NotAcceptable;
-
-                return ret;
+                return new JsonResult(queryResult);
             }
-            
-           
         }
     }
 }
