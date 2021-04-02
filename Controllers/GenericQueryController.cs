@@ -46,8 +46,8 @@ namespace testwebapi.Controllers
                 logger.LogInformation($"query {query} executed OK; {queryResult.Data.Count()} rows");
                 outputFormat = outputFormat ?? "json";
 
-                var formatter = queryFormatters.First(f => outputFormat.Equals(f.OutputFormat, StringComparison.InvariantCultureIgnoreCase));
-                if(formatter != null)
+                var formatter = queryFormatters.FirstOrDefault(f => outputFormat.Equals(f.OutputFormat, StringComparison.InvariantCultureIgnoreCase));
+                if (formatter != null)
                 {
                     return formatter.GetActionResult(queryResult);
                 }
@@ -57,13 +57,26 @@ namespace testwebapi.Controllers
                     {
                         Content = $"Unknown output format '{outputFormat}'",
                         ContentType = "text/plain",
-                        StatusCode = (int)HttpStatusCode.NotAcceptable
+                        StatusCode = (int)HttpStatusCode.NotImplemented
                     };
                 }
             }
             else
             {
-                return new JsonResult(queryResult);
+                var ret = new JsonResult(queryResult);
+                switch (queryResult.Status)
+                {
+                    case GenericQueryResultStatus.QRY_NOTFOUND:
+                        ret.StatusCode = (int)HttpStatusCode.NotFound;
+                        break;
+                    case GenericQueryResultStatus.QRY_ERROR:
+                        ret.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        break;
+                    default:
+                        ret.StatusCode = (int)HttpStatusCode.OK;
+                        break;
+                }
+                return ret;
             }
         }
     }
