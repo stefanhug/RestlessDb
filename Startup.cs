@@ -1,6 +1,7 @@
 using GenericDbRestApi.DataLayer;
 using GenericDbRestApi.Managers;
 using GenericDBRestApi.Formatters;
+using GenericDBRestApi.Managers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +38,7 @@ namespace testwebapi
             services.AddDbContext<MyDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<GenericQueryRepository, GenericQueryRepository>();
             services.AddScoped<GenericQueryManager, GenericQueryManager>();
+            services.AddScoped<MarkdownRenderManager, MarkdownRenderManager>();
 
             //Formatters
             services.AddSingleton<IQueryFormatter, QueryJsonFormatter>();
