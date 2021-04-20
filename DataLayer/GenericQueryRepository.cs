@@ -11,6 +11,7 @@ namespace GenericDbRestApi.DataLayer
 {
     public class GenericQueryRepository
     {
+        const string QRY_QRY_REPOSITORY = "select * from GQUERY.QUERYREPOSITORY where name=@NAME";
         public GenericQueryRepository(MyDbContext dbContext, ILogger<GenericQueryRepository> logger) 
         {
             this.dbContext = dbContext;
@@ -21,7 +22,7 @@ namespace GenericDbRestApi.DataLayer
             Dictionary<string, string> queryParameters)
         {
             var ret = new GenericQueryResult();
-            var queryRepositoryRow = GenericSqlHelper.QuerySingleRow("select * from sysadm.TSY_QUERYREPOSITORY where name=@NAME", 
+            var queryRepositoryRow = GenericSqlHelper.QuerySingleRow(QRY_QRY_REPOSITORY, 
                                                               DbConnection, 
                                                               new Dictionary<string, string>() { { "@NAME", queryName } });
             if (queryRepositoryRow == null)
