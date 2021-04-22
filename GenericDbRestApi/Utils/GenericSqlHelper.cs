@@ -11,16 +11,6 @@ namespace GenericDbRestApi.Utils
 {
     public static class GenericSqlHelper
     {
-        public static Dictionary<string, object> GetReaderDataAsDict(SqlDataReader reader)
-        {
-            var ret = new Dictionary<string, object>((StringComparer.InvariantCultureIgnoreCase));
-            for (int i = 0; i < reader.FieldCount; i++)
-            {
-                ret.Add(reader.GetName(i), NormalizeValue(reader.GetValue(i)));
-            }
-            return ret;
-        }
-
         public static Dictionary<string, object> QuerySingleRow(string sqlStatement, SqlConnection dbConnection, Dictionary<string, string> parameters = null)
         {
             SqlCommand command = new SqlCommand(sqlStatement, dbConnection);
@@ -78,6 +68,16 @@ namespace GenericDbRestApi.Utils
                     qryCol.ColumnType = QueryColumnType.STRING;
 
                 ret.Add(qryCol);
+            }
+            return ret;
+        }
+
+        private static Dictionary<string, object> GetReaderDataAsDict(SqlDataReader reader)
+        {
+            var ret = new Dictionary<string, object>((StringComparer.InvariantCultureIgnoreCase));
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                ret.Add(reader.GetName(i), NormalizeValue(reader.GetValue(i)));
             }
             return ret;
         }
