@@ -43,7 +43,16 @@ namespace GenericDbRestApi.DataLayer
 
                 logger.LogInformation("GetQueryResults SQL: {0}", sql);
 
-                (ret.Data, ret.Columns) = GenericSqlHelper.QueryAsDictList(sql, DbConnection, queryParameters);
+                try
+                {
+                    (ret.Data, ret.Columns) = GenericSqlHelper.QueryAsDictList(sql, DbConnection, queryParameters);
+                }
+                catch (Exception e)
+                {
+                    ret.ErrorMessage = $"Error retrieving data: {e.Message}";
+                    ret.Status = GenericQueryResultStatus.SERVER_ERROR;
+                }
+                
             }
 
 
