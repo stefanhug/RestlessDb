@@ -39,6 +39,8 @@ namespace testwebapi.Controllers
                     parameters.Add(tuple.Key, tuple.Value);
                 }
             }
+
+
             var queryResult = manager.GetQueryResults(query, offset, maxRows, parameters);
 
             if (queryResult.Status == GenericQueryResultStatus.OK)
