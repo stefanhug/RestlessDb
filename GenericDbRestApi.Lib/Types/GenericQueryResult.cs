@@ -31,6 +31,12 @@ namespace GenericDbRestApi.Types
         [DataMember]
         public int MaxRows { get; set; }
         [DataMember]
+        public int RetrievedRows { get; set; }
+        [DataMember]
+        public bool HasMoreRows { get; set; }
+
+
+        [DataMember]
         public List<QueryColumn> Columns { get; set; }
         [DataMember]
         public List<Dictionary<string, object>> Data { get; set; }
