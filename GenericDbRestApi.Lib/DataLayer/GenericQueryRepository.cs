@@ -43,7 +43,7 @@ namespace GenericDbRestApi.DataLayer
                     ret.MaxRows = maxRows;
 
                     string sqlStmt = (string)queryRepositoryRow["SQL"];
-                    string sql = $"{sqlStmt} offset {offset} rows fetch next {maxRows} rows only";
+                    string sql = $"{sqlStmt} offset {offset} rows fetch next {maxRows + 1} rows only";
 
                     logger.LogInformation("GetQueryResults SQL: {0}", sql);
 
