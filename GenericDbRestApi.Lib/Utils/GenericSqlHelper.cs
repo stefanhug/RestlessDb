@@ -29,11 +29,13 @@ namespace GenericDbRestApi.Utils
             }
         }
 
-        public static (List<Dictionary<string, object>> data, List<QueryColumn> columns)
-            QueryAsDictList(string sqlStatement, SqlConnection dbConnection, Dictionary<string, string> parameters = null)
+        public static (List<Dictionary<string, object>> data, List<QueryColumn> columns, bool hasMoreRows)
+            QueryAsDictList(string sqlStatement, SqlConnection dbConnection, int maxRows, Dictionary<string, string> parameters = null)
         {
             var data = new List<Dictionary<string, object>>();
-            List<QueryColumn> columns ;
+            bool hasMoreRows = false;
+            List<QueryColumn> columns;
+            int numRowsRead = 0;
 
             SqlCommand command = new SqlCommand(sqlStatement, dbConnection);
             AddParamsToCommand(command, parameters);
@@ -41,13 +43,17 @@ namespace GenericDbRestApi.Utils
             {
                 while (reader.Read())
                 {
-                    data.Add(GetReaderDataAsDict(reader));
+                    numRowsRead++;
+                    if (numRowsRead <= maxRows)
+                        data.Add(GetReaderDataAsDict(reader));
+                    else
+                        hasMoreRows = true;
                 }
 
                 columns = GetColumnDescription(reader);
             }
 
-            return (data, columns);
+            return (data, columns, hasMoreRows);
         }
 
         private static List<QueryColumn> GetColumnDescription(SqlDataReader reader)
