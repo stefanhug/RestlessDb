@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GenericDbRestApi\GenericDBRestApi.csproj" />
+    <ProjectReference Include="..\GenericDbRestApi.Lib\GenericDBRestApi.Lib.csproj" />
   </ItemGroup>
 
 </Project>
