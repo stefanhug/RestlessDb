@@ -27,6 +27,112 @@ namespace GenericDBRestApi.Test
             Assert.Equal(colHeaderRow, expectedHeaderRow);
         }
 
+        [Fact]
+        public void WhenQueryResultWithColumnsIsGivenThenCorrectNumberOfRowsIsCreated()
+        {
+            GenericQueryResult inputData = CreateBasicQueryResult();
+            var sut = new DbQueryCsv(inputData);
+            var csvStream = sut.GetAsStream();
+            var reader = new StreamReader(csvStream);
+            // Read Header and colheader row
+            SkipLines(reader, 2);
+            int dataRowsRead = 0;
+            while (reader.ReadLine() != null)
+                dataRowsRead++;
+
+            Assert.Equal(dataRowsRead, MAXROWS);
+        }
+
+        [Fact]
+        public void WhenQueryResultWithColumnsWithNoValueContainingSeparatorCharIsGivenThenNothingEscaped()
+        {
+            GenericQueryResult inputData = CreateSpecialQueryResult(',', '\"');
+            var sut = new DbQueryCsv(inputData);
+            var csvStream = sut.GetAsStream();
+            var reader = new StreamReader(csvStream);
+            SkipLines(reader, 2);
+            var dataRow = reader.ReadLine();
+            Assert.NotNull(dataRow);
+            Assert.Equal("Nothing to escape,1", dataRow);
+        }
+
+        [Fact]
+        public void WhenQueryResultWithColumnsWithValueContainingSeparatorCharIsGivenThenEscaped()
+        {
+            GenericQueryResult inputData = CreateSpecialQueryResult(',', '\"');
+            var sut = new DbQueryCsv(inputData);
+            var csvStream = sut.GetAsStream();
+            var reader = new StreamReader(csvStream);
+            SkipLines(reader, 3);
+            var dataRow = reader.ReadLine();
+            Assert.NotNull(dataRow);
+            Assert.Equal("\"One,two,three\",2", dataRow);
+        }
+
+        [Fact]
+        public void WhenQueryResultWithColumnsWithValueContainingEscapeCharIsGivenThenEscaped()
+        {
+            GenericQueryResult inputData = CreateSpecialQueryResult(',', '\"');
+            var sut = new DbQueryCsv(inputData);
+            var csvStream = sut.GetAsStream();
+            var reader = new StreamReader(csvStream);
+            SkipLines(reader, 4);
+            var dataRow = reader.ReadLine();
+            Assert.NotNull(dataRow);
+            Assert.Equal("\"Hi \"\"escaped text\"\"\",3", dataRow);
+        }
+
+        private void SkipLines(StreamReader reader, int numLines)
+        {
+            for (int i = 0; i < numLines; i++)
+                reader.ReadLine();
+        }
+
+        private GenericQueryResult CreateSpecialQueryResult(char separatorChar, char escapeChar)
+        {
+            var ret = new GenericQueryResult();
+            ret.Name = "TestSpecialChars";
+            ret.Label = "Test Label Special Chars";
+            ret.Description = "Test Description";
+            ret.Columns = new List<QueryColumn>()
+            {
+                new QueryColumn()
+                {
+                    Label = "Column 1",
+                    ColumnType = QueryColumnType.STRING
+                },
+                new QueryColumn()
+                {
+                    Label = "Column 2",
+                    ColumnType = QueryColumnType.DOUBLE
+                }
+            };
+
+            ret.Data = new List<Dictionary<string, object>>();
+            ret.Data.Add(
+                 new Dictionary<string, object>()
+                 {
+                                { ret.Columns[0].Label, "Nothing to escape" }, { ret.Columns[1].Label, 1 }
+                 }
+             );
+
+            ret.Data.Add(
+                 new Dictionary<string, object>()
+                 {
+                                { ret.Columns[0].Label, "One,two,three" }, { ret.Columns[1].Label, 2 }
+                 }
+             );
+
+            ret.Data.Add(
+                 new Dictionary<string, object>()
+                 {
+                                { ret.Columns[0].Label, "Hi \"escaped text\"" }, { ret.Columns[1].Label, 3 }
+                 }
+             );
+
+            return ret;
+        }
+
         private GenericQueryResult CreateBasicQueryResult()
         {
             var ret = new GenericQueryResult();
