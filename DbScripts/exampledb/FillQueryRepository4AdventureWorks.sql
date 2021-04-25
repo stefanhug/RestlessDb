@@ -3,7 +3,7 @@ values('Persons', 'Persons',
     'Query some fields of  in Adventureworks person.person table', 
 	'select BusinessEntityID, Title, FirstName, MiddleName, LastName, ModifiedDate 
 	 from Person.Person 
-	 order by LastName')
+	 order by BusinessEntityID')
 
 insert into GQuery.QueryRepository(NAME, LABEL, DESCRIPTION, SQL)
 values('PersonsByLastName', 'Persons filtered by last name', 
