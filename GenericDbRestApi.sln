@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenericDBRestApi", "GenericDBRestApi\GenericDBRestApi.csproj", "{A5138681-26C7-494A-8DBE-BC82880C4355}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenericDbRestApi", "GenericDbRestApi\GenericDbRestApi.csproj", "{A5138681-26C7-494A-8DBE-BC82880C4355}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenericDBRestApi.Test", "GenericDBRestApi.Test\GenericDBRestApi.Test.csproj", "{23306D16-ED4B-4421-9A8B-12EBA68F1E7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenericDbRestApi.Test", "GenericDbRestApi.Test\GenericDbRestApi.Test.csproj", "{23306D16-ED4B-4421-9A8B-12EBA68F1E7E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenericDbRestApi.Lib", "GenericDbRestApi.Lib\GenericDbRestApi.Lib.csproj", "{2EBC9B1A-B042-49E7-81D9-9ACFA20430D2}"
 EndProject
