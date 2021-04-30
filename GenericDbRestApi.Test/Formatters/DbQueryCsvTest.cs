@@ -1,5 +1,5 @@
-using GenericDbRestApi.Types;
-using GenericDBRestApi.Formatters;
+using GenericDbRestApi.Lib.Types;
+using GenericDBRestApi.Lib.Formatters;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
@@ -15,14 +15,14 @@ namespace GenericDBRestApi.Test
         [Fact]
         public void WhenQueryResultWithColumnsIsGivenThenHeaderRowAndColHeaderRowIsInserted()
         {
-            GenericQueryResult inputData = CreateBasicQueryResult();
+            QueryResult inputData = CreateBasicQueryResult();
             var sut = new DbQueryCsv(inputData);
             var csvStream = sut.GetAsStream();
             var reader = new StreamReader(csvStream);
             var headerRow = reader.ReadLine();
             var colHeaderRow = reader.ReadLine();
-            var expectedHeader = $"{inputData.Label} - {inputData.Description}";
-            var expectedHeaderRow = string.Join(sut.SeparatorChar, inputData.Columns.Select(c => c.Label));
+            var expectedHeader = $"{inputData.MetaData.Label} - {inputData.MetaData.Description}";
+            var expectedHeaderRow = string.Join(sut.SeparatorChar, inputData.MetaData.Columns.Select(c => c.Label));
             Assert.Equal(headerRow, expectedHeader);
             Assert.Equal(colHeaderRow, expectedHeaderRow);
         }
@@ -30,7 +30,7 @@ namespace GenericDBRestApi.Test
         [Fact]
         public void WhenQueryResultWithColumnsIsGivenThenCorrectNumberOfRowsIsCreated()
         {
-            GenericQueryResult inputData = CreateBasicQueryResult();
+            QueryResult inputData = CreateBasicQueryResult();
             var sut = new DbQueryCsv(inputData);
             var csvStream = sut.GetAsStream();
             var reader = new StreamReader(csvStream);
@@ -46,7 +46,7 @@ namespace GenericDBRestApi.Test
         [Fact]
         public void WhenQueryResultWithColumnsWithNoValueContainingSeparatorCharIsGivenThenNothingEscaped()
         {
-            GenericQueryResult inputData = CreateSpecialQueryResult(',', '\"');
+            QueryResult inputData = CreateSpecialQueryResult(',', '\"');
             var sut = new DbQueryCsv(inputData);
             var csvStream = sut.GetAsStream();
             var reader = new StreamReader(csvStream);
@@ -59,7 +59,7 @@ namespace GenericDBRestApi.Test
         [Fact]
         public void WhenQueryResultWithColumnsWithValueContainingSeparatorCharIsGivenThenEscaped()
         {
-            GenericQueryResult inputData = CreateSpecialQueryResult(',', '\"');
+            QueryResult inputData = CreateSpecialQueryResult(',', '\"');
             var sut = new DbQueryCsv(inputData);
             var csvStream = sut.GetAsStream();
             var reader = new StreamReader(csvStream);
@@ -72,7 +72,7 @@ namespace GenericDBRestApi.Test
         [Fact]
         public void WhenQueryResultWithColumnsWithValueContainingEscapeCharIsGivenThenEscaped()
         {
-            GenericQueryResult inputData = CreateSpecialQueryResult(',', '\"');
+            QueryResult inputData = CreateSpecialQueryResult(',', '\"');
             var sut = new DbQueryCsv(inputData);
             var csvStream = sut.GetAsStream();
             var reader = new StreamReader(csvStream);
@@ -88,13 +88,14 @@ namespace GenericDBRestApi.Test
                 reader.ReadLine();
         }
 
-        private GenericQueryResult CreateSpecialQueryResult(char separatorChar, char escapeChar)
+        private QueryResult CreateSpecialQueryResult(char separatorChar, char escapeChar)
         {
-            var ret = new GenericQueryResult();
-            ret.Name = "TestSpecialChars";
-            ret.Label = "Test Label Special Chars";
-            ret.Description = "Test Description";
-            ret.Columns = new List<QueryColumn>()
+            var ret = new QueryResult();
+            ret.MetaData = new QueryMetaData();
+            ret.MetaData.Name = "TestSpecialChars";
+            ret.MetaData.Label = "Test Label Special Chars";
+            ret.MetaData.Description = "Test Description";
+            ret.MetaData.Columns = new List<QueryColumn>()
             {
                 new QueryColumn()
                 {
@@ -112,34 +113,35 @@ namespace GenericDBRestApi.Test
             ret.Data.Add(
                  new Dictionary<string, object>()
                  {
-                                { ret.Columns[0].Label, "Nothing to escape" }, { ret.Columns[1].Label, 1 }
+                    { ret.MetaData.Columns[0].Label, "Nothing to escape" }, { ret.MetaData.Columns[1].Label, 1 }
                  }
              );
 
             ret.Data.Add(
                  new Dictionary<string, object>()
                  {
-                                { ret.Columns[0].Label, "One,two,three" }, { ret.Columns[1].Label, 2 }
+                    { ret.MetaData.Columns[0].Label, "One,two,three" }, { ret.MetaData.Columns[1].Label, 2 }
                  }
              );
 
             ret.Data.Add(
                  new Dictionary<string, object>()
                  {
-                                { ret.Columns[0].Label, "Hi \"escaped text\"" }, { ret.Columns[1].Label, 3 }
+                                { ret.MetaData.Columns[0].Label, "Hi \"escaped text\"" }, { ret.MetaData.Columns[1].Label, 3 }
                  }
              );
 
             return ret;
         }
 
-        private GenericQueryResult CreateBasicQueryResult()
+        private QueryResult CreateBasicQueryResult()
         {
-            var ret = new GenericQueryResult();
-            ret.Name = "TestName";
-            ret.Label = "Test Label";
-            ret.Description = "Test Description";
-            ret.Columns = new List<QueryColumn>()
+            var ret = new QueryResult();
+            ret.MetaData = new QueryMetaData();
+            ret.MetaData.Name = "TestName";
+            ret.MetaData.Label = "Test Label";
+            ret.MetaData.Description = "Test Description";
+            ret.MetaData.Columns = new List<QueryColumn>()
             {
                 new QueryColumn()
                 {
@@ -171,10 +173,10 @@ namespace GenericDBRestApi.Test
                 ret.Data.Add(
                     new Dictionary<string, object>()
                     {
-                        { ret.Columns[0].Label, $"String {i}" },
-                        { ret.Columns[1].Label, i * 0.1 },
-                        { ret.Columns[2].Label, i },
-                        { ret.Columns[3].Label, new DateTime(2020, 1, 1).AddDays(i) }
+                        { ret.MetaData.Columns[0].Label, $"String {i}" },
+                        { ret.MetaData.Columns[1].Label, i * 0.1 },
+                        { ret.MetaData.Columns[2].Label, i },
+                        { ret.MetaData.Columns[3].Label, new DateTime(2020, 1, 1).AddDays(i) }
                     }
                 );
             }

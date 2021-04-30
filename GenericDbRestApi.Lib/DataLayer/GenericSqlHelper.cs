@@ -3,17 +3,23 @@ using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using GenericDbRestApi.Lib.DataLayer;
+using GenericDbRestApi.Lib.Types;
+using System.Data;
 using System.Data.Common;
-using GenericDbRestApi.DataLayer;
-using GenericDbRestApi.Types;
 
-namespace GenericDbRestApi.Utils
+namespace GenericDbRestApi.Lib.DataLayer
 {
-    public static class GenericSqlHelper
+    public class GenericSqlHelper : IGenericSqlHelper
     {
-        public static Dictionary<string, object> QuerySingleRow(string sqlStatement, SqlConnection dbConnection, Dictionary<string, string> parameters = null)
+        const string PARAM_PREFIX = "@";
+        public GenericSqlHelper(SqlConnection dbConnection)
         {
-            SqlCommand command = new SqlCommand(sqlStatement, dbConnection);
+            this.SqlConnection = dbConnection;
+        }
+        public Dictionary<string, object> QuerySingleRow(string sqlStatement, Dictionary<string, object> parameters = null)
+        {
+            SqlCommand command = new SqlCommand(sqlStatement, SqlConnection);
             AddParamsToCommand(command, parameters);
 
             using (SqlDataReader reader = command.ExecuteReader())
@@ -29,15 +35,14 @@ namespace GenericDbRestApi.Utils
             }
         }
 
-        public static (List<Dictionary<string, object>> data, List<QueryColumn> columns, bool hasMoreRows)
-            QueryAsDictList(string sqlStatement, SqlConnection dbConnection, int maxRows, Dictionary<string, string> parameters = null)
+        public (List<Dictionary<string, object>> data, bool hasMoreRows)
+            QueryAsDictList(string sqlStatement, int maxRows, Dictionary<string, object> parameters = null)
         {
             var data = new List<Dictionary<string, object>>();
             bool hasMoreRows = false;
-            List<QueryColumn> columns;
             int numRowsRead = 0;
 
-            SqlCommand command = new SqlCommand(sqlStatement, dbConnection);
+            SqlCommand command = new SqlCommand(sqlStatement, SqlConnection);
             AddParamsToCommand(command, parameters);
             using (SqlDataReader reader = command.ExecuteReader())
             {
@@ -49,18 +54,38 @@ namespace GenericDbRestApi.Utils
                     else
                         hasMoreRows = true;
                 }
+            }
 
+            return (data, hasMoreRows);
+        }
+
+        public List<QueryColumn> QueryResultColumns(string sqlStatement)
+        {
+            List<QueryColumn> columns;
+
+            SqlCommand command = new SqlCommand(sqlStatement, SqlConnection);
+
+            // set default for params, otherwise the query even with SchemaOnly will fail
+            var sqlParams = QueryParamsParser.GetQueryParams(sqlStatement);
+
+            foreach (var sqlParam in sqlParams)
+            {
+                command.Parameters.Add(new SqlParameter() { ParameterName = PARAM_PREFIX + sqlParam, IsNullable = true });
+            }
+
+            using (SqlDataReader reader = command.ExecuteReader(CommandBehavior.SchemaOnly))
+            {
                 columns = GetColumnDescription(reader);
             }
 
-            return (data, columns, hasMoreRows);
+            return columns;
         }
 
         private static List<QueryColumn> GetColumnDescription(SqlDataReader reader)
         {
             var ret = new List<QueryColumn>();
 
-            foreach(var col in reader.GetColumnSchema())
+            foreach (var col in reader.GetColumnSchema())
             {
                 var qryCol = new QueryColumn();
                 qryCol.Label = col.ColumnName;
@@ -88,14 +113,14 @@ namespace GenericDbRestApi.Utils
             return ret;
         }
 
-        private static void AddParamsToCommand(SqlCommand command, Dictionary<string, string> parameters)
+        private static void AddParamsToCommand(SqlCommand command, Dictionary<string, object> parameters)
         {
             if (parameters == null)
                 return;
 
             foreach (var param in parameters)
             {
-                command.Parameters.Add(new SqlParameter(param.Key, param.Value));
+                command.Parameters.Add(new SqlParameter(PARAM_PREFIX + param.Key, param.Value.ToString()));
             }
         }
 
@@ -108,5 +133,8 @@ namespace GenericDbRestApi.Utils
 
             return value.ToString();
         }
+ 
+        public SqlConnection SqlConnection { get; }
+
     }
 }

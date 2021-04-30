@@ -1,6 +1,6 @@
-﻿using GenericDbRestApi.Managers;
-using GenericDbRestApi.Types;
-using GenericDBRestApi.Formatters;
+﻿using GenericDbRestApi.Lib.Managers;
+using GenericDbRestApi.Lib.Types;
+using GenericDBRestApi.Lib.Formatters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -8,17 +8,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
-namespace testwebapi.Controllers
+namespace GenericDbRestApi.Lib.Controllers
 {
     [ApiController]
     [Route("/dbapi/{query}")]
-    public class GenericQueryController : ControllerBase
+    public class QueryController : ControllerBase
     {
-        private readonly ILogger<GenericQueryController> logger;
+        private readonly ILogger<QueryController> logger;
         private readonly GenericQueryManager manager;
         private readonly IEnumerable<IQueryFormatter> queryFormatters;
 
-        public GenericQueryController(ILogger<GenericQueryController> logger, GenericQueryManager manager,
+        public QueryController(ILogger<QueryController> logger, GenericQueryManager manager,
             IEnumerable<IQueryFormatter> queryFormatters)
         {
             this.logger = logger;
@@ -31,12 +31,12 @@ namespace testwebapi.Controllers
             [FromQuery(Name = "maxrows")] int? maxRows, 
             [FromQuery(Name = "outputformat")] string outputFormat)
         {
-            Dictionary<string, string> parameters = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+            Dictionary<string, object> parameters = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
             foreach (var tuple in HttpContext.Request.Query)
             {
                 if (tuple.Key.ToLowerInvariant() != "offset" && tuple.Key.ToLowerInvariant() != "maxrows")
                 {
-                    parameters.Add(tuple.Key, tuple.Value);
+                    parameters.Add(tuple.Key.ToUpperInvariant(), tuple.Value);
                 }
             }
 
