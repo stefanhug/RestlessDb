@@ -1,15 +1,15 @@
 ﻿using ClosedXML.Excel;
-using GenericDbRestApi.Types;
+using GenericDbRestApi.Lib.Types;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace GenericDBRestApi.Formatters
+namespace GenericDBRestApi.Lib.Formatters
 {
     public class DbQueryExcelWorkbook : XLWorkbook
     {
-        private readonly GenericQueryResult queryResult;
-        public GenericQueryResult QueryResult 
+        private readonly QueryResult queryResult;
+        public QueryResult QueryResult 
         {
             get
             {
@@ -17,7 +17,7 @@ namespace GenericDBRestApi.Formatters
             }
         }
 
-        public DbQueryExcelWorkbook(GenericQueryResult queryResult)
+        public DbQueryExcelWorkbook(QueryResult queryResult)
         {
             this.queryResult = queryResult;
         }
@@ -25,14 +25,14 @@ namespace GenericDBRestApi.Formatters
         public MemoryStream GetAsStream()
         {
             var memStream = new MemoryStream();
-            var worksheet = Worksheets.Add(queryResult.Label);
-            var lastCol = queryResult.Columns.Count();
+            var worksheet = Worksheets.Add(queryResult.MetaData.Label);
+            var lastCol = queryResult.MetaData.Columns.Count();
             worksheet.Range(1, 1, 1, lastCol).Merge();
             worksheet.Range(2, 1, 2, lastCol).Merge();
 
-            SetCellValueAndFormat(worksheet, 1, 1, value: queryResult.Label, bold: true, 
+            SetCellValueAndFormat(worksheet, 1, 1, value: queryResult.MetaData.Label, bold: true, 
                 fontSize: 20, backgroundColor: XLColor.LightSteelBlue);
-            SetCellValueAndFormat(worksheet, 2, 1, value: queryResult.Description, italic: true, 
+            SetCellValueAndFormat(worksheet, 2, 1, value: queryResult.MetaData.Description, italic: true, 
                 fontSize: 16, backgroundColor: XLColor.LightGray);
                         
             InsertHeader(worksheet, 4, 1);
@@ -60,7 +60,7 @@ namespace GenericDBRestApi.Formatters
 
         private void AdjustToContents(IXLWorksheet worksheet, int row, int startCol)
         {
-            for (int i = 0; i < queryResult.Columns.Count(); i++)
+            for (int i = 0; i < queryResult.MetaData.Columns.Count(); i++)
             {
                 worksheet.Column(startCol + i).AdjustToContents(row);
             }
@@ -69,7 +69,7 @@ namespace GenericDBRestApi.Formatters
         private void InsertHeader(IXLWorksheet worksheet, int initRow, int initCol)
         {
             var currentColIndex = initCol;
-            foreach (var col in queryResult.Columns)
+            foreach (var col in queryResult.MetaData.Columns)
             {
                 SetCellValueAndFormat(worksheet, initRow, currentColIndex, value: col.Label, 
                     bold: true, backgroundColor: XLColor.LightSkyBlue);

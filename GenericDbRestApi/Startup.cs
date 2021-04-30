@@ -1,6 +1,6 @@
-using GenericDbRestApi.DataLayer;
-using GenericDbRestApi.Managers;
-using GenericDBRestApi.Formatters;
+using GenericDbRestApi.Lib.Repositories;
+using GenericDbRestApi.Lib.Managers;
+using GenericDBRestApi.Lib.Formatters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Data.SqlClient;
@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Data;
 using System.Text.Json.Serialization;
+using GenericDbRestApi.Lib.DataLayer;
 
 namespace testwebapi
 {
@@ -32,9 +33,17 @@ namespace testwebapi
             });
 
             var connectionString = Configuration.GetSection("AppSettings").GetValue<string>("ConnectionString");
-            services.AddScoped<GenericQueryRepository, GenericQueryRepository>();
+            services.AddScoped<SqlConnection, SqlConnection>(p => 
+                {
+                    var conn = new SqlConnection(connectionString);
+                    conn.Open();
+                    return conn; 
+                });
+            services.AddScoped<IGenericSqlHelper, GenericSqlHelper>();
+            services.AddScoped<QueryItemProvider, QueryItemProvider>();
+            services.AddScoped<QueryParamsProvider, QueryParamsProvider>();
+            services.AddScoped<QueryRepository, QueryRepository>();
             services.AddScoped<GenericQueryManager, GenericQueryManager>();
-            services.AddScoped<SqlConnection, SqlConnection >( p => new SqlConnection(connectionString));
 
             //Formatters
             services.AddSingleton<IQueryFormatter, QueryJsonFormatter>();

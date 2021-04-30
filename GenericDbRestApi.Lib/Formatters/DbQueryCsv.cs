@@ -1,20 +1,20 @@
-﻿using GenericDbRestApi.Types;
+﻿using GenericDbRestApi.Lib.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GenericDBRestApi.Formatters
+namespace GenericDBRestApi.Lib.Formatters
 {
     public class DbQueryCsv
     {
-        private readonly GenericQueryResult queryResult;
+        private readonly QueryResult queryResult;
 
         public char SeparatorChar { get; set; } = ',';
         public char EscapeChar { get; set; } = '"';
 
-        public DbQueryCsv(GenericQueryResult queryResult)
+        public DbQueryCsv(QueryResult queryResult)
         {
             this.queryResult = queryResult;
         }
@@ -41,7 +41,7 @@ namespace GenericDBRestApi.Formatters
 
         private void WriteColumnHeader(StreamWriter textWriter)
         {
-            textWriter.WriteLine(string.Join(SeparatorChar, queryResult.Columns.Select(col => EscapeValue(col.Label))));
+            textWriter.WriteLine(string.Join(SeparatorChar, queryResult.MetaData.Columns.Select(col => EscapeValue(col.Label))));
         }
 
         private string EscapeValue(object value)
@@ -55,7 +55,7 @@ namespace GenericDBRestApi.Formatters
 
         private void WriteHeader(StreamWriter textWriter)
         {
-            textWriter.WriteLine($"{queryResult.Label} - {queryResult.Description}");
+            textWriter.WriteLine($"{queryResult.MetaData.Label} - {queryResult.MetaData.Description}");
         }
     }
 }

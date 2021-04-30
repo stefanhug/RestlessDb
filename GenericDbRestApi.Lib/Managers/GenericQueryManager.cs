@@ -1,23 +1,23 @@
 using System.Collections.Generic;
-using GenericDbRestApi.DataLayer;
-using GenericDbRestApi.Types;
+using GenericDbRestApi.Lib.Repositories;
+using GenericDbRestApi.Lib.Types;
 using Microsoft.Extensions.Logging;
 
-namespace GenericDbRestApi.Managers
+namespace GenericDbRestApi.Lib.Managers
 {
     public class GenericQueryManager
     {
         const int MAXROWS = 8000;
         private readonly ILogger<GenericQueryManager> logger;
-        private readonly GenericQueryRepository queryRepository;
+        private readonly QueryRepository queryRepository;
 
-        public GenericQueryManager(ILogger<GenericQueryManager> logger, GenericQueryRepository queryRepository)
+        public GenericQueryManager(ILogger<GenericQueryManager> logger, QueryRepository queryRepository)
         {
             this.logger = logger;
             this.queryRepository = queryRepository;
         }
 
-        public GenericQueryResult GetQueryResults(string query, int? offset, int? maxRows, Dictionary<string, string> parameters)
+        public QueryResult GetQueryResults(string query, int? offset, int? maxRows, Dictionary<string, object> parameters)
         {
             offset ??= 0;
             maxRows ??= MAXROWS;

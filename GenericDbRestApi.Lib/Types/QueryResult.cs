@@ -1,43 +1,32 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace GenericDbRestApi.Types
+namespace GenericDbRestApi.Lib.Types
 {
-    public enum QueryColumnType { STRING, INT, DOUBLE, DATETIME }
-
-    public class QueryColumn
-    {
-        public string Label { get; set; }
-        public QueryColumnType ColumnType { get; set; }
-    }
-
     public enum GenericQueryResultStatus { OK, QRY_NOTFOUND, QRY_ERROR, SERVER_ERROR }
-        
+
     [DataContract]
-    public class GenericQueryResult
+    public class QueryResult
     {
         [DataMember]
         public GenericQueryResultStatus Status { get; set; } = GenericQueryResultStatus.OK;
         [DataMember]
         public string ErrorMessage { get; set; }
         [DataMember]
-        public string Name { get; set; }
-        [DataMember]
-        public string Label { get; set; }
-        [DataMember]
-        public string Description { get; set; }
-        [DataMember]
         public int Offset { get; set; }
         [DataMember]
         public int MaxRows { get; set; }
+        [DataMember]
+        public Dictionary<string, object> QueryParameters { get; set; }
         [DataMember]
         public int RetrievedRows { get; set; }
         [DataMember]
         public bool HasMoreRows { get; set; }
 
 
+
         [DataMember]
-        public List<QueryColumn> Columns { get; set; }
+        public QueryMetaData MetaData { get; set; }
         [DataMember]
         public List<Dictionary<string, object>> Data { get; set; }
     }
