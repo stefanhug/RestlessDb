@@ -8,9 +8,9 @@ namespace GenericDbRestApi.Lib.DataLayer
 {
     public class QueryItemProvider
     {
-        const int MAXCHILDQUERIES = 100;
+        public const int MAXCHILDQUERIES = 100;
 
-        const string QRY_QRY_REPOSITORY = @"
+        public const string QRY_QRY_REPOSITORY = @"
             WITH CTE (Name, Label, Description, Parent, Pos, Sql)
             AS (
 	            SELECT Name, Label, Description, Parent, Pos, Sql
@@ -48,9 +48,18 @@ namespace GenericDbRestApi.Lib.DataLayer
             return ret;
         }
 
+        private bool SafeCompare(object a, object b)
+        {
+            if (a == null && b == null)
+                return true;
+            else if (a == null || b== null)
+                return false;
+
+            return a.ToString().Equals(b.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
         private void RecurseChildItems(QueryItem currentItem, List<Dictionary<string, object>> queryItemsForName, List<string> parentsList)
         {
-            var childRows = from a in queryItemsForName where a["Parent"].ToString() == currentItem.Name orderby a["Pos"] select a;
+            var childRows = from a in queryItemsForName where SafeCompare(a["Parent"], currentItem.Name) orderby a["Pos"] select a;
 
             if (childRows.Any())
             {

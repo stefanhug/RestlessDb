@@ -6,7 +6,7 @@ using System.IO;
 using Xunit;
 using System;
 
-namespace GenericDBRestApi.Test
+namespace GenericDBRestApi.Test.Formatters
 {
     public class DbQueryCsvTest
     {

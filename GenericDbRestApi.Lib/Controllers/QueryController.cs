@@ -40,7 +40,6 @@ namespace GenericDbRestApi.Lib.Controllers
                 }
             }
 
-
             var queryResult = manager.GetQueryResults(query, offset, maxRows, parameters);
 
             if (queryResult.Status == GenericQueryResultStatus.OK)
