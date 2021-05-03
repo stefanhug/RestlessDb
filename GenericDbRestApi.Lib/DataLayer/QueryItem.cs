@@ -21,7 +21,7 @@ namespace GenericDbRestApi.Lib.DataLayer
         public List<QueryColumn> Columns { get; set; }
         public List<QueryItem> ChildItems { get; set; }
 
-        internal QueryMetaData AsQueryMetaData()
+        public QueryMetaData AsQueryMetaData()
         {
             var ret = new QueryMetaData();
             ret.Name = Name;

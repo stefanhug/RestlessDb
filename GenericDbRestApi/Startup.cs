@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using System.Data;
 using System.Text.Json.Serialization;
 using GenericDbRestApi.Lib.DataLayer;
+using GenericDbRestApi.Lib.Services;
 
 namespace testwebapi
 {
@@ -26,31 +27,16 @@ namespace testwebapi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // needed for string serialiation of enum values
             services.AddControllers().AddJsonOptions
             (opts =>
             {
                 opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
+            // DbRestApi registrtation
             var connectionString = Configuration.GetSection("AppSettings").GetValue<string>("ConnectionString");
-            services.AddScoped<SqlConnection, SqlConnection>(p => 
-                {
-                    var conn = new SqlConnection(connectionString);
-                    conn.Open();
-                    return conn; 
-                });
-            services.AddScoped<IGenericSqlHelper, GenericSqlHelper>();
-            services.AddScoped<QueryItemProvider, QueryItemProvider>();
-            services.AddScoped<QueryParamsProvider, QueryParamsProvider>();
-            services.AddScoped<QueryRepository, QueryRepository>();
-            services.AddScoped<GenericQueryManager, GenericQueryManager>();
-
-            //Formatters
-            services.AddSingleton<IQueryFormatter, QueryJsonFormatter>();
-            services.AddSingleton<IQueryFormatter, QueryXmlFormatter>();
-            services.AddSingleton<IQueryFormatter, QueryCsvFormatter>();
-            services.AddSingleton<IQueryFormatter, QueryExcelFormatter>();
-            
+            services.AddDbRestApi(connectionString);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,6 +56,10 @@ namespace testwebapi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                
+                //endpoints.MapControllerRoute(
+                //    name: "dbapi",
+                //    pattern: "dbapi/{query}");
             });
         }
     }

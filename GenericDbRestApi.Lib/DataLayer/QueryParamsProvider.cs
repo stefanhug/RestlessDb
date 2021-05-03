@@ -26,9 +26,12 @@ namespace GenericDbRestApi.Lib.DataLayer
             missingParams.ExceptWith(commandParams.Keys);
 
             logger.LogInformation($"Needed parameters for query {sqlStmt}: {string.Join(", ", neededParams)}");
-            logger.LogInformation($"Params not found in command params: {string.Join(", ", missingParams)}");
+            if (missingParams.Count > 0)
+            {
+                logger.LogInformation($"Params not found in command params: {string.Join(", ", missingParams)}");
+            }
 
-            foreach(var missingParam in missingParams)
+            foreach (var missingParam in missingParams)
             {
                 bool found;
                 object value;
@@ -46,7 +49,7 @@ namespace GenericDbRestApi.Lib.DataLayer
 
             if (stillMissing.Count > 0)
             {
-                throw new QueryParamsProviderException($"Needed parameter(s) >{string.Join(", ", stillMissing)},< not provided in parent rows nor in query parameters");
+                throw new QueryParamsProviderException($"Needed parameter(s) '{string.Join(", ", stillMissing)}' not provided in parent rows nor in query parameters");
             }
 
             var notNeededParams = new HashSet<string>(commandParams.Keys);
