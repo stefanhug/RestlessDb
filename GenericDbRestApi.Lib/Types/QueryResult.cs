@@ -3,15 +3,9 @@ using System.Runtime.Serialization;
 
 namespace GenericDbRestApi.Lib.Types
 {
-    public enum GenericQueryResultStatus { OK, QRY_NOTFOUND, QRY_ERROR, SERVER_ERROR }
-
     [DataContract]
     public class QueryResult
     {
-        [DataMember]
-        public GenericQueryResultStatus Status { get; set; } = GenericQueryResultStatus.OK;
-        [DataMember]
-        public string ErrorMessage { get; set; }
         [DataMember]
         public int Offset { get; set; }
         [DataMember]

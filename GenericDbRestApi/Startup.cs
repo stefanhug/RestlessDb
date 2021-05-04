@@ -34,7 +34,7 @@ namespace testwebapi
                 opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
-            // DbRestApi registrtation
+            // DbRestApi registration
             var connectionString = Configuration.GetSection("AppSettings").GetValue<string>("ConnectionString");
             services.AddDbRestApi(connectionString);
         }
