@@ -1,15 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using GenericDbRestApi.Lib.Types;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace GenericDbRestApi.Lib.DataLayer
 {
-    public class QueryParamsProviderException : Exception
-    {
-        public QueryParamsProviderException(string message) : base(message) {}
-    }
-
     public class QueryParamsProvider
     {
         public QueryParamsProvider(ILogger<QueryParamsProvider> logger)
@@ -49,7 +45,7 @@ namespace GenericDbRestApi.Lib.DataLayer
 
             if (stillMissing.Count > 0)
             {
-                throw new QueryParamsProviderException($"Needed parameter(s) '{string.Join(", ", stillMissing)}' not provided in parent rows nor in query parameters");
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.PARAMS_MISSING, $"Needed parameter(s) '{string.Join(", ", stillMissing)}' not provided in parent rows nor in query parameters");
             }
 
             var notNeededParams = new HashSet<string>(commandParams.Keys);
@@ -57,7 +53,7 @@ namespace GenericDbRestApi.Lib.DataLayer
 
             if (notNeededParams.Count > 0)
             {
-                throw new QueryParamsProviderException($"Not needed parameter(s) >{string.Join(", ", notNeededParams)},< provided to query. Remove not needed query parameters");
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.PARAMS_NOTNEEDED, $"Not needed parameter(s) >{string.Join(", ", notNeededParams)},< provided to query. Remove not needed query parameters");
             }
 
             return resultParams;

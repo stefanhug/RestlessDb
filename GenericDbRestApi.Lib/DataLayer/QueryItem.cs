@@ -2,15 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace GenericDbRestApi.Lib.DataLayer
 {
-    public class QueryItemLoaderException : Exception
-    {
-        public QueryItemLoaderException(string message) : base(message) { }
-    }
-
     public class QueryItem
     {
         public string Name { get; set; }

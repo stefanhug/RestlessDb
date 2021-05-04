@@ -41,7 +41,7 @@ namespace GenericDbRestApi.Lib.DataLayer
 
             if (topRows.Count() == 0)
             {
-                throw new QueryItemLoaderException($"No query repository entry with name {queryName} found");
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.QUERY_NOTFOUND, $"No query repository entry with name {queryName} found");
             }
             
             var ret = CreateItemFromRow(topRows.First(), queryItemsForName, new List<string>());
@@ -84,7 +84,7 @@ namespace GenericDbRestApi.Lib.DataLayer
 
             if (parentsList.Contains(ret.Name))
             {
-                throw new QueryItemLoaderException($"Loop recursion detected for item {ret.Name}, please correct setup");
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.RECURSION, $"Loop recursion detected for item {ret.Name}, please correct setup");
             }
             parentsList.Add(ret.Name);
 

@@ -7,32 +7,20 @@ using GenericDbRestApi.Lib.DataLayer;
 using GenericDbRestApi.Lib.Types;
 using System.Data;
 using System.Data.Common;
+using Microsoft.Extensions.Logging;
 
 namespace GenericDbRestApi.Lib.DataLayer
 {
     public class GenericSqlHelper : IGenericSqlHelper
     {
-        const string PARAM_PREFIX = "@";
-        public GenericSqlHelper(SqlConnection dbConnection)
+        public static readonly string PARAM_PREFIX = "@";
+        private SqlConnection SqlConnection { get; }
+        private ILogger<GenericSqlHelper> Logger { get; }
+
+        public GenericSqlHelper(SqlConnection dbConnection, ILogger<GenericSqlHelper> logger)
         {
             this.SqlConnection = dbConnection;
-        }
-        public Dictionary<string, object> QuerySingleRow(string sqlStatement, Dictionary<string, object> parameters = null)
-        {
-            SqlCommand command = new SqlCommand(sqlStatement, SqlConnection);
-            AddParamsToCommand(command, parameters);
-
-            using (SqlDataReader reader = command.ExecuteReader())
-            {
-                if (reader.Read())
-                {
-                    return GetReaderDataAsDict(reader);
-                }
-                else
-                {
-                    return null;
-                }
-            }
+            this.Logger = logger;
         }
 
         public (List<Dictionary<string, object>> data, bool hasMoreRows)
@@ -42,21 +30,35 @@ namespace GenericDbRestApi.Lib.DataLayer
             bool hasMoreRows = false;
             int numRowsRead = 0;
 
-            SqlCommand command = new SqlCommand(sqlStatement, SqlConnection);
-            AddParamsToCommand(command, parameters);
-            using (SqlDataReader reader = command.ExecuteReader())
+            try
             {
-                while (reader.Read())
+                SqlCommand command = new SqlCommand(sqlStatement, SqlConnection);
+                AddParamsToCommand(command, parameters);
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    numRowsRead++;
-                    if (numRowsRead <= maxRows)
-                        data.Add(GetReaderDataAsDict(reader));
-                    else
-                        hasMoreRows = true;
+                    while (reader.Read())
+                    {
+                        numRowsRead++;
+                        if (numRowsRead <= maxRows)
+                            data.Add(GetReaderDataAsDict(reader));
+                        else
+                            hasMoreRows = true;
+                    }
                 }
-            }
 
-            return (data, hasMoreRows);
+                return (data, hasMoreRows);
+            }
+            catch(SqlException e)
+            {
+                var message = $"SqlException: '{e.Message}'\r\n" +
+                              $"Errors: {e.Errors}\r\n" +
+                              $"Sql statement: {sqlStatement}\r\n" +
+                              $"Parameters: " + string.Join(", ", parameters) +
+                              $"Stack trace: {e.StackTrace}";
+
+                Logger.LogError(message);
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.DBQUERY, message);
+            }
         }
 
         public List<QueryColumn> QueryResultColumns(string sqlStatement)
@@ -132,9 +134,6 @@ namespace GenericDbRestApi.Lib.DataLayer
             }
 
             return value.ToString();
-        }
- 
-        public SqlConnection SqlConnection { get; }
-
+        } 
     }
 }

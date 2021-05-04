@@ -30,42 +30,29 @@ namespace GenericDbRestApi.Lib.Repositories
             ret.MaxRows = maxRows;
             ret.QueryParameters = queryParameters;
 
-            try
-            {
-                var queryItem = QueryItemProvider.LoadQueryItem(queryName);
+            var queryItem = QueryItemProvider.LoadQueryItem(queryName);
                 
-                string sql = $"{queryItem.Sql} offset {offset} rows fetch next {maxRows + 1} rows only";
+            string sql = $"{queryItem.Sql} offset {offset} rows fetch next {maxRows + 1} rows only";
 
-                logger.LogInformation("GetQueryResults-Top SQL: {0}", sql);
+            logger.LogInformation("GetQueryResults-Top SQL: {0}", sql);
 
-                // check the query parameters with the QueryParamsProvider
-                var checkedParmeters = QueryParamsProvider.CollectParamsForQuery(sql, queryParameters, new List<Dictionary<string, object>>());
+            // check the query parameters with the QueryParamsProvider
+            var checkedParmeters = QueryParamsProvider.CollectParamsForQuery(sql, queryParameters, new List<Dictionary<string, object>>());
 
-                (ret.Data, ret.HasMoreRows) = GenericSqlHelper.QueryAsDictList(sql, maxRows, checkedParmeters);
+            (ret.Data, ret.HasMoreRows) = GenericSqlHelper.QueryAsDictList(sql, maxRows, checkedParmeters);
 
-                // ret.MetaData.Children will be filled in the recursive query
-                ret.MetaData = queryItem.AsQueryMetaData();
+            // ret.MetaData.Children will be filled in the recursive query
+            ret.MetaData = queryItem.AsQueryMetaData();
 
-                if (queryItem.ChildItems != null)
+            if (queryItem.ChildItems != null)
+            {
+                foreach (var dataRow in ret.Data)
                 {
-                    foreach (var dataRow in ret.Data)
-                    {
-                        RecurseDataChildren(new List<Dictionary<string, object>>(){ dataRow }, queryItem.ChildItems, queryParameters);
-                    }
+                    RecurseDataChildren(new List<Dictionary<string, object>>(){ dataRow }, queryItem.ChildItems, queryParameters);
                 }
+            }
                 
-                ret.RetrievedRows = ret.Data.Count;
-            }
-            catch (QueryItemLoaderException e)
-            {
-                ret.ErrorMessage = $"Error retrieving query metadata: {e.Message}";
-                ret.Status = GenericQueryResultStatus.QRY_NOTFOUND;
-            }
-            catch (Exception e)
-            {
-                ret.ErrorMessage = $"Error retrieving data: {e.Message}";
-                ret.Status = GenericQueryResultStatus.SERVER_ERROR;
-            }
+            ret.RetrievedRows = ret.Data.Count;
 
             return ret;
         }

@@ -14,6 +14,17 @@ namespace GenericDbRestApi.Lib.Controllers
     [Route("/dbapi/{query}")]
     public class QueryController : ControllerBase
     {
+        public static readonly Dictionary<GenericDbQueryExceptionCode, HttpStatusCode> ExceptionToStatusCodeMap =
+            new Dictionary<GenericDbQueryExceptionCode, HttpStatusCode>()
+            {
+                {GenericDbQueryExceptionCode.DBQUERY, HttpStatusCode.InternalServerError},
+                {GenericDbQueryExceptionCode.FORMATTER_NOTFOUND, HttpStatusCode.NotImplemented},
+                {GenericDbQueryExceptionCode.QUERY_NOTFOUND, HttpStatusCode.NotFound},
+                {GenericDbQueryExceptionCode.RECURSION, HttpStatusCode.InternalServerError},
+                {GenericDbQueryExceptionCode.PARAMS_MISSING, HttpStatusCode.BadRequest},
+                {GenericDbQueryExceptionCode.PARAMS_NOTNEEDED, HttpStatusCode.BadRequest},
+            };
+
         private readonly ILogger<QueryController> logger;
         private readonly GenericQueryManager manager;
         private readonly IEnumerable<IQueryFormatter> queryFormatters;
@@ -27,8 +38,8 @@ namespace GenericDbRestApi.Lib.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get(string query, [FromQuery(Name = "offset")] int? offset, 
-            [FromQuery(Name = "maxrows")] int? maxRows, 
+        public IActionResult Get(string query, [FromQuery(Name = "offset")] int? offset,
+            [FromQuery(Name = "maxrows")] int? maxRows,
             [FromQuery(Name = "outputformat")] string outputFormat)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
@@ -40,45 +51,42 @@ namespace GenericDbRestApi.Lib.Controllers
                 }
             }
 
-            var queryResult = manager.GetQueryResults(query, offset, maxRows, parameters);
-
-            if (queryResult.Status == GenericQueryResultStatus.OK)
+            try
             {
+                var queryResult = manager.GetQueryResults(query, offset, maxRows, parameters);
+
                 logger.LogInformation($"query {query} executed OK; {queryResult.Data.Count()} rows");
                 outputFormat = outputFormat ?? "json";
 
                 var formatter = queryFormatters.FirstOrDefault(f => outputFormat.Equals(f.OutputFormat, StringComparison.InvariantCultureIgnoreCase));
-                if (formatter != null)
+
+                if (formatter == null)
                 {
-                    return formatter.GetActionResult(queryResult);
+                    throw new GenericDbQueryException(GenericDbQueryExceptionCode.FORMATTER_NOTFOUND,
+                        $"Unknown output format '{outputFormat}'");
                 }
-                else
-                {
-                    return new ContentResult()
-                    {
-                        Content = $"Unknown output format '{outputFormat}'",
-                        ContentType = "text/plain",
-                        StatusCode = (int)HttpStatusCode.NotImplemented
-                    };
-                }
+
+                return formatter.GetActionResult(queryResult);
             }
-            else
+            catch (GenericDbQueryException e)
             {
-                var ret = new JsonResult(queryResult);
-                switch (queryResult.Status)
+                var msg = $"Exception: {e.ExceptionCode.ToString()}\r\n{e.Message}";
+                return new ContentResult()
                 {
-                    case GenericQueryResultStatus.QRY_NOTFOUND:
-                        ret.StatusCode = (int)HttpStatusCode.NotFound;
-                        break;
-                    case GenericQueryResultStatus.QRY_ERROR:
-                        ret.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        break;
-                    default:
-                        ret.StatusCode = (int)HttpStatusCode.OK;
-                        break;
-                }
-                return ret;
+                    Content = msg,
+                    ContentType = "text/plain",
+                    StatusCode = (int)ExceptionToStatusCodeMap[e.ExceptionCode]
+                };
             }
+            catch (Exception e)
+            {
+                return new ContentResult()
+                {
+                    Content = $"Exception: {e.Message}",
+                    ContentType = "text/plain",
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            };
         }
     }
 }
