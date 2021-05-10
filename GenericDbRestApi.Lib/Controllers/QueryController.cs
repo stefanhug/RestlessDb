@@ -43,9 +43,11 @@ namespace GenericDbRestApi.Lib.Controllers
             [FromQuery(Name = "outputformat")] string outputFormat)
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
+
+            var paramsToRemove = new HashSet<string>() { "offset", "maxrows", "outputformat" };
             foreach (var tuple in HttpContext.Request.Query)
             {
-                if (tuple.Key.ToLowerInvariant() != "offset" && tuple.Key.ToLowerInvariant() != "maxrows")
+                if (!paramsToRemove.Contains(tuple.Key.ToLowerInvariant()))
                 {
                     parameters.Add(tuple.Key.ToUpperInvariant(), tuple.Value);
                 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace GenericDbRestApi.Lib.Types
 {
-    public enum QueryColumnType { STRING, INT, DOUBLE, DATETIME }
+    public enum QueryColumnType { STRING, INT, DOUBLE, DATETIME, DECIMAL, SHORT }
 
     public class QueryColumn
     {

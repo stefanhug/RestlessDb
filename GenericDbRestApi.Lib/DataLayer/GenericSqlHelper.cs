@@ -93,10 +93,14 @@ namespace GenericDbRestApi.Lib.DataLayer
                 qryCol.Label = col.ColumnName;
                 if (col.DataType == typeof(int))
                     qryCol.ColumnType = QueryColumnType.INT;
+                else if (col.DataType == typeof(short))
+                    qryCol.ColumnType = QueryColumnType.SHORT;
                 else if (col.DataType == typeof(double))
                     qryCol.ColumnType = QueryColumnType.DOUBLE;
                 else if (col.DataType == typeof(DateTime))
                     qryCol.ColumnType = QueryColumnType.DATETIME;
+                else if (col.DataType == typeof(decimal))
+                    qryCol.ColumnType = QueryColumnType.DECIMAL;
                 else
                     qryCol.ColumnType = QueryColumnType.STRING;
 
@@ -128,7 +132,7 @@ namespace GenericDbRestApi.Lib.DataLayer
 
         private static object NormalizeValue(object value)
         {
-            if (value is int || value is double || value is DateTime)
+            if (value is int || value is double || value is DateTime || value is decimal || value is short)
             {
                 return value;
             }

@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using GenericDbRestApi.Lib.Formatters;
 using GenericDbRestApi.Lib.Types;
 using Microsoft.AspNetCore.Mvc;
 using System;
