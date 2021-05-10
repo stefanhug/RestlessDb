@@ -1,15 +1,14 @@
 ﻿using GenericDbRestApi.Lib.Types;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace GenericDBRestApi.Lib.Formatters
+namespace GenericDbRestApi.Lib.Formatters
 {
     public class DbQueryCsv
     {
         private readonly QueryResult queryResult;
+        private readonly Dictionary<string, int> metaStartColumnMap;
 
         public char SeparatorChar { get; set; } = ',';
         public char EscapeChar { get; set; } = '"';
@@ -17,6 +16,7 @@ namespace GenericDBRestApi.Lib.Formatters
         public DbQueryCsv(QueryResult queryResult)
         {
             this.queryResult = queryResult;
+            metaStartColumnMap = FormatterHelper.GetMetaDataStartColumnMap(queryResult.MetaData);
         }
 
         public MemoryStream GetAsStream()
@@ -25,23 +25,50 @@ namespace GenericDBRestApi.Lib.Formatters
             var textWriter = new StreamWriter(memoryStream);
             WriteHeader(textWriter);
             WriteColumnHeader(textWriter);
-            WriteDataRows(textWriter);
+
+            InsertTable(textWriter, queryResult.Data, queryResult.MetaData);
             textWriter.Flush();
             memoryStream.Position = 0;
             return memoryStream;
         }
 
-        private void WriteDataRows(StreamWriter textWriter)
+        private void InsertTable(StreamWriter textWriter, List<Dictionary<string, object>> tableData, QueryMetaData metaData)
         {
-            foreach (var row in queryResult.Data)
+            foreach (var row in tableData)
             {
-                textWriter.WriteLine(string.Join(SeparatorChar, row.Select(col => EscapeValue(col.Value))));
+                InsertDataRow(textWriter, row, metaData);
+            }
+        }
+
+        private void InsertDataRow(StreamWriter textWriter, Dictionary<string, object> row, QueryMetaData metaData)
+        {
+            var startColIndex = metaStartColumnMap[metaData.Name];
+            var rowList = new List<string>();
+
+            for (int i = 0; i < startColIndex; i++)
+                rowList.Add(string.Empty);
+
+            foreach (var col in metaData.Columns)
+            {
+                var val = row[col.Label];
+                rowList.Add(EscapeValue(val));
+            }
+
+            textWriter.WriteLine(string.Join(SeparatorChar, rowList));
+
+            if (metaData.Children != null)
+            {
+                foreach (var metaChild in metaData.Children)
+                {
+                    InsertTable(textWriter, (List<Dictionary<string, object>>)row[metaChild.Name], metaChild);
+                }
             }
         }
 
         private void WriteColumnHeader(StreamWriter textWriter)
         {
-            textWriter.WriteLine(string.Join(SeparatorChar, queryResult.MetaData.Columns.Select(col => EscapeValue(col.Label))));
+            var combinedColumns = FormatterHelper.CombineColHeaders(queryResult.MetaData);
+            textWriter.WriteLine(string.Join(SeparatorChar, combinedColumns.Select(col => EscapeValue(col.Label))));
         }
 
         private string EscapeValue(object value)

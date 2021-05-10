@@ -55,16 +55,16 @@ namespace GenericDbRestApi.Test.DataLayer
                 new QueryColumn() { Label = "SalesOrderID", ColumnType = QueryColumnType.INT},
                 new QueryColumn() { Label = "OrderDate", ColumnType = QueryColumnType.DATETIME},
                 new QueryColumn() { Label = "CustomerID", ColumnType = QueryColumnType.INT},
-                new QueryColumn() { Label = "SubTotal", ColumnType = QueryColumnType.STRING}
+                new QueryColumn() { Label = "SubTotal", ColumnType = QueryColumnType.DECIMAL}
             };
 
         public List<QueryColumn> SalesOrderDetailColumns = new List<QueryColumn>()
             {
                 new QueryColumn() { Label = "SalesOrderDetailID", ColumnType = QueryColumnType.INT},
                 new QueryColumn() { Label = "ProductID", ColumnType = QueryColumnType.DATETIME},
-                new QueryColumn() { Label = "OrderQty", ColumnType = QueryColumnType.STRING},
-                new QueryColumn() { Label = "UnitPrice", ColumnType = QueryColumnType.STRING},
-                new QueryColumn() { Label = "LineTotal", ColumnType = QueryColumnType.STRING}
+                new QueryColumn() { Label = "OrderQty", ColumnType = QueryColumnType.DECIMAL},
+                new QueryColumn() { Label = "UnitPrice", ColumnType = QueryColumnType.DECIMAL},
+                new QueryColumn() { Label = "LineTotal", ColumnType = QueryColumnType.DECIMAL}
             };
 
     }
