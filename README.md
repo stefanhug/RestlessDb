@@ -13,15 +13,38 @@ The given exammples are based on the example database *Adventureworks* provided 
 ```
 git clone https://github.com/stefanhug/GenericDbRestApi.git
 ```
+- configure the DB connection
+Edit the connection string in *GenericDbRestApi/GenericDbRestApi/appsettings.Development.json* to match your database, user and password:
+```
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AppSettings": {
+    "ConnectionString": "Data Source={MYDATABASE};Initial Catalog=Adventureworks2019;User Id={MYUSER};Password={MYPASSWORD};MultipleActiveResultSets=True"
+  }
+}
+```
+
 - build the repository:
 ```
 cd .\GenericDbRestApi\
 dotnet build
 ```
 - run the SQL script *DbScripts/createqueryrepository.sql* with *sqlcmd* or *SQL server management studio* in your DB to create the query repository table *GQuery.QueryItem* 
-- add exanple tables with *notyetthere.sql*
-- add example query repository entries using *fillqueryrepository.sql*
-- compile and install 
+- add exanple queries by running  *DbScripts/exampledb/FillQueryRepository4AdventureWorks.sql*. If another DB schema than adventureworks is used the examples need to be adapted.
+- start the application:
+```
+cd ./bin/netcoreapp3.1/
+GenericDbRestApi.exe --environment=Development
+```
+- open a browser a enter the URL *https://localhost:5001/dbapi/persons*
+  You should see the following output of the *Adventureworks Person* table:
+  ![browser json output person table](./doc/img/jsoninbrowser.PNG "Logo Title Text 1")
 
 ## Requirements
 - .net Core 3.1
