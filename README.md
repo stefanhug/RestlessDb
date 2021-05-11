@@ -52,6 +52,10 @@ GenericDbRestApi.exe --environment=Development
   You should see the following output of the *Adventureworks Person* table:
   ![browser json output person table](./doc/img/jsoninbrowser.PNG "Logo Title Text 1")
 
+
+TODO:specify corresponing query item and URL pattern
+
+
 ## Specify ranges for output and max rows to return
 The following parameters can be used to specify maximum number of rows to return and the offsett from the begin of the query
 
@@ -77,6 +81,8 @@ https://localhost:44352/dbapi/persons?maxrows=10&offset=8000
 
 ## REST query parameters
 - TBD
+
+## Hierarchical queries
 
 
 
