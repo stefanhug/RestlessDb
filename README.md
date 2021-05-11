@@ -71,8 +71,9 @@ https://localhost:44352/dbapi/persons?maxrows=10&offset=8000
 
 ## supported output formats
 
-- JSON
-- Excel
+### JSON
+### Excel
+
 - CSV
 - XML
 
