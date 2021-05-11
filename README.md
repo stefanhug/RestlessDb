@@ -3,6 +3,11 @@ Create REST endpoints based on database queries within minutes with an ASP.net c
 Multiple output formats like json, csv, excel and xml are provided.
 Currently only SQL server as backend is supported, extension for other databases is planned
 
+## Requirements
+- .net Core 3.1 or higher
+- Sql Server DB instance
+- Adventureworks DB for the examples
+
 ## Example Usage
 The given exammples are based on the example database *Adventureworks* provided by Microsoft(R) which can be downloaded from here:
  [Adventureworks Example Db download](https://docs.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms).
@@ -46,10 +51,10 @@ GenericDbRestApi.exe --environment=Development
   You should see the following output of the *Adventureworks Person* table:
   ![browser json output person table](./doc/img/jsoninbrowser.PNG "Logo Title Text 1")
 
-## Requirements
-- .net Core 3.1
+## 
 
 ## supported output formats
+
 - JSON
 - Excel
 - CSV
