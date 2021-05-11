@@ -1,10 +1,24 @@
 # GenericDbRestApi
-Generic REST API based on ASP.net core for database query backed services.
+Create REST endpoints based on database queries within minutes with an ASP.net core based backend. Creating a new REST endpoint just requires one insert in a *QueryItem* table.
+Multiple output formats like json, csv, excel and xml are provided.
+Currently only SQL server as backend is supported, extension for other databases is planned
 
-All Every rest service is based on a database query which is stored in the table TSY_QUERY_REPOSITORY
-
-## Usage
-- run *createqueryrepository.sql* to create the query repository table 
+## Example Usage
+The given exammples are based on the example database *Adventureworks* provided by Microsoft(R) which can be downloaded from here:
+ [Adventureworks Example Db download](https://docs.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms).
+ All examples can be easily transformed to a different database schema.
+ 
+- clone this repository:
+ 
+```
+git clone https://github.com/stefanhug/GenericDbRestApi.git
+```
+- build the repository:
+```
+cd .\GenericDbRestApi\
+dotnet build
+```
+- run the SQL script *DbScripts/createqueryrepository.sql* with *sqlcmd* or *SQL server management studio* in your DB to create the query repository table *GQuery.QueryItem* 
 - add exanple tables with *notyetthere.sql*
 - add example query repository entries using *fillqueryrepository.sql*
 - compile and install 
