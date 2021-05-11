@@ -3,7 +3,7 @@ Create REST endpoints based on database queries within minutes with an ASP.net c
 Multiple output formats like json, csv, excel and xml are provided.
 Currently only SQL server as backend is supported, extension for other databases is planned
 
-## Requirements
+## Prerequisites
 - .net Core 3.1 or higher
 - Sql Server DB instance
 - Adventureworks DB for the examples
@@ -38,6 +38,7 @@ Edit the connection string in *GenericDbRestApi/GenericDbRestApi/appsettings.Dev
 - build the repository:
 ```
 cd .\GenericDbRestApi\
+dotnet restore
 dotnet build
 ```
 - run the SQL script *DbScripts/createqueryrepository.sql* with *sqlcmd* or *SQL server management studio* in your DB to create the query repository table *GQuery.QueryItem* 
@@ -51,7 +52,18 @@ GenericDbRestApi.exe --environment=Development
   You should see the following output of the *Adventureworks Person* table:
   ![browser json output person table](./doc/img/jsoninbrowser.PNG "Logo Title Text 1")
 
-## 
+## Specify ranges for output and max rows to return
+The following parameters can be used to specify maximum number of rows to return and the offsett from the begin of the query
+
+- maxrows (default: 8000)
+- offset (default: 0)
+
+Example:
+```
+https://localhost:44352/dbapi/persons?maxrows=10
+https://localhost:44352/dbapi/persons?maxrows=10&offset=8000
+```
+
 
 ## supported output formats
 
