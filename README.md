@@ -50,7 +50,7 @@ GenericDbRestApi.exe --environment=Development
 ```
 - open a browser a enter the URL *https://localhost:5001/dbapi/persons*
   You should see the following output of the *Adventureworks Person* table:
-  ![browser json output person table](./doc/img/jsoninbrowser.PNG "Logo Title Text 1")
+  ![json output in browser](./doc/img/jsoninbrowser.PNG "json output in browser")
 
 Let's compare this to the corresponding QueryItem inserted in *FillQueryRepository4AdventureWorks.sql*:
 ``` sql
@@ -178,10 +178,121 @@ BusinessEntityID,Title,FirstName,MiddleName,LastName,ModifiedDate
 ```
 
 ### Excel
+The library *ClosedXML* ( [Closed XML Github page](https://github.com/ClosedXML/ClosedXML "Closed XML Github page") )is used for transforming the retrieved data to excel. 
+The label (*QueryItem.Label*), Description (*QueryItem.Description*) and column header rows are fixed.
 
-- CSV
-- XML
-- TBD
+![persons table excel output](./doc/img/personstable_excel.PNG "persons table excel output")
+
+### XML
+```xml
+<QueryResult xmlns="http://schemas.datacontract.org/2004/07/GenericDbRestApi.Lib.Types"
+           	xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Data xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+		<a:ArrayOfKeyValueOfstringanyType>
+			<a:KeyValueOfstringanyType>
+				<a:Key>BusinessEntityID</a:Key>
+				<a:Value i:type="b:int"
+       					xmlns:b="http://www.w3.org/2001/XMLSchema">1</a:Value>
+			</a:KeyValueOfstringanyType>
+			<a:KeyValueOfstringanyType>
+				<a:Key>Title</a:Key>
+				<a:Value i:type="b:string"
+       					xmlns:b="http://www.w3.org/2001/XMLSchema"/>
+			</a:KeyValueOfstringanyType>
+			<a:KeyValueOfstringanyType>
+				<a:Key>FirstName</a:Key>
+				<a:Value i:type="b:string"
+       					xmlns:b="http://www.w3.org/2001/XMLSchema">Ken</a:Value>
+			</a:KeyValueOfstringanyType>
+			<a:KeyValueOfstringanyType>
+				<a:Key>MiddleName</a:Key>
+				<a:Value i:type="b:string"
+       					xmlns:b="http://www.w3.org/2001/XMLSchema">J</a:Value>
+			</a:KeyValueOfstringanyType>
+			<a:KeyValueOfstringanyType>
+				<a:Key>LastName</a:Key>
+				<a:Value i:type="b:string"
+       					xmlns:b="http://www.w3.org/2001/XMLSchema">Sánchez</a:Value>
+			</a:KeyValueOfstringanyType>
+			<a:KeyValueOfstringanyType>
+				<a:Key>ModifiedDate</a:Key>
+				<a:Value i:type="b:dateTime"
+       					xmlns:b="http://www.w3.org/2001/XMLSchema">2009-01-07T00:00:00</a:Value>
+			</a:KeyValueOfstringanyType>
+		</a:ArrayOfKeyValueOfstringanyType>
+		<a:ArrayOfKeyValueOfstringanyType>
+			<a:KeyValueOfstringanyType>
+				<a:Key>BusinessEntityID</a:Key>
+				<a:Value i:type="b:int"
+       					xmlns:b="http://www.w3.org/2001/XMLSchema">2</a:Value>
+			</a:KeyValueOfstringanyType>
+			<a:KeyValueOfstringanyType>
+				<a:Key>Title</a:Key>
+				<a:Value i:type="b:string"
+       					xmlns:b="http://www.w3.org/2001/XMLSchema"/>
+			</a:KeyValueOfstringanyType>
+			<a:KeyValueOfstringanyType>
+				<a:Key>FirstName</a:Key>
+				<a:Value i:type="b:string"
+       					xmlns:b="http://www.w3.org/2001/XMLSchema">Terri</a:Value>
+			</a:KeyValueOfstringanyType>
+			<a:KeyValueOfstringanyType>
+				<a:Key>MiddleName</a:Key>
+				<a:Value i:type="b:string"
+       					xmlns:b="http://www.w3.org/2001/XMLSchema">Lee</a:Value>
+			</a:KeyValueOfstringanyType>
+			<a:KeyValueOfstringanyType>
+				<a:Key>LastName</a:Key>
+				<a:Value i:type="b:string"
+       					xmlns:b="http://www.w3.org/2001/XMLSchema">Duffy</a:Value>
+			</a:KeyValueOfstringanyType>
+			<a:KeyValueOfstringanyType>
+				<a:Key>ModifiedDate</a:Key>
+				<a:Value i:type="b:dateTime"
+       					xmlns:b="http://www.w3.org/2001/XMLSchema">2008-01-24T00:00:00</a:Value>
+			</a:KeyValueOfstringanyType>
+		</a:ArrayOfKeyValueOfstringanyType>a
+	</Data>
+	<HasMoreRows>true</HasMoreRows>
+	<MaxRows>3</MaxRows>
+	<MetaData>
+		<Children i:nil="true"/>
+		<Columns>
+			<QueryColumn>
+				<ColumnType>INT</ColumnType>
+				<Label>BusinessEntityID</Label>
+			</QueryColumn>
+			<QueryColumn>
+				<ColumnType>STRING</ColumnType>
+				<Label>Title</Label>
+			</QueryColumn>
+			<QueryColumn>
+				<ColumnType>STRING</ColumnType>
+				<Label>FirstName</Label>
+			</QueryColumn>
+			<QueryColumn>
+				<ColumnType>STRING</ColumnType>
+				<Label>MiddleName</Label>
+			</QueryColumn>
+			<QueryColumn>
+				<ColumnType>STRING</ColumnType>
+				<Label>LastName</Label>
+			</QueryColumn>
+			<QueryColumn>
+				<ColumnType>DATETIME</ColumnType>
+				<Label>ModifiedDate</Label>
+			</QueryColumn>
+		</Columns>
+		<Description>Query some fields of  in Adventureworks person.person table</Description>
+		<Label>Persons</Label>
+		<Name>Persons</Name>
+	</MetaData>
+	<Offset>0</Offset>
+	<QueryParameters xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
+	<RetrievedRows>3</RetrievedRows>
+</QueryResult>
+```
+
 
 ## REST query parameters
 - TBD
