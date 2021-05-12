@@ -4,7 +4,7 @@ Multiple output formats like json, csv, excel and xml are provided.
 Currently only SQL server as backend is supported, extension for other databases is planned
 
 ## Prerequisites
-- .net Core 3.1 or higher
+- .net Core Framework 3.1 or higher
 - Sql Server DB instance
 - Adventureworks DB for the examples
 
@@ -52,12 +52,23 @@ GenericDbRestApi.exe --environment=Development
   You should see the following output of the *Adventureworks Person* table:
   ![browser json output person table](./doc/img/jsoninbrowser.PNG "Logo Title Text 1")
 
+Let's compare this to the corresponding QueryItem inserted in *FillQueryRepository4AdventureWorks.sql*:
+``` sql
+insert into GQuery.QueryItem(Name, Label, Description, Sql)
+values('Persons', 'Persons', 
+    'Query some fields of  in Adventureworks person.person table', 
+	'select BusinessEntityID, Title, FirstName, MiddleName, LastName, ModifiedDate 
+	 from Person.Person 
+	 order by BusinessEntityID')
+```
+
 
 TODO:specify corresponing query item and URL pattern
 
 
 ## Specify ranges for output and max rows to return
-The following parameters can be used to specify maximum number of rows to return and the offsett from the begin of the query
+The following parameters can be used to specify maximum number of rows to return and the offsett from the begin of the query.
+Per default only the first 8000 rows delivered by a query will be returned.
 
 - maxrows (default: 8000)
 - offset (default: 0)
@@ -67,7 +78,6 @@ Example:
 https://localhost:44352/dbapi/persons?maxrows=10
 https://localhost:44352/dbapi/persons?maxrows=10&offset=8000
 ```
-
 
 ## supported output formats
 
