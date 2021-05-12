@@ -289,13 +289,30 @@ The label (*QueryItem.Label*), Description (*QueryItem.Description*) and column 
 	</MetaData>
 	<Offset>0</Offset>
 	<QueryParameters xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
-	<RetrievedRows>3</RetrievedRows>
+	<etrievedRows>3</RetrievedRows>
 </QueryResult>
 ```
 
 
 ## REST query parameters
-- TBD
+The SQL statements in the *QueryItem* table can contain parameters which need to be provided als query string parameters to the rest endpoint:
+
+```sql
+insert into GQuery.QueryItem(Name, Label, Description, Sql)
+values('PersonsByLastName', 'Persons filtered by last name', 
+       'Parametrized Query of  in Adventureworks person.person table - with parameter lastName', 
+       'select BusinessEntityID, Title, FirstName, MiddleName, LastName, ModifiedDate 
+        from Person.Person
+        where LastName = @LASTNAME
+        order by FirstName')
+```
+
+In the corresponding REST call the query parameter(s) are specified whithout the *@* sign.
+```
+https://localhost:5001/dbapi/personsbylastname?lastname=Smith
+https://localhost:5001/dbapi/personsbylastname?lastname=Smith&outputformat=excel
+```
+
 
 ## Hierarchical queries
 
