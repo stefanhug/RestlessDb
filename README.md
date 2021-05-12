@@ -395,9 +395,6 @@ For the output formats excel and csv additional columns for the child columns ar
 - Excel: <a id="raw-url" href="./doc/SalesOrders_Hierarchical.xlsx">Excel hierarchical query</a>
 - CSV: <a id="raw-url1" href="./doc/SalesOrders_Hierarchical.csv">CSV hierarchical query</a>
 
-<a id="raw-url" href="https://raw.githubusercontent.com/stefanhug/GenericDbRestApi/docandtesting_5/SalesOrders_Hierarchical.xlsx">Download FILE</a>
-
-
 ## Integrating *GenericDbRestApi.Lib.dll* in an existing application
 The proided example application GenericDbRestApi is a minimum example appserver without authentication and other features.
 To integrate GenericDbRestApi in an existing project the following step is necessary (nuget package is not yet available).
