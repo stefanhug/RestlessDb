@@ -15,12 +15,12 @@ The given exammples are based on the example database *Adventureworks* provided 
  
 - clone this repository:
  
-```
+``` powershell
 git clone https://github.com/stefanhug/GenericDbRestApi.git
 ```
 - configure the DB connection
 Edit the connection string in *GenericDbRestApi/GenericDbRestApi/appsettings.Development.json* to match your database, user and password:
-```
+``` js
 {
   "Logging": {
     "LogLevel": {
@@ -36,15 +36,15 @@ Edit the connection string in *GenericDbRestApi/GenericDbRestApi/appsettings.Dev
 ```
 
 - build the repository:
-```
-cd .\GenericDbRestApi\
+``` pwsh
+cd ./GenericDbRestApi/
 dotnet restore
 dotnet build
 ```
 - run the SQL script *DbScripts/createqueryrepository.sql* with *sqlcmd* or *SQL server management studio* in your DB to create the query repository table *GQuery.QueryItem* 
 - add exanple queries by running  *DbScripts/exampledb/FillQueryRepository4AdventureWorks.sql*. If another DB schema than adventureworks is used the examples need to be adapted.
 - start the application:
-```
+``` pwsh
 cd ./bin/netcoreapp3.1/
 GenericDbRestApi.exe --environment=Development
 ```
@@ -56,14 +56,19 @@ Let's compare this to the corresponding QueryItem inserted in *FillQueryReposito
 ``` sql
 insert into GQuery.QueryItem(Name, Label, Description, Sql)
 values('Persons', 'Persons', 
-    'Query some fields of  in Adventureworks person.person table', 
-	'select BusinessEntityID, Title, FirstName, MiddleName, LastName, ModifiedDate 
-	 from Person.Person 
-	 order by BusinessEntityID')
+       'Query some fields of  in Adventureworks person.person table', 
+       'select BusinessEntityID, Title, FirstName, MiddleName, LastName, ModifiedDate 
+	from Person.Person 
+	order by BusinessEntityID')
 ```
 
+The SQL statement to execute is specified in the *QueryItem.Sql* column, *QueryItem.Name* is used to specifiy the endpoint url of the query:
 
-TODO:specify corresponing query item and URL pattern
+```
+https://{{SERVER}:{PORT}/dbapi/{QueryItem.Name}
+```
+
+**Note: the SQL statement needs to contain an order by clause to make range selection working. But this is anyway reequired to ensure that the results of a DB query are predictable** 
 
 
 ## Specify ranges for output and max rows to return
@@ -86,9 +91,44 @@ https://localhost:44352/dbapi/persons?maxrows=10&offset=8000
 
 - CSV
 - XML
-
-## Rest API call convention
 - TBD
+
+## Integrating *GenericDbRestApi.Lib.dll* in an existing application
+The proided example application GenericDbRestApi is a minimum example appserver without authentication and other features.
+To integrate GenericDbRestApi in an existing project the following step is necessary (nuget package is not yet available).
+- reference *GenericDbRestApi.Lib.dll* in your project
+- Add the following code to you *Startup.cs*
+
+``` csharp
+...
+using GenericDbRestApi.Lib.Services;  //ADD
+...
+namespace GenericDbRestApi
+{
+    public class Startup
+    {
+	...
+	
+	public void ConfigureServices(IServiceCollection services)
+        {
+            ...
+	    // needed for string serialiation of enum values
+            services.AddControllers().AddJsonOptions
+            (opts =>
+            {
+                opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); // ADD to provide correct JSON serialization pf enum values as string, not as ordinal
+            });
+
+            // DbRestApi registration
+            var connectionString = Configuration.GetSection("AppSettings").GetValue<string>("ConnectionString"); //ADD
+            services.AddDbRestApi(connectionString);    //ADD
+	    ...
+        }
+	
+	...
+    }
+}
+```
 
 ## REST query parameters
 - TBD
