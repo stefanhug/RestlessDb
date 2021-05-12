@@ -1,19 +1,12 @@
-using GenericDbRestApi.Lib.Repositories;
-using GenericDbRestApi.Lib.Managers;
-using GenericDBRestApi.Lib.Formatters;
+using GenericDbRestApi.Lib.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Data;
 using System.Text.Json.Serialization;
-using GenericDbRestApi.Lib.DataLayer;
-using GenericDbRestApi.Lib.Services;
 
-namespace testwebapi
+namespace GenericDbRestApi
 {
     public class Startup
     {

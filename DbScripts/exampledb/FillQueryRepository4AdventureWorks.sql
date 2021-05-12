@@ -7,11 +7,11 @@ values('Persons', 'Persons',
 
 insert into GQuery.QueryItem(Name, Label, Description, Sql)
 values('PersonsByLastName', 'Persons filtered by last name', 
-    'Parametrized Query of  in Adventureworks person.person table - with parameter lastName', 
-	'select BusinessEntityID, Title, FirstName, MiddleName, LastName, ModifiedDate 
-	 from Person.Person
-	 where LastName = @LASTNAME
-	 order by LastName')
+       'Parametrized Query of  in Adventureworks person.person table - with parameter lastName', 
+	   'select BusinessEntityID, Title, FirstName, MiddleName, LastName, ModifiedDate 
+	    from Person.Person
+	    where LastName = @LASTNAME
+	    order by FirstName')
 
 insert into GQuery.QueryItem(Name, Label, Description, Sql)
 values('JobCandidates', 'Job Candidates', 
