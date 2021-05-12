@@ -107,7 +107,6 @@ namespace GenericDbRestApi.ApiTest
             }
         }
 
-
         private readonly string authority;
     }
 }
