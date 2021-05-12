@@ -84,14 +84,110 @@ https://localhost:44352/dbapi/persons?maxrows=10
 https://localhost:44352/dbapi/persons?maxrows=10&offset=8000
 ```
 
-## supported output formats
+## Supported output formats
+GenericDbRestApi supports currently the following output formats via the URL query parameter *outputformat*:
+- json - default if no format specified
+- comma separated value (csv)
+- excel
+- xml (via. XML datacontract serializer)
+
+```
+https://localhost:44352/dbapi/persons?maxrows=1000&outputformat=json
+https://localhost:44352/dbapi/persons?maxrows=1000&outputformat=excel
+https://localhost:44352/dbapi/persons?maxrows=1000&outputformat=csv
+https://localhost:44352/dbapi/persons?maxrows=1000&outputformat=xml
+```
+
+
+Usage uf the http *accept* header is (currently) not supported.
 
 ### JSON
+- Information of the retrieve columns is provided in metaData.Columns
+- hasMoreRows: more rows from the query available after the specified range (default: 0..8000)
+- data of the query is provided in *data* field as array of json objects
+
+```javascript
+{
+	"offset": 0,
+	"maxRows": 3,
+	"queryParameters": {},
+	"retrievedRows": 3,
+	"hasMoreRows": true,
+	"metaData": {
+		"name": "Persons",
+		"label": "Persons",
+		"description": "Query some fields of  in Adventureworks person.person table",
+		"columns": [
+			{
+				"label": "BusinessEntityID",
+				"columnType": "INT"
+			},
+			{
+				"label": "Title",
+				"columnType": "STRING"
+			},
+			{
+				"label": "FirstName",
+				"columnType": "STRING"
+			},
+			{
+				"label": "MiddleName",
+				"columnType": "STRING"
+			},
+			{
+				"label": "LastName",
+				"columnType": "STRING"
+			},
+			{
+				"label": "ModifiedDate",
+				"columnType": "DATETIME"
+			}
+		],
+		"children": null
+	},
+	"data": [
+		{
+			"BusinessEntityID": 1,
+			"Title": "",
+			"FirstName": "Ken",
+			"MiddleName": "J",
+			"LastName": "Sánchez",
+			"ModifiedDate": "2009-01-07T00:00:00"
+		},
+		{
+			"BusinessEntityID": 2,
+			"Title": "",
+			"FirstName": "Terri",
+			"MiddleName": "Lee",
+			"LastName": "Duffy",
+			"ModifiedDate": "2008-01-24T00:00:00"
+		}
+	]
+}
+```
+
+### CSV
+First Line is header, second header columns
+
+```csv
+Persons - Query some fields of  in Adventureworks person.person table
+BusinessEntityID,Title,FirstName,MiddleName,LastName,ModifiedDate
+1,,Ken,J,Sánchez,07.01.2009 00:00:00
+2,,Terri,Lee,Duffy,24.01.2008 00:00:00
+3,,Roberto,,Tamburello,04.11.2007 00:00:00
+```
+
 ### Excel
 
 - CSV
 - XML
 - TBD
+
+## REST query parameters
+- TBD
+
+## Hierarchical queries
+
 
 ## Integrating *GenericDbRestApi.Lib.dll* in an existing application
 The proided example application GenericDbRestApi is a minimum example appserver without authentication and other features.
@@ -129,11 +225,5 @@ namespace GenericDbRestApi
     }
 }
 ```
-
-## REST query parameters
-- TBD
-
-## Hierarchical queries
-
 
 
