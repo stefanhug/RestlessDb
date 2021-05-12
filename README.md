@@ -315,7 +315,80 @@ https://localhost:5001/dbapi/personsbylastname?lastname=Smith&outputformat=excel
 
 
 ## Hierarchical queries
+Hierarchical queries are supported, for each node in the hierarchical query a *QueryItem* needs to be createdcolumns .
+Child nodes reference their parent node via *QueryItem.Parent* column. (*QueryItem.Parent* is NULL for top level nodes and simple queries)
+Child queries can contain parameters referring to columns of the parent row, like *@SalesOrderID* in the example below.
 
+```
+https://localhost:5001/dbapi/salesorders?maxrows=2
+```
+
+```sql
+insert into GQuery.QueryItem(Name, Label, Description, Sql)
+values('SalesOrders', 'Sales Orders', 
+       'Query of some fields from the the Adventureworks table Sales.SalesOrderHeader',
+       'select SalesOrderID, OrderDate, CustomerID, SubTotal from Sales.SalesOrderHeader order by SalesOrderID')
+
+insert into GQuery.QueryItem(Name, Label, Description, Parent, Pos, Sql)
+values('SalesOrderDetails', 'Sales Order Details', 
+       'Query of some fields from the the Adventureworks table Sales.SalesOrderDetail as detail query',
+       'SalesOrders', 0,
+       'select SalesOrderDetailID, ProductID, OrderQty, UnitPrice, LineTotal from sales.SalesOrderDetail where SalesOrderID = @SalesOrderID order by SalesOrderDetailID')
+```
+
+In the *json* output format the metata field for a hierarchical query has a tree like structure, the child objects are stored as list of objects in the data list for each object
+
+```javascript
+{
+	...
+	"metaData": {
+		"name": "SalesOrders",
+		"label": "Sales Orders",
+		"description": "Query of some fields from the the Adventureworks table Sales.SalesOrderHeader",
+		"columns": [
+			{
+				"label": "SalesOrderID",
+				"columnType": "INT"
+			},
+			...
+		],
+		"children": [
+			{
+				"name": "SalesOrderDetails",
+				"label": "Sales Order Details",
+				"description": "Query of some fields from the the Adventureworks table Sales.SalesOrderDetail as detail query",
+				"columns": [
+					{
+						"label": "SalesOrderDetailID",
+						"columnType": "INT"
+					},
+					...
+				],
+				"children": null
+			}
+		]
+	},
+	"data": [
+		{
+			"SalesOrderID": 43659,
+			"OrderDate": "2011-05-31T00:00:00",
+			"CustomerID": 29825,
+			"SubTotal": 20565.6206,
+			"SalesOrderDetails": [
+				{
+					"SalesOrderDetailID": 1,
+					"ProductID": 776,
+					"OrderQty": 1,
+					"UnitPrice": 2024.994,
+					"LineTotal": 2024.994
+				},
+				...
+			]
+		},
+		...
+	]
+}
+```
 
 ## Integrating *GenericDbRestApi.Lib.dll* in an existing application
 The proided example application GenericDbRestApi is a minimum example appserver without authentication and other features.
