@@ -392,8 +392,9 @@ In the *json* output format the metata field for a hierarchical query has a tree
 
 For the output formats excel and csv additional columns for the child columns are created and new rows for each child are added:
 
-- Excel: ( [Excel hierarchical query](./doc/SalesOrders_Hierarchical.xlsx "Excel hierarchical query") )
-- CSV: ( [CSV hierarchical query](./doc/SalesOrders_Hierarchical.xlsx "CSV hierarchical query") )
+- Excel: <a id="raw-url" href="./doc/SalesOrders_Hierarchical.xlsx">Excel hierarchical query</a>
+- CSV: <a id="raw-url1" href="./doc/SalesOrders_Hierarchical.csv">CSV hierarchical query</a>
+
 
 ## Integrating *GenericDbRestApi.Lib.dll* in an existing application
 The proided example application GenericDbRestApi is a minimum example appserver without authentication and other features.
