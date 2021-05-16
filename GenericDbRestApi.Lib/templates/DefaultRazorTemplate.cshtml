@@ -1,0 +1,34 @@
+﻿@model GenericDbRestApi.Lib.Types.QueryResult
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+        <title>@Model.MetaData.Label</title>
+    </head>
+    <body>
+        <h1>@Model.MetaData.Label</h1>
+        <h2>@Model.MetaData.Description</h2>
+        <table>
+            @foreach (var header in @Model.MetaData.Columns)
+            {
+                <th>@header.Label</th>
+            }
+            @foreach (var row in @Model.Data)
+            {
+                <tr>
+                    @foreach (var col in @Model.MetaData.Columns)
+                    {
+                        <td>@row[col.Label]</td>
+                    }
+                </tr>
+            }
+        </table>
+
+    </body>
+</html>
