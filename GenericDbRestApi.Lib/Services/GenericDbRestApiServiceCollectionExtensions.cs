@@ -28,6 +28,7 @@ namespace GenericDbRestApi.Lib.Services
             services.AddSingleton<IQueryFormatter, QueryXmlFormatter>();
             services.AddSingleton<IQueryFormatter, QueryCsvFormatter>();
             services.AddSingleton<IQueryFormatter, QueryExcelFormatter>();
+            services.AddSingleton<IQueryFormatter, QueryHtmlFormatter>();
         }
     }
 }
