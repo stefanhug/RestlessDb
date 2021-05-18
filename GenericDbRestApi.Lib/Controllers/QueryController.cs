@@ -23,6 +23,7 @@ namespace GenericDbRestApi.Lib.Controllers
                 {GenericDbQueryExceptionCode.RECURSION, HttpStatusCode.InternalServerError},
                 {GenericDbQueryExceptionCode.PARAMS_MISSING, HttpStatusCode.BadRequest},
                 {GenericDbQueryExceptionCode.PARAMS_NOTNEEDED, HttpStatusCode.BadRequest},
+                {GenericDbQueryExceptionCode.SQL_MUST_HAVE_ORDER_BY, HttpStatusCode.InternalServerError}
             };
 
         private readonly ILogger<QueryController> logger;

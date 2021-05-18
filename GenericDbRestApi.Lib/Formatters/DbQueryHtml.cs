@@ -10,37 +10,27 @@ namespace GenericDbRestApi.Lib.Formatters
 {
     public class DbQueryHtml
     {
-        private static readonly string DEFAULT_TEMPLATE_NAME = Path.Combine("templates", "DefaultRazorTemplate.cshtml");
+        private static readonly string DEFAULT_TEMPLATE_KEY = "DefaultRazorTemplate.cshtml";
         private readonly QueryResult queryResult;
+        private readonly string templateString;
         private readonly Dictionary<string, int> metaStartColumnMap;
         private RazorLightEngine razorLightEngine;
 
-        public DbQueryHtml(QueryResult queryResult)
+        public DbQueryHtml(QueryResult queryResult, string templateString)
         {
             this.queryResult = queryResult;
+            this.templateString = templateString;
             metaStartColumnMap = FormatterHelper.GetMetaDataStartColumnMap(queryResult.MetaData);
         }
 
         public string GetAsString()
         {
-            string executionDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string templatePath = Path.Combine(executionDirectory, DEFAULT_TEMPLATE_NAME);
-            if (!File.Exists(templatePath))
-                throw new GenericDbQueryException(GenericDbQueryExceptionCode.TEMPLATE_ERROR,
-                                                  $"Default template {templatePath} not found");
-
-            string template = File.ReadAllText(templatePath, Encoding.UTF8);
-            if (string.IsNullOrEmpty(template))
-                throw new GenericDbQueryException(GenericDbQueryExceptionCode.TEMPLATE_ERROR,
-                                                  $"Default template {templatePath} is empty");
-
             string result = GetEngine()
-                            .CompileRenderStringAsync<QueryResult>(DEFAULT_TEMPLATE_NAME, template, queryResult)
+                            .CompileRenderStringAsync<QueryResult>(DEFAULT_TEMPLATE_KEY, templateString, queryResult)
                             .GetAwaiter().GetResult();
 
             return result;
         }
-
 
         private RazorLightEngine GetEngine()
         {

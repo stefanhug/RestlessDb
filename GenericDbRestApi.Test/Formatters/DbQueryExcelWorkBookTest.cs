@@ -8,6 +8,7 @@ using Xunit;
 
 namespace GenericDbRestApi.Test.Formatters
 {
+    [Trait("Category", "UnitTest")]
     public class DbQueryExcelWorkBookTest
     {
         private const int FIRSTDATAROW_OFFSET = 5;

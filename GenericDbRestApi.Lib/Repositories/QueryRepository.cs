@@ -32,14 +32,10 @@ namespace GenericDbRestApi.Lib.Repositories
 
             var queryItem = QueryItemProvider.LoadQueryItem(queryName);
                 
-            string sql = $"{queryItem.Sql} offset {offset} rows fetch next {maxRows + 1} rows only";
-
-            logger.LogInformation("GetQueryResults-Top SQL: {0}", sql);
-
             // check the query parameters with the QueryParamsProvider
-            var checkedParmeters = QueryParamsProvider.CollectParamsForQuery(sql, queryParameters, new List<Dictionary<string, object>>());
+            var checkedParmeters = QueryParamsProvider.CollectParamsForQuery(queryItem.Sql, queryParameters, new List<Dictionary<string, object>>());
 
-            (ret.Data, ret.HasMoreRows) = GenericSqlHelper.QueryAsDictList(sql, maxRows, checkedParmeters);
+            (ret.Data, ret.HasMoreRows) = GenericSqlHelper.QueryAsDictList(queryItem.Sql, offset, maxRows, checkedParmeters);
 
             // ret.MetaData.Children will be filled in the recursive query
             ret.MetaData = queryItem.AsQueryMetaData();
@@ -79,7 +75,7 @@ namespace GenericDbRestApi.Lib.Repositories
             bool hasMoreRows;
 
             var effectiveQueryParams = QueryParamsProvider.CollectParamsForQuery(sql, queryParameters, parentRowStack);
-            (childRows, hasMoreRows) = GenericSqlHelper.QueryAsDictList(sql, MAX_CHILD_ROWS, effectiveQueryParams);
+            (childRows, hasMoreRows) = GenericSqlHelper.QueryAsDictList(sql, 0, MAX_CHILD_ROWS, effectiveQueryParams);
 
             // the last item is the current parent
             parentRowStack.Last().Add(queryItem.Name, childRows);

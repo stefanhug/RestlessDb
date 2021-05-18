@@ -9,6 +9,7 @@ using Xunit;
 
 namespace GenericDbRestApi.ApiTest
 {
+    [Trait("Category", "ApiTest")]
     public class ClientJsonOutputTest
     {
         public ClientJsonOutputTest()
@@ -18,7 +19,6 @@ namespace GenericDbRestApi.ApiTest
         }
 
         [Theory]
-        [Trait("Category", "ApiTest")]
         [InlineData("persons", 8000, 6)]
         [InlineData("persons?maxrows=10", 10, 6)]
         [InlineData("persons?maxrows=10&offset=8000", 10, 6)]

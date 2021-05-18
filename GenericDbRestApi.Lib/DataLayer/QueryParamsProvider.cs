@@ -8,6 +8,8 @@ namespace GenericDbRestApi.Lib.DataLayer
 {
     public class QueryParamsProvider
     {
+        private readonly ILogger<QueryParamsProvider> logger;
+
         public QueryParamsProvider(ILogger<QueryParamsProvider> logger)
         {
             this.logger = logger;
@@ -22,6 +24,7 @@ namespace GenericDbRestApi.Lib.DataLayer
             missingParams.ExceptWith(commandParams.Keys);
 
             logger.LogInformation($"Needed parameters for query {sqlStmt}: {string.Join(", ", neededParams)}");
+            
             if (missingParams.Count > 0)
             {
                 logger.LogInformation($"Params not found in command params: {string.Join(", ", missingParams)}");
@@ -76,7 +79,5 @@ namespace GenericDbRestApi.Lib.DataLayer
 
             return (false, null);
         }
-
-        private readonly ILogger<QueryParamsProvider> logger;
     }
 }
