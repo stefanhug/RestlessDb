@@ -14,6 +14,17 @@ namespace GenericDbRestApi.Lib.DataLayer
     public class GenericSqlHelper : IGenericSqlHelper
     {
         public static readonly string PARAM_PREFIX = "@";
+
+        private static Dictionary<Type, QueryColumnType> TypeToColumnTypeDict = new Dictionary<Type, QueryColumnType>()
+        {
+            { typeof(int), QueryColumnType.INT },
+            { typeof(short), QueryColumnType.SHORT },
+            { typeof(double), QueryColumnType.DOUBLE },
+            { typeof(DateTime), QueryColumnType.DATETIME },
+            { typeof(decimal), QueryColumnType.DECIMAL },
+            { typeof(string), QueryColumnType.STRING }
+        };
+
         private SqlConnection SqlConnection { get; }
         private ILogger<GenericSqlHelper> Logger { get; }
 
@@ -24,7 +35,7 @@ namespace GenericDbRestApi.Lib.DataLayer
         }
 
         public (List<Dictionary<string, object>> data, bool hasMoreRows)
-            QueryAsDictList(string sqlStatement, int maxRows, Dictionary<string, object> parameters = null)
+            QueryAsDictList(string sqlStatement, int offset, int maxRows, Dictionary<string, object> parameters = null)
         {
             var data = new List<Dictionary<string, object>>();
             bool hasMoreRows = false;
@@ -32,6 +43,10 @@ namespace GenericDbRestApi.Lib.DataLayer
 
             try
             {
+                string sqlWithRange = $"{sqlStatement} offset {offset} rows fetch next {maxRows + 1} rows only";
+
+                Logger.LogInformation("QueryAsDictList SQL: {0}", sqlWithRange);
+
                 SqlCommand command = new SqlCommand(sqlStatement, SqlConnection);
                 AddParamsToCommand(command, parameters);
                 using (SqlDataReader reader = command.ExecuteReader())
@@ -91,18 +106,7 @@ namespace GenericDbRestApi.Lib.DataLayer
             {
                 var qryCol = new QueryColumn();
                 qryCol.Label = col.ColumnName;
-                if (col.DataType == typeof(int))
-                    qryCol.ColumnType = QueryColumnType.INT;
-                else if (col.DataType == typeof(short))
-                    qryCol.ColumnType = QueryColumnType.SHORT;
-                else if (col.DataType == typeof(double))
-                    qryCol.ColumnType = QueryColumnType.DOUBLE;
-                else if (col.DataType == typeof(DateTime))
-                    qryCol.ColumnType = QueryColumnType.DATETIME;
-                else if (col.DataType == typeof(decimal))
-                    qryCol.ColumnType = QueryColumnType.DECIMAL;
-                else
-                    qryCol.ColumnType = QueryColumnType.STRING;
+                qryCol.ColumnType = GetColumnTypeOfType(col.DataType);
 
                 ret.Add(qryCol);
             }
@@ -132,12 +136,15 @@ namespace GenericDbRestApi.Lib.DataLayer
 
         private static object NormalizeValue(object value)
         {
-            if (value is int || value is double || value is DateTime || value is decimal || value is short)
-            {
-                return value;
-            }
-
-            return value.ToString();
+            return GetColumnTypeOfType(value.GetType()) == QueryColumnType.STRING ? value.ToString() : value;
         } 
+
+        private static QueryColumnType GetColumnTypeOfType(Type type)
+        {
+            QueryColumnType val;
+            if (TypeToColumnTypeDict.TryGetValue(type, out val))
+                return val;
+            return QueryColumnType.STRING;
+        }
     }
 }

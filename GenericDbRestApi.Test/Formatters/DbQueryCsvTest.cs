@@ -9,6 +9,7 @@ using GenericDbRestApi.Lib.Formatters;
 
 namespace GenericDbRestApi.Test.Formatters
 {
+    [Trait("Category", "UnitTest")]
     public class DbQueryCsvTest
     {
         [Fact]

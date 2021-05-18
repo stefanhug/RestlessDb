@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace GenericDbRestApi.Lib.DataLayer
 {
@@ -19,5 +20,14 @@ namespace GenericDbRestApi.Lib.DataLayer
             }
             return ret;
         }
+
+        public static bool ContainsOrderBy(string sql)
+        {
+            string pattern = @"order\W+by";
+            Regex rgx = new Regex(pattern, RegexOptions.IgnoreCase);
+
+            return rgx.Matches(sql).Any();
+        }
+
     }
 }

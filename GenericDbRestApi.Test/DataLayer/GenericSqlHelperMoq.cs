@@ -13,7 +13,7 @@ namespace GenericDbRestApi.Test.DataLayer
 
             genericSqlHelperMoq.Setup(
                 p => p.QueryAsDictList(QueryItemProvider.QRY_QRY_REPOSITORY,
-                                       QueryItemProvider.MAXCHILDQUERIES + 1,
+                                       0, QueryItemProvider.MAXCHILDQUERIES,
                                        new Dictionary<string, object> { { "NAME", "salesorders" } }))
                      .Returns((qryQueryItemReturnValue, false));
 

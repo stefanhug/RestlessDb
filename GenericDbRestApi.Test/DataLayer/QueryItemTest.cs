@@ -3,6 +3,7 @@ using Xunit;
 
 namespace GenericDbRestApi.Test.DataLayer
 {
+    [Trait("Category", "UnitTest")]
     public class QueryItemTest
     {
         [Fact]

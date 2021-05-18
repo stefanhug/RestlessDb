@@ -7,7 +7,8 @@ namespace GenericDbRestApi.Lib.Types
     public enum GenericDbQueryExceptionCode
     {
         QUERY_NOTFOUND, RECURSION, DBQUERY, FORMATTER_NOTFOUND,
-        PARAMS_MISSING, PARAMS_NOTNEEDED, TEMPLATE_ERROR
+        PARAMS_MISSING, PARAMS_NOTNEEDED, TEMPLATE_ERROR,
+        SQL_MUST_HAVE_ORDER_BY
     }
 
     public class GenericDbQueryException : Exception

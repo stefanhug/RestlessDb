@@ -6,6 +6,7 @@ using Xunit;
 
 namespace GenericDbRestApi.Test.DataLayer
 {
+    [Trait("Category", "UnitTest")]
     public class QueryParamsParserTest
     {
         [Fact]
@@ -29,7 +30,7 @@ namespace GenericDbRestApi.Test.DataLayer
         }
 
         [Fact]
-        public void WhenSqlWithTWOParametersGivenThenParamsFound()
+        public void WhenSqlWithTwoParametersGivenThenParamsFound()
         {
             var sql = @"select SalesOrderID, OrderDate, CustomerID, SubTotal 
                         from Sales.SalesOrderHeader 
@@ -55,6 +56,17 @@ namespace GenericDbRestApi.Test.DataLayer
             Assert.Collection(sqlParameters, item => Assert.Equal("LASTNAME", item));
         }
 
-
+        [Theory]
+        [InlineData("select * from HumanResources.vJobCandidate order by JobCandidateId", true)]
+        [InlineData("select * from HumanResources.vJobCandidate order     by JobCandidateId", true)]
+        [InlineData("select * from HumanResources.vJobCandidate ORDER BY JobCandidateId", true)]
+        [InlineData("select * from HumanResources.vJobCandidate Order By JobCandidateId", true)]
+        [InlineData("select * from HumanResources.vJobCandidate ORDERBY JobCandidateId", false)]
+        [InlineData("select * from HumanResources.vJobCandidate where JobCandidateId = 5", false)]
+        public void WhenSqlGivenThenContainsOrderByCorrectlyParsed(string sql, bool expectedResult)
+        {
+            var containsOrderBy = QueryParamsParser.ContainsOrderBy(sql);
+            Assert.Equal(expectedResult, containsOrderBy);
+        }
     }
 }
