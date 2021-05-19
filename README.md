@@ -1,7 +1,7 @@
 ![RestlessDb header image](/doc/img/RestlessDb.png)
 # RestlessDb
 Create REST endpoints based on database queries within minutes with an ASP.net core based backend. Creating a new REST endpoint just requires one insert in a *QueryItem* table.
-Multiple output formats like json, csv, excel and xml are provided.
+Multiple output formats like json, html, csv, excel and xml are provided.
 Currently only SQL server as backend is supported, extension for other databases is planned
 
 ## Prerequisites
@@ -88,15 +88,17 @@ https://localhost:44352/dbapi/persons?maxrows=10&offset=8000
 ## Supported output formats
 GenericDbRestApi supports currently the following output formats via the URL query parameter *outputformat*:
 - json - default if no format specified
+- html  
 - comma separated value (csv)
 - excel
 - xml (via. XML datacontract serializer)
 
 ```
-https://localhost:44352/dbapi/persons?maxrows=1000&outputformat=json
-https://localhost:44352/dbapi/persons?maxrows=1000&outputformat=excel
-https://localhost:44352/dbapi/persons?maxrows=1000&outputformat=csv
-https://localhost:44352/dbapi/persons?maxrows=1000&outputformat=xml
+https://localhost:5001/dbapi/persons?maxrows=1000&outputformat=json
+https://localhost:5001/dbapi/persons?maxrows=1000&outputformat=html
+https://localhost:5001/dbapi/persons?maxrows=1000&outputformat=excel
+https://localhost:5001/dbapi/persons?maxrows=1000&outputformat=csv
+https://localhost:5001/dbapi/persons?maxrows=1000&outputformat=xml
 ```
 
 
@@ -167,6 +169,11 @@ Usage uf the http *accept* header is (currently) not supported.
 }
 ```
 
+### Htnl
+Html output is created using the Razor template engine with the library *RazorLight* ( ([RazorLight Github page](https://github.com/toddams/RazorLight "RazorLight Github page") ). The generic template is located in *RestlessDb/templates/DefaultRazorTemplate.cshtml* and copied to the *templates* subfolder of the bin output dir.
+Modifications in the template are effective in the next call. The provides template supports hierarchical queries using embedded child tables.
+Partial pages and includes are currently not supported,
+
 ### CSV
 First Line is header, second header columns
 
@@ -179,7 +186,7 @@ BusinessEntityID,Title,FirstName,MiddleName,LastName,ModifiedDate
 ```
 
 ### Excel
-The library *ClosedXML* ( [Closed XML Github page](https://github.com/ClosedXML/ClosedXML "Closed XML Github page") )is used for transforming the retrieved data to excel. 
+The library *ClosedXML* ( [Closed XML Github page](https://github.com/ClosedXML/ClosedXML "Closed XML Github page") ) is used for transforming the retrieved data to excel. 
 The label (*QueryItem.Label*), Description (*QueryItem.Description*) and column header rows are fixed.
 
 ![persons table excel output](./doc/img/personstable_excel.PNG "persons table excel output")
