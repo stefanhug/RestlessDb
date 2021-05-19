@@ -169,10 +169,12 @@ Usage uf the http *accept* header is (currently) not supported.
 }
 ```
 
-### Htnl
+### Html
 Html output is created using the Razor template engine with the library *RazorLight* ( ([RazorLight Github page](https://github.com/toddams/RazorLight "RazorLight Github page") ). The generic template is located in *RestlessDb/templates/DefaultRazorTemplate.cshtml* and copied to the *templates* subfolder of the bin output dir.
 Modifications in the template are effective in the next call. The provides template supports hierarchical queries using embedded child tables.
-Partial pages and includes are currently not supported,
+Some Razor features like partial pages and includes are currently not supported. 
+
+![salesorders table html output](./doc/img/salesorders_html.PNG "salesorders table html output")
 
 ### CSV
 First Line is header, second header columns
