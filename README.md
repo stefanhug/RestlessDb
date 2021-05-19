@@ -1,4 +1,4 @@
-# GenericDbRestApi
+# RestlessDb
 Create REST endpoints based on database queries within minutes with an ASP.net core based backend. Creating a new REST endpoint just requires one insert in a *QueryItem* table.
 Multiple output formats like json, csv, excel and xml are provided.
 Currently only SQL server as backend is supported, extension for other databases is planned
