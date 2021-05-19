@@ -17,10 +17,10 @@ The given exammples are based on the example database *Adventureworks* provided 
 - clone this repository:
  
 ``` powershell
-git clone https://github.com/stefanhug/GenericDbRestApi.git
+git clone https://github.com/stefanhug/RestlessDb.git
 ```
 - configure the DB connection
-Edit the connection string in *GenericDbRestApi/GenericDbRestApi/appsettings.Development.json* to match your database, user and password:
+Edit the connection string in *RestlessDb/RestlessDb.App/appsettings.Development.json* to match your database, user and password:
 ``` js
 {
   "Logging": {
@@ -38,7 +38,7 @@ Edit the connection string in *GenericDbRestApi/GenericDbRestApi/appsettings.Dev
 
 - build the repository:
 ``` pwsh
-cd ./GenericDbRestApi/
+cd ./RestlessDb/
 dotnet restore
 dotnet build
 ```
@@ -47,7 +47,7 @@ dotnet build
 - start the application:
 ``` pwsh
 cd ./bin/netcoreapp3.1/
-GenericDbRestApi.exe --environment=Development
+RestlessDb.App.exe --environment=Development
 ```
 - open a browser a enter the URL *https://localhost:5001/dbapi/persons*
   You should see the following output of the *Adventureworks Person* table:
@@ -405,17 +405,17 @@ For the output formats excel and csv additional columns for the child columns ar
 - Excel: <a id="raw-url" href="./doc/SalesOrders_Hierarchical.xlsx">Excel hierarchical query</a>
 - CSV: <a id="raw-url1" href="./doc/SalesOrders_Hierarchical.csv">CSV hierarchical query</a>
 
-## Integrating *GenericDbRestApi.Lib.dll* in an existing application
-The proided example application GenericDbRestApi is a minimum example appserver without authentication and other features.
-To integrate GenericDbRestApi in an existing project the following step is necessary (nuget package is not yet available).
-- reference *GenericDbRestApi.Lib.dll* in your project
+## Integrating *RestlessDb.dll* in an existing application
+The proided example application RestlessDb.App is a minimum example appserver without authentication and other features.
+To integrate RestlessDb in an existing project the following step is necessary (nuget package is not yet available).
+- reference *RestlessDb.dll* in your project
 - Add the following code to you *Startup.cs*
 
 ``` csharp
 ...
-using GenericDbRestApi.Lib.Services;  //ADD
+using RestlessDb.Services;  //ADD
 ...
-namespace GenericDbRestApi
+namespace RestlessDb.App
 {
     public class Startup
     {
