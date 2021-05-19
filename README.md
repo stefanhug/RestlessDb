@@ -1,3 +1,4 @@
+![RestlessDb header image](/doc/img/RestlessDb.png)
 # RestlessDb
 Create REST endpoints based on database queries within minutes with an ASP.net core based backend. Creating a new REST endpoint just requires one insert in a *QueryItem* table.
 Multiple output formats like json, csv, excel and xml are provided.
