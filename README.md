@@ -2,7 +2,8 @@
 # RestlessDb
 Create REST endpoints based on database queries within minutes with an ASP.net core based backend. Creating a new REST endpoint just requires one insert in a *QueryItem* table.
 Multiple output formats like json, html, csv, excel and xml are provided.
-Currently only SQL server as backend is supported, extension for other databases is planned
+Currently only SQL server as backend is supported, extension for other databases is planned. 
+The project is still in alpha state and not production ready. See section *Open topics* for future plans and missing features.
 
 ## Prerequisites
 - .net Core Framework 3.1 or higher
@@ -442,4 +443,12 @@ namespace RestlessDb.App
 }
 ```
 
+## Open topics
+- change all methods to *async* to avoid *Task.GetAwaiter().GetResult()* constructs. I don't see the often mentioned danger of deadlooks in this context but scaleability would be improved.
+- More API tests, integrate API tests in build pipeline.
+- Blazor UI for *QueryItem* configuration
+- Swagger/Swashbuckle integration with custom openAPI document provisioning - one endpoint description for each configured top leven *QueryItem*
+- DB abstraction: should not be too difficult, only the syntax of range queries is different for other DB's
+- Provide nuget package#
+- Docker support
 
