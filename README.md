@@ -446,9 +446,12 @@ namespace RestlessDb.App
 ## Open topics
 - change all methods to *async* to avoid *Task.GetAwaiter().GetResult()* constructs. I don't see the often mentioned danger of deadlooks in this context but scaleability would be improved.
 - More API tests, integrate API tests in build pipeline.
+- Support of custom templates for HTML/RazorLight output
+- Support of custom templates for Excel output with CLosedXML.Report (https://github.com/ClosedXML/ClosedXML.Report)
 - Blazor UI for *QueryItem* configuration
 - Swagger/Swashbuckle integration with custom openAPI document provisioning - one endpoint description for each configured top leven *QueryItem*
 - DB abstraction: should not be too difficult, only the syntax of range queries is different for other DB's
-- Provide nuget package#
+- Add JWT support for authentication and authorization providers
+- Provide nuget package
 - Docker support
 
