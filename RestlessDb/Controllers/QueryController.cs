@@ -14,18 +14,6 @@ namespace RestlessDb.Controllers
     [Route("/dbapi/{query}")]
     public class QueryController : ControllerBase
     {
-        public static readonly Dictionary<GenericDbQueryExceptionCode, HttpStatusCode> ExceptionToStatusCodeMap =
-            new Dictionary<GenericDbQueryExceptionCode, HttpStatusCode>()
-            {
-                {GenericDbQueryExceptionCode.DBQUERY, HttpStatusCode.InternalServerError},
-                {GenericDbQueryExceptionCode.FORMATTER_NOTFOUND, HttpStatusCode.NotImplemented},
-                {GenericDbQueryExceptionCode.QUERY_NOTFOUND, HttpStatusCode.NotFound},
-                {GenericDbQueryExceptionCode.RECURSION, HttpStatusCode.InternalServerError},
-                {GenericDbQueryExceptionCode.PARAMS_MISSING, HttpStatusCode.BadRequest},
-                {GenericDbQueryExceptionCode.PARAMS_NOTNEEDED, HttpStatusCode.BadRequest},
-                {GenericDbQueryExceptionCode.SQL_MUST_HAVE_ORDER_BY, HttpStatusCode.InternalServerError}
-            };
-
         private readonly ILogger<QueryController> logger;
         private readonly GenericQueryManager manager;
         private readonly IEnumerable<IQueryFormatter> queryFormatters;
@@ -43,6 +31,8 @@ namespace RestlessDb.Controllers
             [FromQuery(Name = "maxrows")] int? maxRows,
             [FromQuery(Name = "outputformat")] string outputFormat)
         {
+            int startTickCount = Environment.TickCount;
+
             Dictionary<string, object> parameters = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
 
             var paramsToRemove = new HashSet<string>() { "offset", "maxrows", "outputformat" };
@@ -78,7 +68,7 @@ namespace RestlessDb.Controllers
                 {
                     Content = msg,
                     ContentType = "text/plain",
-                    StatusCode = (int)ExceptionToStatusCodeMap[e.ExceptionCode]
+                    StatusCode = (int)ExceptionStatusToHttpStatusCodeMapper.GetHttpStatusCode(e)
                 };
             }
             catch (Exception e)
@@ -89,7 +79,12 @@ namespace RestlessDb.Controllers
                     ContentType = "text/plain",
                     StatusCode = (int)HttpStatusCode.InternalServerError
                 };
-            };
+            }
+            finally
+            {
+                logger.LogInformation("Get: {0}, offset:{1}, maxRows: {2}, params: [{3}] ({4} ms)",
+                    query, offset, maxRows, string.Join(", ", parameters), Environment.TickCount - startTickCount);
+            }
         }
     }
 }

@@ -66,7 +66,7 @@ namespace RestlessDb.DataLayer
             string SafeGetAsToLower(object o)
             {
                 var ret = o as string;
-                return o == null ? null : ret.ToLowerInvariant();
+                return ret == null ? null : ret.ToLowerInvariant();
             }
 
             var ret = 

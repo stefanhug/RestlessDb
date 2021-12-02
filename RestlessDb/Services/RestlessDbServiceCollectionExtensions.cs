@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace RestlessDb.Services
 {
-    public static class GenericDbRestApiServiceCollectionExtensions
+    public static class RestlessDbServiceCollectionExtensions
     {
         public static void AddDbRestApi(this IServiceCollection services, string dbConnectionString)
         {
@@ -22,6 +22,8 @@ namespace RestlessDb.Services
             services.AddScoped<QueryParamsProvider, QueryParamsProvider>();
             services.AddScoped<QueryRepository, QueryRepository>();
             services.AddScoped<GenericQueryManager, GenericQueryManager>();
+            services.AddScoped<QueryConfigRepository, QueryConfigRepository>();
+            services.AddScoped<QueryConfigManager, QueryConfigManager>();
 
             //Formatters
             services.AddSingleton<IQueryFormatter, QueryJsonFormatter>();

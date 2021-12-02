@@ -40,26 +40,40 @@ namespace RestlessDb.DataLayer
             var data = new List<Dictionary<string, object>>();
             bool hasMoreRows = false;
             int numRowsRead = 0;
+            int start = Environment.TickCount;
 
             try
             {
                 string sqlWithRange = $"{sqlStatement} offset {offset} rows fetch next {maxRows + 1} rows only";
 
-                Logger.LogInformation("QueryAsDictList SQL: {0}", sqlWithRange);
+                Logger.LogInformation("QueryAsDictList SQL start");
 
                 SqlCommand command = new SqlCommand(sqlStatement, SqlConnection);
                 AddParamsToCommand(command, parameters);
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
+                    Logger.LogInformation("QueryAsDictList ExecuteReader done ({0} ms)", Environment.TickCount - start);
                     while (reader.Read())
                     {
                         numRowsRead++;
                         if (numRowsRead <= maxRows)
+                        {
                             data.Add(GetReaderDataAsDict(reader));
+                            Logger.LogDebug("Read record to dictionary {0} ({1} ms)", numRowsRead, Environment.TickCount - start);
+                        }
                         else
+                        {
                             hasMoreRows = true;
+                            // strange, the reader continues to read over the limit 'fetch next {maxRows + 1} rows only'
+                            break;
+                        }
                     }
+
+                    command.Cancel(); //Otherwise we get a timeout in the dispose if more rows available
                 }
+                
+                Logger.LogInformation("QueryAsDictList SQL: {0} ({1} ms)", sqlWithRange, Environment.TickCount - start);
+
 
                 return (data, hasMoreRows);
             }
@@ -115,11 +129,12 @@ namespace RestlessDb.DataLayer
 
         private static Dictionary<string, object> GetReaderDataAsDict(SqlDataReader reader)
         {
-            var ret = new Dictionary<string, object>((StringComparer.InvariantCultureIgnoreCase));
+            var ret = new Dictionary<string, object>(reader.FieldCount, StringComparer.InvariantCultureIgnoreCase);
             for (int i = 0; i < reader.FieldCount; i++)
             {
                 ret.Add(reader.GetName(i), NormalizeValue(reader.GetValue(i)));
             }
+            
             return ret;
         }
 

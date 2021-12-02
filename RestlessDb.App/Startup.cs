@@ -20,6 +20,8 @@ namespace RestlessDb.App
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
+            
             // needed for string serialiation of enum values
             services.AddControllers().AddJsonOptions
             (opts =>
@@ -39,6 +41,14 @@ namespace RestlessDb.App
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors(builder =>
+            {
+                builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+            });
 
             app.UseHttpsRedirection();
 

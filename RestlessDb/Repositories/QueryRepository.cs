@@ -13,12 +13,18 @@ namespace RestlessDb.Repositories
         // Max number of rows to retrieve for a child query
         const int MAX_CHILD_ROWS = 10000;
 
+        private readonly IGenericSqlHelper genericSqlHelper;
+        private readonly QueryItemProvider queryItemProvider;
+        private readonly QueryParamsProvider queryParamsProvider;
+
+        private readonly ILogger<QueryRepository> logger;
+
         public QueryRepository(IGenericSqlHelper genericSqlHelper, QueryItemProvider queryItemProvider, 
             QueryParamsProvider queryParamsProvider,ILogger<QueryRepository> logger) 
         {
-            this.GenericSqlHelper = genericSqlHelper;
-            this.QueryItemProvider = queryItemProvider;
-            this.QueryParamsProvider = queryParamsProvider;
+            this.genericSqlHelper = genericSqlHelper;
+            this.queryItemProvider = queryItemProvider;
+            this.queryParamsProvider = queryParamsProvider;
             this.logger = logger;
         }
 
@@ -30,12 +36,12 @@ namespace RestlessDb.Repositories
             ret.MaxRows = maxRows;
             ret.QueryParameters = queryParameters;
 
-            var queryItem = QueryItemProvider.LoadQueryItem(queryName);
+            var queryItem = queryItemProvider.LoadQueryItem(queryName);
                 
             // check the query parameters with the QueryParamsProvider
-            var checkedParmeters = QueryParamsProvider.CollectParamsForQuery(queryItem.Sql, queryParameters, new List<Dictionary<string, object>>());
+            var checkedParmeters = queryParamsProvider.CollectParamsForQuery(queryItem.Sql, queryParameters, new List<Dictionary<string, object>>());
 
-            (ret.Data, ret.HasMoreRows) = GenericSqlHelper.QueryAsDictList(queryItem.Sql, offset, maxRows, checkedParmeters);
+            (ret.Data, ret.HasMoreRows) = genericSqlHelper.QueryAsDictList(queryItem.Sql, offset, maxRows, checkedParmeters);
 
             // ret.MetaData.Children will be filled in the recursive query
             ret.MetaData = queryItem.AsQueryMetaData();
@@ -74,8 +80,8 @@ namespace RestlessDb.Repositories
             List<Dictionary<string, object>> childRows;
             bool hasMoreRows;
 
-            var effectiveQueryParams = QueryParamsProvider.CollectParamsForQuery(sql, queryParameters, parentRowStack);
-            (childRows, hasMoreRows) = GenericSqlHelper.QueryAsDictList(sql, 0, MAX_CHILD_ROWS, effectiveQueryParams);
+            var effectiveQueryParams = queryParamsProvider.CollectParamsForQuery(sql, queryParameters, parentRowStack);
+            (childRows, hasMoreRows) = genericSqlHelper.QueryAsDictList(sql, 0, MAX_CHILD_ROWS, effectiveQueryParams);
 
             // the last item is the current parent
             parentRowStack.Last().Add(queryItem.Name, childRows);
@@ -90,12 +96,6 @@ namespace RestlessDb.Repositories
                 }
             }
         }
-
-        public IGenericSqlHelper GenericSqlHelper { get; }
-        internal QueryItemProvider QueryItemProvider { get; }
-        public QueryParamsProvider QueryParamsProvider { get; }
-
-        private readonly ILogger<QueryRepository> logger;
     }
 
 }
