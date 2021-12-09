@@ -1,5 +1,5 @@
 ﻿using RestlessDb.DataLayer;
-using RestlessDb.Types;
+using RestlessDb.Common.Types;
 using Moq;
 using System.Collections.Generic;
 

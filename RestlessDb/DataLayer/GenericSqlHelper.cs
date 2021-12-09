@@ -4,7 +4,7 @@ using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using RestlessDb.DataLayer;
-using RestlessDb.Types;
+using RestlessDb.Common.Types;
 using System.Data;
 using System.Data.Common;
 using Microsoft.Extensions.Logging;

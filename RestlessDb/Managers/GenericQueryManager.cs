@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using RestlessDb.Repositories;
-using RestlessDb.Types;
+using RestlessDb.Common.Types;
 using Microsoft.Extensions.Logging;
 
 namespace RestlessDb.Managers

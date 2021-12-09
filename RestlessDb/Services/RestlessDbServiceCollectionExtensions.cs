@@ -24,6 +24,7 @@ namespace RestlessDb.Services
             services.AddScoped<GenericQueryManager, GenericQueryManager>();
             services.AddScoped<QueryConfigRepository, QueryConfigRepository>();
             services.AddScoped<QueryConfigManager, QueryConfigManager>();
+            services.AddScoped<QueryItemsManager, QueryItemsManager>();
 
             //Formatters
             services.AddSingleton<IQueryFormatter, QueryJsonFormatter>();

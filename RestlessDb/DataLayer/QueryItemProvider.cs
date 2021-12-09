@@ -1,4 +1,4 @@
-﻿using RestlessDb.Types;
+﻿using RestlessDb.Common.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +9,30 @@ namespace RestlessDb.DataLayer
     {
         private class DbQueryItem
         {
+            public DbQueryItem() { }
+
+            public DbQueryItem(IDictionary<string, object> row)
+            {
+                Name = ((string)row["Name"]).ToLowerInvariant();
+                Label = (string)row["Label"];
+                Description = (string)row["Description"];
+                Parent = SafeGetAsToLower(row["Parent"]);
+                Pos = (int)row["Pos"];
+                Sql = (string)row["Sql"];
+            }
+
             public string Name { get; set; }
             public string Label { get; set; }
             public string Description { get; set; }
             public string Parent { get; set; }
             public string Sql { get; set; }
             public int Pos { get; set; }
+
+            private string SafeGetAsToLower(object o)
+            {
+                var ret = o as string;
+                return ret == null ? null : ret.ToLowerInvariant();
+            }
         }
 
         public const int MAXCHILDQUERIES = 100;
@@ -35,11 +53,37 @@ namespace RestlessDb.DataLayer
             FROM CTE
         ";
 
+        public const string QRY_ALL_QRYITEMS = @"
+            SELECT Name, Label, Description, Parent, Pos, Sql
+            FROM GQuery.QueryItem
+        ";
+
+
         protected IGenericSqlHelper GenericSqlHelper { get; }
 
         public QueryItemProvider(IGenericSqlHelper genericSqlHelper)
         {
             this.GenericSqlHelper = genericSqlHelper;
+        }
+
+        public List<QueryItem> LoadQueryItems()
+        {
+            var ret = new List<QueryItem>();
+            var dbQueryItems = GetAllDbQueryItems();
+
+            var topItems = dbQueryItems.Where(i => string.IsNullOrWhiteSpace(i.Parent));
+            if (topItems == null)
+            {
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.QUERY_NOTFOUND, $"No queries in repository found");
+            }
+
+            foreach(var a in topItems)
+            {
+                ret.Add(CreateItemFromRow(a, dbQueryItems, new List<string>()));
+            }
+          
+           
+            return ret;
         }
 
         public QueryItem LoadQueryItem(string queryName)
@@ -55,6 +99,19 @@ namespace RestlessDb.DataLayer
             var ret = CreateItemFromRow(topItem, dbQueryItems, new List<string>());
             return ret;
         }
+        
+        private List<DbQueryItem> GetAllDbQueryItems()
+        {
+            var (queryItemsForName, hasMoreRows) = GenericSqlHelper.QueryAsDictList(QRY_ALL_QRYITEMS);
+
+            var ret =
+                from a
+                in queryItemsForName
+                select new DbQueryItem(a);
+                
+            return ret.ToList();
+        }
+
 
         private List<DbQueryItem> GetDbQueryItems(string queryName)
         {
@@ -63,27 +120,13 @@ namespace RestlessDb.DataLayer
                                                                   0, MAXCHILDQUERIES,
                                                                   new Dictionary<string, object>() { { "NAME", queryName } });
 
-            string SafeGetAsToLower(object o)
-            {
-                var ret = o as string;
-                return ret == null ? null : ret.ToLowerInvariant();
-            }
+            var ret =
+                from a
+                in queryItemsForName
+                select new DbQueryItem(a);
 
-            var ret = 
-                from a 
-                in queryItemsForName 
-                select new DbQueryItem()
-                {
-                    Name = ((string)a["Name"]).ToLowerInvariant(),
-                    Label = (string)a["Label"],
-                    Description = (string)a["Description"],
-                    Parent = SafeGetAsToLower(a["Parent"]),
-                    Pos = (int)a["Pos"],
-                    Sql = (string)a["Sql"]
-                };
             return ret.ToList();
         }
-
 
         private void RecurseChildItems(QueryItem currentItem, List<DbQueryItem> dbQueryItems, List<string> parentsList)
         {

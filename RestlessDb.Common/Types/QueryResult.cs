@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace RestlessDb.Types
+namespace RestlessDb.Common.Types
 {
     [DataContract]
     public class QueryResult

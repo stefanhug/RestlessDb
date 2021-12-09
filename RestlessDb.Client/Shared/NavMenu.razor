@@ -1,0 +1,58 @@
+﻿@inject ClientModel ClientModel
+
+<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">RestlessDbClient</a>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </li>
+        @if (ClientModel.QueryConfig != null)
+        {
+            <li class="nav-item px-3 nav-link">
+                <NavLink class="nav-link">
+                    <span class="oi oi-magnifying-glass" aria-hidden="true">Queries</span>
+                </NavLink>
+                <ul>
+                    @foreach (var configItem in ClientModel.QueryConfig.QueryConfigItems)
+                    {
+                        <li class="nav-item px-3">
+                            <NavLink class="nav-link" href=@("showquery/" + configItem.Name)>
+                                <span class="oi oi-share" aria-hidden="true">@configItem.Label</span>
+                            </NavLink>
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href=@("queryadmin") >
+                <span class="oi oi-brush" aria-hidden="true"></span> Query Administration
+            </NavLink>
+        </li>
+        }
+    </ul>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ClientModel.CheckInitAsync();
+    }
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

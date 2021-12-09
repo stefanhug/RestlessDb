@@ -1,0 +1,71 @@
+﻿@page "/queryadmin"
+@inject ClientModel ClientModel
+
+
+@if (ErrorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@ErrorMessage</pre>
+    </div>
+}
+else
+{
+    <div class="top-row">
+        <h1> Query administration </h1>
+        <h2>Configure and modify queries</h2>
+
+
+        <hr />
+    </div>
+    @if (queryAdminResult == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+
+        <table class="table table-striped">
+            <thead>
+            <th>Name</th>
+            <th>Label</th>
+            <th>Description</th>
+            <th>Sql Statement</th>
+            </thead>
+            <tbody>
+                @foreach (var itm in queryAdminResult.QueryAdminItems)
+                {
+                    <tr>
+                        <td>@itm.Name</td>
+                        <td>@itm.Label</td>
+                        <td>@itm.Description</td>
+                        <td>@itm.Sql</td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+}
+
+@code {
+    private string ErrorMessage { get; set; }
+    private QueryAdminResult queryAdminResult;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            queryAdminResult = await ClientModel.FetchQueryItemsAsync();
+        }
+        catch (HttpRequestException e)
+        {
+            ErrorMessage = $"HttpRequestException: httpstatus: {e.StatusCode}\nMessage:{e.Message}\n=====\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
+        }
+        catch (Exception e)
+        {
+            ErrorMessage = $"{e.Message}\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
+        }
+    }
+}

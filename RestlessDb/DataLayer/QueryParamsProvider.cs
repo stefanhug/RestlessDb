@@ -1,4 +1,4 @@
-﻿using RestlessDb.Types;
+﻿using RestlessDb.Common.Types;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

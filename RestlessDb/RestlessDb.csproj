@@ -33,5 +33,8 @@
   <ItemGroup>
     <Folder Include="templates\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RestlessDb.Common\RestlessDb.Common.csproj" />
+  </ItemGroup>
 
 </Project>

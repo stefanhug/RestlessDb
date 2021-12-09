@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace RestlessDb.Types
+namespace RestlessDb.Common.Types
 {
     public enum QueryColumnType { STRING, INT, DOUBLE, DATETIME, DECIMAL, SHORT }
 

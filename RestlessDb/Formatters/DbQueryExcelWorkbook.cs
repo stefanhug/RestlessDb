@@ -1,5 +1,5 @@
 ﻿using ClosedXML.Excel;
-using RestlessDb.Types;
+using RestlessDb.Common.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;

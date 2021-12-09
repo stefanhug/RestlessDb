@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using RestlessDb.Types;
+using RestlessDb.Common.Types;
 using Xunit;
 
 namespace RestlessDb.ApiTest

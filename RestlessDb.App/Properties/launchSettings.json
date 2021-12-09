@@ -12,7 +12,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "dbapi/persons",
+      "launchUrl": "dbapi/persons?maxrows=10",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
