@@ -1,10 +1,6 @@
-﻿using RestlessDb.Common.Types;
-using RazorLight;
+﻿using RazorLight;
+using RestlessDb.Common.Types;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace RestlessDb.Formatters
 {
