@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
   </PropertyGroup>
 
@@ -32,6 +32,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="templates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RestlessDb.Common\RestlessDb.Common.csproj" />
   </ItemGroup>
 
 </Project>

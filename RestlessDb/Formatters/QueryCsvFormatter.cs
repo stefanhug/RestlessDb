@@ -1,5 +1,5 @@
 ﻿using RestlessDb.Formatters;
-using RestlessDb.Types;
+using RestlessDb.Common.Types;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;

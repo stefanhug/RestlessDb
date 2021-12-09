@@ -1,0 +1,74 @@
+﻿@page "/showquery/{queryitem}"
+@inject ClientModel ClientModel
+
+
+@if (Error != null)
+{
+<div class="alert alert-danger" role="alert">
+    <pre>@Error</pre>
+</div>
+}
+else if (ConfigItem == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+<div class="top-row">
+    <h1>@ConfigItem.Label</h1>
+    <h2>@ConfigItem.Description</h2>
+
+
+    <p>
+        Offset: <input @bind="Offset" />Maxrows: <input @bind="MaxRows" />
+    </p>
+    <p>
+        <button @onclick="ShowQueryResultsAsync">Show query results</button>
+    </p>
+    <hr />
+</div>
+    @if (QueryContent != null)
+    {
+        @((MarkupString)QueryContent)
+    }
+}
+
+@code {
+    [Parameter]
+    public string QueryItem { get; set; }
+
+    public int Offset { get; set; } = 0;
+    public int MaxRows { get; set; } = 500;
+
+
+    public string Error { get; set; }
+
+    public QueryConfigItem ConfigItem { get; set; }
+
+    public string QueryContent { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Error = null;
+        ConfigItem = await ClientModel.GetConfigItemAsync(QueryItem);
+        QueryContent = null;
+    }
+
+    public async Task ShowQueryResultsAsync()
+    {
+        Error = null;
+        QueryContent = "Loading...";
+        try
+        {
+            QueryContent = await ClientModel.FetchQueryContentAsync(QueryItem, "html", Offset, MaxRows);
+        }
+        catch (HttpRequestException e)
+        {
+            Error = $"HttpRequestException: httpstatus: {e.StatusCode}\nMessage:{e.Message}\n=====\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
+        }
+        catch (Exception e)
+        {
+            Error = $"{e.Message}\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
+        }
+    }
+}

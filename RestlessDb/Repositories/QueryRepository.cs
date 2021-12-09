@@ -1,4 +1,4 @@
-using RestlessDb.Types;
+using RestlessDb.Common.Types;
 using RestlessDb.DataLayer;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;

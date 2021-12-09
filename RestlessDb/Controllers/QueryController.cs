@@ -1,5 +1,5 @@
 ﻿using RestlessDb.Managers;
-using RestlessDb.Types;
+using RestlessDb.Common.Types;
 using RestlessDb.Formatters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

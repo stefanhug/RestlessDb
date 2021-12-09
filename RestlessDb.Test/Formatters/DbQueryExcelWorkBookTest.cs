@@ -1,6 +1,6 @@
 ﻿using ClosedXML.Excel;
 using RestlessDb.Formatters;
-using RestlessDb.Types;
+using RestlessDb.Common.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;

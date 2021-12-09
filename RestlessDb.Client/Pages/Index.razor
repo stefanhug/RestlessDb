@@ -1,0 +1,23 @@
+﻿@page "/"
+@inject ClientModel ClientModel
+
+<h1>Restless Db</h1>
+
+<h2>Ui for the Restless Db .net Core Api Service</h2>
+Execute and configure queries and display the result in multiple queries
+
+@if(ClientModel.ErrorMessage != null)
+{
+<div class="alert alert-danger" role="alert">
+    <pre>@ClientModel.ErrorMessage</pre>
+</div>
+}
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ClientModel.CheckInitAsync();
+    }
+    
+}

@@ -1,10 +1,6 @@
-﻿using RestlessDb.Types;
-using RazorLight;
+﻿using RazorLight;
+using RestlessDb.Common.Types;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace RestlessDb.Formatters
 {
@@ -38,7 +34,7 @@ namespace RestlessDb.Formatters
             {
                 razorLightEngine = new RazorLightEngineBuilder()
                                 .UseEmbeddedResourcesProject(typeof(QueryResult))
-                                .SetOperatingAssembly(typeof(QueryResult).Assembly)
+                                .SetOperatingAssembly(this.GetType().Assembly)
                                 .UseMemoryCachingProvider()
                                 .Build();
             }

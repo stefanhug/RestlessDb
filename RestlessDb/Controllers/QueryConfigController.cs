@@ -1,11 +1,8 @@
-﻿using RestlessDb.Managers;
-using RestlessDb.Types;
-using RestlessDb.Formatters;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using RestlessDb.Common.Types;
+using RestlessDb.Managers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 
 namespace RestlessDb.Controllers

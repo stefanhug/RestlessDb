@@ -1,9 +1,9 @@
-﻿@model RestlessDb.Types.QueryResult;
+﻿@model RestlessDb.Common.Types.QueryResult;
 @using System.Text;
 @using System.Collections.Generic;
 @using Microsoft.AspNetCore.Html;
 @{
-	HtmlString RenderTable(RestlessDb.Types.QueryMetaData metaData, 
+	HtmlString RenderTable(RestlessDb.Common.Types.QueryMetaData metaData, 
 					 List<Dictionary<string, object>> data,
 					 int level)
 	{

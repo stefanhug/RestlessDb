@@ -1,4 +1,4 @@
-﻿using RestlessDb.Types;
+﻿using RestlessDb.Common.Types;
 using System;
 using System.Collections.Generic;
 using System.Net;

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace RestlessDb.Types
+namespace RestlessDb.Common.Types
 {
     public enum GenericDbQueryExceptionCode
     {
