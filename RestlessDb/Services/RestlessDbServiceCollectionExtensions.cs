@@ -4,12 +4,28 @@ using RestlessDb.Repositories;
 using RestlessDb.Formatters;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace RestlessDb.Services
 {
     public static class RestlessDbServiceCollectionExtensions
     {
         public static void AddDbRestApi(this IServiceCollection services, string dbConnectionString)
+        {
+            AddDependencies(services, dbConnectionString);
+            AddFormatters(services);
+        }
+
+        private static void AddFormatters(IServiceCollection services)
+        {
+            services.AddSingleton<IQueryFormatter, QueryJsonFormatter>();
+            services.AddSingleton<IQueryFormatter, QueryXmlFormatter>();
+            services.AddSingleton<IQueryFormatter, QueryCsvFormatter>();
+            services.AddSingleton<IQueryFormatter, QueryExcelFormatter>();
+            services.AddSingleton<IQueryFormatter, QueryHtmlFormatter>();
+        }
+
+        private static void AddDependencies(IServiceCollection services, string dbConnectionString)
         {
             services.AddScoped<SqlConnection, SqlConnection>(p =>
             {
@@ -25,13 +41,7 @@ namespace RestlessDb.Services
             services.AddScoped<QueryConfigRepository, QueryConfigRepository>();
             services.AddScoped<QueryConfigManager, QueryConfigManager>();
             services.AddScoped<QueryItemsManager, QueryItemsManager>();
-
-            //Formatters
-            services.AddSingleton<IQueryFormatter, QueryJsonFormatter>();
-            services.AddSingleton<IQueryFormatter, QueryXmlFormatter>();
-            services.AddSingleton<IQueryFormatter, QueryCsvFormatter>();
-            services.AddSingleton<IQueryFormatter, QueryExcelFormatter>();
-            services.AddSingleton<IQueryFormatter, QueryHtmlFormatter>();
+            services.AddScoped<QueryItemsRepository, QueryItemsRepository>();
         }
     }
 }

@@ -1,0 +1,111 @@
+﻿@page "/qryitemedit/{qryitemname}"
+@page "/qryitemnew"
+
+@inject ClientModel clientModel
+@inject NavigationManager uriHelper
+
+@if (QryItemName == null)
+{
+    <div class="alert alert-danger">
+        Add a new qry item @(QryItemParent ?? "with parent {QryItemParent}")
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        Edit query item @QryItemName
+    </div>
+
+}
+
+<EditForm Model="@queryItemEdit" OnValidSubmit="@HandleSubmitAsync">
+    <label>Query Name:</label>
+    <div>
+        @if (QryItemName == null)
+        {
+            <InputText @bind-Value="@queryItemEdit.Name" />
+        }
+        else
+        {
+            @queryItemEdit.Name
+        }
+    </div>
+    <label>Parent:</label>
+    <div>
+        @(queryItemEdit.Parent ?? "--top level--")
+    </div>
+    <label>Label:</label>
+    <div>
+        <InputText @bind-Value="@queryItemEdit.Label" />
+    </div>
+    <label>Description:</label>
+    <div>
+        <InputText @bind-Value="@queryItemEdit.Description" />
+    </div>
+    <label>Pos:</label>
+    <div>
+        <InputNumber @bind-Value="@queryItemEdit.Pos" />
+    </div>
+    <label>Sql:</label>
+    <div>
+        <InputTextArea @bind-Value="@queryItemEdit.Sql" />
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Submit
+    </button>
+    <button type="cancel" class="btn-success" @onclick="() =>HandleCancelAsync()">
+        Cancel
+    </button>
+
+</EditForm>
+
+
+@code
+{
+    [Parameter]
+    public string QryItemName { get; set; }
+    public string QryItemParent { get; set; }
+
+    private QueryItem queryItemEdit;
+
+    bool IsUpdate() => QryItemName != null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = uriHelper.ToAbsoluteUri(uriHelper.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("parent", out var parentTmp))
+        {
+            QryItemParent = parentTmp;
+        }
+
+        if (IsUpdate())
+        {
+            queryItemEdit = await clientModel.FetchQueryItemAsync(QryItemName);  
+        }
+        else
+        {
+            queryItemEdit = new() { Parent = QryItemParent };
+        }
+
+    }
+
+    private async Task HandleSubmitAsync()
+    {
+        if (IsUpdate())
+        {
+            await clientModel.UpdateQueryItemAsync(queryItemEdit);
+        }
+        else
+        {
+            await clientModel.InsertQueryItemAsync(queryItemEdit);
+        }
+
+        uriHelper.NavigateTo("/queryadmin");
+    }
+
+    private async Task HandleCancelAsync()
+    {
+        uriHelper.NavigateTo("/queryadmin");
+    }
+}

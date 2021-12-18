@@ -31,24 +31,9 @@ namespace RestlessDb.Controllers
 
                 return new JsonResult(queryResult);
             }
-            catch (GenericDbQueryException e)
-            {
-                var msg = $"Exception: {e.ExceptionCode.ToString()}\r\n{e.Message}";
-                return new ContentResult()
-                {
-                    Content = msg,
-                    ContentType = "text/plain",
-                    StatusCode = (int)ExceptionStatusToHttpStatusCodeMapper.GetHttpStatusCode(e)
-                };
-            }
             catch (Exception e)
             {
-                return new ContentResult()
-                {
-                    Content = $"Exception: {e.Message}",
-                    ContentType = "text/plain",
-                    StatusCode = (int)HttpStatusCode.InternalServerError
-                };
+                return ControllerHelper.HandleException(e, logger);
             };
         }
     }

@@ -35,7 +35,7 @@ namespace RestlessDb.DataLayer
         }
 
         public (List<Dictionary<string, object>> data, bool hasMoreRows)
-            QueryAsDictList(string sqlStatement, int offset, int maxRows, Dictionary<string, object> parameters = null)
+            QueryAsDictList(string sqlStatement, int offset, int maxRows, Dictionary<string, object> parameters)
         {
             var data = new List<Dictionary<string, object>>();
             bool hasMoreRows = false;
@@ -112,6 +112,28 @@ namespace RestlessDb.DataLayer
             return columns;
         }
 
+        public int ExecuteNonQuery(string sqlStatement, Dictionary<string, object> parameters)
+        {
+            try
+            {
+                SqlCommand command = new SqlCommand(sqlStatement, SqlConnection);
+                AddParamsToCommand(command, parameters);
+                Logger.LogInformation("ExecuteNonQuery: '{0}' -params: {1}", command, parameters);
+                return command.ExecuteNonQuery();
+            }
+            catch (SqlException e)
+            {
+                var message = $"SqlException: '{e.Message}'\r\n" +
+                              $"Errors: {e.Errors}\r\n" +
+                              $"Sql statement: {sqlStatement}\r\n" +
+                              $"Parameters: " + string.Join(", ", parameters) +
+                              $"Stack trace: {e.StackTrace}";
+
+                Logger.LogError(message);
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.DBQUERY, message);
+            }
+        }
+
         private static List<QueryColumn> GetColumnDescription(SqlDataReader reader)
         {
             var ret = new List<QueryColumn>();
@@ -145,7 +167,7 @@ namespace RestlessDb.DataLayer
 
             foreach (var param in parameters)
             {
-                command.Parameters.Add(new SqlParameter(PARAM_PREFIX + param.Key, param.Value.ToString()));
+                command.Parameters.Add(new SqlParameter(PARAM_PREFIX + param.Key, param.Value != null ? param.Value.ToString() : DBNull.Value));
             }
         }
 

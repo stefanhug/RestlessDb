@@ -6,7 +6,7 @@ namespace RestlessDb.Common.Types
     {
         QUERY_NOTFOUND, RECURSION, DBQUERY, FORMATTER_NOTFOUND,
         PARAMS_MISSING, PARAMS_NOTNEEDED, TEMPLATE_ERROR,
-        SQL_MUST_HAVE_ORDER_BY
+        SQL_MUST_HAVE_ORDER_BY, DUPLICATE_KEY, DML_ERROR, ITEM_NOTFOUND
     }
 
     public class GenericDbQueryException : Exception
@@ -15,6 +15,8 @@ namespace RestlessDb.Common.Types
         {
             ExceptionCode = code;
         }
+
+        public override string Message => $"Exception: {ExceptionCode.ToString()}\r\n{base.Message}";
 
         public GenericDbQueryExceptionCode ExceptionCode { get; }
     }

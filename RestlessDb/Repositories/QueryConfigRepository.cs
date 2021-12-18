@@ -28,15 +28,6 @@ namespace RestlessDb.Repositories
             this.queryItemProvider = queryItemProvider;
         }
 
-        public QueryAdminResult GetAllQueryItems()
-        {
-            var ret = new QueryAdminResult();
-
-            ret.QueryAdminItems = queryItemProvider.LoadQueryItems();
-
-            return ret;
-        }
-
         public QueryConfigResult GetAllQueries()
         {
             var ret = new QueryConfigResult();

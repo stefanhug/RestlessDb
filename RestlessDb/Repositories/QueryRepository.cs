@@ -59,7 +59,7 @@ namespace RestlessDb.Repositories
             return ret;
         }
 
-        private void RecurseDataChildren(List<Dictionary<string, object>> parentRowStack, List<QueryItem> childItems, Dictionary<string, object> queryParameters)
+        private void RecurseDataChildren(List<Dictionary<string, object>> parentRowStack, List<QueryItemExt> childItems, Dictionary<string, object> queryParameters)
         {
             if (childItems != null)
             {
@@ -70,7 +70,7 @@ namespace RestlessDb.Repositories
             }
         }
 
-        private void RecurseDataChild(List<Dictionary<string, object>> parentRowStack, QueryItem queryItem, Dictionary<string, object> queryParameters)
+        private void RecurseDataChild(List<Dictionary<string, object>> parentRowStack, QueryItemExt queryItem, Dictionary<string, object> queryParameters)
         {
             string sqlStmt = queryItem.Sql;
             string sql = $"{sqlStmt} offset 0 rows fetch next {MAX_CHILD_ROWS + 1} rows only";
@@ -97,5 +97,4 @@ namespace RestlessDb.Repositories
             }
         }
     }
-
 }

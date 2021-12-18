@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestlessDb.Test", "Restless
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestlessDb.ApiTest", "RestlessDb.ApiTest\RestlessDb.ApiTest.csproj", "{992D84DF-E176-4CCC-B601-9A1B4CE8098C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestlessDb.Common", "RestlessDb.Common\RestlessDb.Common.csproj", "{F0B5BB1A-BCDB-4C73-B222-4ACC02268BCD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestlessDb.Common", "RestlessDb.Common\RestlessDb.Common.csproj", "{F0B5BB1A-BCDB-4C73-B222-4ACC02268BCD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestlessDb.Client", "RestlessDb.Client\RestlessDb.Client.csproj", "{5AA76152-44BD-45DB-B089-516FC17ECEF2}"
 EndProject

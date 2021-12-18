@@ -66,9 +66,9 @@ namespace RestlessDb.DataLayer
             this.GenericSqlHelper = genericSqlHelper;
         }
 
-        public List<QueryItem> LoadQueryItems()
+        public List<QueryItemExt> LoadQueryItems()
         {
-            var ret = new List<QueryItem>();
+            var ret = new List<QueryItemExt>();
             var dbQueryItems = GetAllDbQueryItems();
 
             var topItems = dbQueryItems.Where(i => string.IsNullOrWhiteSpace(i.Parent));
@@ -86,7 +86,7 @@ namespace RestlessDb.DataLayer
             return ret;
         }
 
-        public QueryItem LoadQueryItem(string queryName)
+        public QueryItemExt LoadQueryItem(string queryName)
         {
             var dbQueryItems = GetDbQueryItems(queryName);
 
@@ -128,13 +128,13 @@ namespace RestlessDb.DataLayer
             return ret.ToList();
         }
 
-        private void RecurseChildItems(QueryItem currentItem, List<DbQueryItem> dbQueryItems, List<string> parentsList)
+        private void RecurseChildItems(QueryItemExt currentItem, List<DbQueryItem> dbQueryItems, List<string> parentsList)
         {
             var childRows = from a in dbQueryItems where SafeCompare(a.Parent, currentItem.Name) orderby a.Pos select a;
 
             if (childRows.Any())
             {
-                currentItem.ChildItems = new List<QueryItem>();
+                currentItem.ChildItems = new List<QueryItemExt>();
 
                 foreach(var childRow in childRows)
                 {
@@ -143,9 +143,9 @@ namespace RestlessDb.DataLayer
             }
         }
 
-        private QueryItem CreateItemFromRow(DbQueryItem dbItem, List<DbQueryItem> dbQueryItems, List<string> parentsList)
+        private QueryItemExt CreateItemFromRow(DbQueryItem dbItem, List<DbQueryItem> dbQueryItems, List<string> parentsList)
         {
-            var ret = new QueryItem()
+            var ret = new QueryItemExt()
             {
                 Name = dbItem.Name,
                 Label = dbItem.Label,
