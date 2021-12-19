@@ -17,7 +17,10 @@ namespace RestlessDb.Controllers
                 {GenericDbQueryExceptionCode.RECURSION, HttpStatusCode.InternalServerError},
                 {GenericDbQueryExceptionCode.PARAMS_MISSING, HttpStatusCode.BadRequest},
                 {GenericDbQueryExceptionCode.PARAMS_NOTNEEDED, HttpStatusCode.BadRequest},
-                {GenericDbQueryExceptionCode.SQL_MUST_HAVE_ORDER_BY, HttpStatusCode.InternalServerError}
+                {GenericDbQueryExceptionCode.SQL_MUST_HAVE_ORDER_BY, HttpStatusCode.InternalServerError},
+                {GenericDbQueryExceptionCode.DUPLICATE_KEY, HttpStatusCode.BadRequest},
+                {GenericDbQueryExceptionCode.DML_ERROR, HttpStatusCode.InternalServerError},
+                {GenericDbQueryExceptionCode.ITEM_NOTFOUND, HttpStatusCode.BadRequest},
             };
 
         public static HttpStatusCode GetHttpStatusCode(GenericDbQueryException e)

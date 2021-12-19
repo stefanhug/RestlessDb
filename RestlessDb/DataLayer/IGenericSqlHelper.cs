@@ -9,5 +9,6 @@ namespace RestlessDb.DataLayer
 
         (List<Dictionary<string, object>> data, bool hasMoreRows) QueryAsDictList(string sqlStatement, int offset = 0 , int maxRows = MAX_QRY_ROWS, Dictionary<string, object> parameters = null);
         List<QueryColumn> QueryResultColumns(string sqlStatement);
+        int ExecuteNonQuery(string sqlStatement, Dictionary<string, object> parameters = null);
     }
 }

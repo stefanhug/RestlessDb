@@ -8,11 +8,11 @@ namespace RestlessDb.ApiTest
     public class QueryControllerJsonOutputTest
     {
         [Theory]
-        [InlineData("persons", 8000, 6)]
-        [InlineData("persons?maxrows=10", 10, 6)]
-        [InlineData("persons?maxrows=10&offset=8000", 10, 6)]
-        [InlineData("personsbylastname?lastname=Smith", 103, 6)]
-        [InlineData("jobcandidates", 13, 16)]
+        [InlineData("dbapi/persons", 8000, 6)]
+        [InlineData("dbapi/persons?maxrows=10", 10, 6)]
+        [InlineData("dbapi/persons?maxrows=10&offset=8000", 10, 6)]
+        [InlineData("dbapi/personsbylastname?lastname=Smith", 103, 6)]
+        [InlineData("dbapi/jobcandidates", 13, 16)]
         public async void WhenSimpleQueryItemRequestedThenCorrectNumberOfRowsReturned(string pathAndQuery, int? resultRows, int? resultColumns)
         {
             var response = await new ApiTestRequestHandler().GetClientResponse(pathAndQuery);
@@ -35,8 +35,8 @@ namespace RestlessDb.ApiTest
 
         [Theory]
         [Trait("Category", "ApiTest")]
-        [InlineData("personss")]
-        [InlineData("personss?maxrows=10")]
+        [InlineData("dbapi/personss")]
+        [InlineData("dbapi/personss?maxrows=10")]
         public async void WhenNonExistingQueryIsRequestedThenNotFoundIsReturned(string pathAndQuery)
         {
             var response = await new ApiTestRequestHandler().GetClientResponse(pathAndQuery);
@@ -46,8 +46,8 @@ namespace RestlessDb.ApiTest
 
         [Theory]
         [Trait("Category", "ApiTest")]
-        [InlineData("persons?unusedparam=foo")]
-        [InlineData("personsbylastname")]
+        [InlineData("dbapi/persons?unusedparam=foo")]
+        [InlineData("dbapi/personsbylastname")]
         public async void WhenWrongParamsAreGivenThenBadRequestIsReturned(string pathAndQuery)
         {
             var response = await new ApiTestRequestHandler().GetClientResponse(pathAndQuery);
@@ -58,8 +58,8 @@ namespace RestlessDb.ApiTest
         
         [Theory]
         [Trait("Category", "ApiTest")]
-        [InlineData("salesorders?maxrows=10", 10, 4, 1)]
-        [InlineData("salesorders?offset=10&maxrows=10", 10, 4, 1)]
+        [InlineData("dbapi/salesorders?maxrows=10", 10, 4, 1)]
+        [InlineData("dbapi/salesorders?offset=10&maxrows=10", 10, 4, 1)]
         public async void WhenHierachicalQueryItemRequestedThenCorrectNumberOfRowsAndChildrenReturned(string pathAndQuery, int? resultRows, int? topResultColumns, int? firstLevelChildren)
         {
             var response = await new ApiTestRequestHandler().GetClientResponse(pathAndQuery);

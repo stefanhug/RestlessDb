@@ -7,14 +7,13 @@ using System.Net;
 
 namespace RestlessDb.Controllers
 {
-    [Route("/dbapi/admin/queryitems")]
+    [Route("/dbapi/admin/[controller]")]
     [ApiController]
     public class QueryItemsController : ControllerBase
     {
 
         private readonly ILogger<QueryItemsController> logger;
         private readonly QueryItemsManager manager;
-
 
         public QueryItemsController(ILogger<QueryItemsController> logger, QueryItemsManager manager)
         {
@@ -27,28 +26,69 @@ namespace RestlessDb.Controllers
         {
             try
             {
-                var queryResult = manager.GetAllQueryItems();
-
+                var queryResult = manager.GetAll();
                 return new JsonResult(queryResult);
-            }
-            catch (GenericDbQueryException e)
-            {
-                var msg = $"Exception: {e.ExceptionCode.ToString()}\r\n{e.Message}";
-                return new ContentResult()
-                {
-                    Content = msg,
-                    ContentType = "text/plain",
-                    StatusCode = (int)ExceptionStatusToHttpStatusCodeMapper.GetHttpStatusCode(e)
-                };
             }
             catch (Exception e)
             {
-                return new ContentResult()
-                {
-                    Content = $"Exception: {e.Message}",
-                    ContentType = "text/plain",
-                    StatusCode = (int)HttpStatusCode.InternalServerError
-                };
+                return ControllerHelper.HandleException(e, logger);
+            };
+        }
+
+        [HttpGet("{name}")]
+        public IActionResult Get(string name)
+        {
+            try
+            {
+                var queryResult = manager.Get(name);
+                return new JsonResult(queryResult);
+            }
+            catch (Exception e)
+            {
+                return ControllerHelper.HandleException(e, logger);
+            };
+        }
+
+        [HttpPut]
+        public IActionResult Put([Bind("Id,Name,Label,Description,Sql,Parent,Pos")] QueryItem queryItem)
+        {
+            try
+            {
+                var itm = manager.Update(queryItem);
+                return Ok(itm);
+                
+            }
+            catch (Exception e)
+            {
+                return ControllerHelper.HandleException(e, logger);
+            };
+        }
+
+        [HttpPost]
+        public IActionResult Post([Bind("Id,Name,Label,Description,Sql,Parent,Pos")] QueryItem queryItem)
+        {
+            try
+            {
+                var itm = manager.Insert(queryItem);
+                return Created($"/dbapi/admin/queryitems/{itm.Name}", itm);
+            }
+            catch (Exception e)
+            {
+                return ControllerHelper.HandleException(e, logger);
+            };
+        }
+
+        [HttpDelete("{name}")]
+        public IActionResult Delete(string name)
+        {
+            try
+            {
+                manager.Delete(name);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return ControllerHelper.HandleException(e, logger);
             };
         }
     }

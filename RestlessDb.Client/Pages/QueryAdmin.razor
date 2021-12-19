@@ -1,5 +1,7 @@
 ﻿@page "/queryadmin"
-@inject ClientModel ClientModel
+@inject ClientModel clientModel
+@inject IJSRuntime js
+@inject NavigationManager uriHelper
 
 
 @if (ErrorMessage != null)
@@ -14,32 +16,50 @@ else
         <h1> Query administration </h1>
         <h2>Configure and modify queries</h2>
 
-
         <hr />
     </div>
-    @if (queryAdminResult == null)
+
+    @if (queryItems == null)
     {
         <p><em>Loading...</em></p>
     }
     else
     {
+        <h2>Add new top level query</h2>
+        <button class="btn btn-primary" @onclick="() => CreateNewQuery(null)">
+            <span class="oi oi-plus" aria-hidden="true">Create New</span>
+        </button>
 
         <table class="table table-striped">
             <thead>
-            <th>Name</th>
-            <th>Label</th>
-            <th>Description</th>
-            <th>Sql Statement</th>
+                <tr>
+                    <th>Name</th>
+                    <th>Label</th>
+                    <th>Description</th>
+                    <th>Sql Statement</th>
+                    <th>Actions</th>
+                </tr>
             </thead>
             <tbody>
-                @foreach (var itm in queryAdminResult.QueryAdminItems)
+                @foreach (var itm in queryItems)
                 {
                     <tr>
                         <td>@itm.Name</td>
                         <td>@itm.Label</td>
                         <td>@itm.Description</td>
                         <td>@itm.Sql</td>
-
+                        <td>
+                            <button class="btn btn-primary" @onclick="() => EditQuery(itm.Name)">
+                                <span class="oi oi-pencil" aria-hidden="true"/>Edit
+                            </button>
+                            <button class="btn btn-primary" @onclick="() => CreateNewQuery(itm.Name)">
+                                <span class="oi oi-plus" aria-hidden="true"/>New child query
+                            </button>
+                            <button class="btn btn-primary" @onclick="() => Delete(itm.Name)">
+                                <span class="oi oi-delete" aria-hidden="true"/>Delete
+                            </button>
+                            
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -50,14 +70,14 @@ else
 
 @code {
     private string ErrorMessage { get; set; }
-    private QueryAdminResult queryAdminResult;
+    private List<QueryItem> queryItems;
 
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            queryAdminResult = await ClientModel.FetchQueryItemsAsync();
+            queryItems = await clientModel.FetchQueryItemsAsync();
         }
         catch (HttpRequestException e)
         {
@@ -67,5 +87,24 @@ else
         {
             ErrorMessage = $"{e.Message}\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
         }
+    }
+
+    async Task Delete(string qryItemName)
+    {
+        if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete the query '{qryItemName}' ?"))
+        {
+            await clientModel.DeleteQueryItemAsync(qryItemName);
+            await js.InvokeVoidAsync("alert", $"Query item '{qryItemName}' successfully deleted");
+        }
+    }
+
+    void CreateNewQuery(string parentQuery)
+    {
+        uriHelper.NavigateTo($"/qryitemnew?parent={parentQuery}");
+    }
+
+    void EditQuery(string queryName)
+    {
+        uriHelper.NavigateTo($"/qryitemedit/{queryName}");
     }
 }
