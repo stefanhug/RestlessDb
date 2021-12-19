@@ -40,6 +40,8 @@ namespace RestlessDb.Managers
                 throw new GenericDbQueryException(GenericDbQueryExceptionCode.DML_ERROR, $"Error insert item {queryItem.Name}: Inserted rows != 1");
             }
 
+            queryItemsRepository.CheckValidSql(queryItem.Sql);
+
             return queryItemsRepository.Get(queryItem.Name);
         }
 
@@ -52,8 +54,10 @@ namespace RestlessDb.Managers
 
             if (queryItemsRepository.Update(queryItem) != 1)
             {
-                throw new GenericDbQueryException(GenericDbQueryExceptionCode.ITEM_NOTFOUND, $"Error update item {queryItem.Name}: Updated rows != 1");
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.DML_ERROR, $"Error update item {queryItem.Name}: Updated rows != 1");
             }
+
+            queryItemsRepository.CheckValidSql(queryItem.Sql);
 
             return queryItemsRepository.Get(queryItem.Name);
         }
@@ -63,6 +67,13 @@ namespace RestlessDb.Managers
             if (queryItemsRepository.Get(name) == null)
             {
                 throw new GenericDbQueryException(GenericDbQueryExceptionCode.ITEM_NOTFOUND, $"Cannot delete item {name}: Item not found");
+            }
+
+            var children = queryItemsRepository.GetChildren(name);
+
+            if (children.Count > 0)
+            {
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.CHILDREN_EXIST, $"Cannot delete item '{name}', because child queries exist: {string.Join(", ", children)}");
             }
 
             if (queryItemsRepository.Delete(name) != 1)

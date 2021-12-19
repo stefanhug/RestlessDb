@@ -21,6 +21,7 @@ namespace RestlessDb.Controllers
                 {GenericDbQueryExceptionCode.DUPLICATE_KEY, HttpStatusCode.BadRequest},
                 {GenericDbQueryExceptionCode.DML_ERROR, HttpStatusCode.InternalServerError},
                 {GenericDbQueryExceptionCode.ITEM_NOTFOUND, HttpStatusCode.BadRequest},
+                {GenericDbQueryExceptionCode.CHILDREN_EXIST, HttpStatusCode.BadRequest},
             };
 
         public static HttpStatusCode GetHttpStatusCode(GenericDbQueryException e)

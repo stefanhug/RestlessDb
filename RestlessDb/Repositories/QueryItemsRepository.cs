@@ -4,6 +4,7 @@ using RestlessDb.DataLayer;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.Data.SqlClient;
 
 namespace RestlessDb.Repositories
 {
@@ -19,6 +20,12 @@ namespace RestlessDb.Repositories
             select Id, Name, Label, Description, Sql, Parent, Pos 
             from GQuery.QueryItem
             where Name = @Name
+        ";
+
+        private const string SQL_GET_CHILDREN = @"
+            select Name 
+            from GQuery.QueryItem
+            where Parent = @Parent
         ";
 
         private const string SQL_INSERT = @"
@@ -49,6 +56,7 @@ namespace RestlessDb.Repositories
             this.genericSqlHelper = genericSqlHelper ?? throw new Exception("No IGenericSqlHelper given");
             this.logger = logger ?? throw new Exception("No ILogger given"); 
         }
+
         public List<QueryItem> GetAll()
         {
             var (items, hasMoreRows) = genericSqlHelper.QueryAsDictList(SQL_GET_ALL);
@@ -72,6 +80,19 @@ namespace RestlessDb.Repositories
                 select CreateItemForDict(item);
 
             return ret.FirstOrDefault();
+        }
+
+        public List<string> GetChildren(string queryItemName)
+        {
+            var (items, hasMoreRows) = genericSqlHelper.QueryAsDictList(SQL_GET_CHILDREN,
+                                                                    0, IGenericSqlHelper.MAX_QRY_ROWS,
+                                                                    new() { { "PARENT", queryItemName } });
+            var ret =
+                from item
+                in items
+                select (string)item["Name"];
+
+            return ret.ToList();
         }
 
         public int Insert(QueryItem queryItem)
@@ -106,6 +127,22 @@ namespace RestlessDb.Repositories
         {
             return genericSqlHelper.ExecuteNonQuery(SQL_DELETE, new() {{ "NAME", name }});
         }
+
+        public void CheckValidSql(string sql)
+        {
+            // execute a schemaOnly query with filled params
+            try
+            {
+                genericSqlHelper.QueryResultColumns(sql);
+            }
+            catch(SqlException e)
+            {
+                var message = $"SqlException: '{e.Message}'\r\nErrors: {e.Errors}\r\nSql statement: {sql}\r\nStack trace: {e.StackTrace}";
+                logger.LogError(message);
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.DBQUERY, message);
+            }
+        }
+
 
         private string ConsolidateNull(string value)
         {
