@@ -40,7 +40,7 @@ namespace RestlessDb.ApiTest
                 Name = "TestPutRequestQryItem_271",
                 Label = "TestPutRequestQryItem_271_Lbl",
                 Description = "TestPutRequestQryItem_271_Description",
-                Sql = "select * from dual",
+                Sql = "select * from INFORMATION_SCHEMA.Tables order by TABLE_NAME",
                 Pos = 0,
                 Parent = null
             };

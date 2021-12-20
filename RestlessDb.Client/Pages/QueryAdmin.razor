@@ -77,7 +77,7 @@ else
     {
         try
         {
-            queryItems = await clientModel.FetchQueryItemsAsync();
+            queryItems = await clientModel.GatewayRestlessDb.FetchQueryItemsAsync();
         }
         catch (HttpRequestException e)
         {
@@ -93,7 +93,7 @@ else
     {
         if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete the query '{qryItemName}' ?"))
         {
-            await clientModel.DeleteQueryItemAsync(qryItemName);
+            await clientModel.GatewayRestlessDb.DeleteQueryItemAsync(qryItemName);
             await js.InvokeVoidAsync("alert", $"Query item '{qryItemName}' successfully deleted");
         }
     }

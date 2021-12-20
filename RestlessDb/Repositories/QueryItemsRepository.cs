@@ -10,7 +10,7 @@ namespace RestlessDb.Repositories
 {
     public class QueryItemsRepository
     {
-        private const string SQL_GET_ALL = @"
+        public const string SQL_GET_ALL = @"
             select Id, Name, Label, Description, Sql, Parent, Pos 
             from GQuery.QueryItem
             order by Name
@@ -131,19 +131,97 @@ namespace RestlessDb.Repositories
         public void CheckValidSql(string sql)
         {
             // execute a schemaOnly query with filled params
+            // TODO: move to QueryRepository, this is a test against a possibly different target DB
             try
             {
                 genericSqlHelper.QueryResultColumns(sql);
             }
             catch(SqlException e)
             {
-                var message = $"SqlException: '{e.Message}'\r\nErrors: {e.Errors}\r\nSql statement: {sql}\r\nStack trace: {e.StackTrace}";
+                var message = $"Check SQL statement {sql} failed:\r\n({e.Message})";
                 logger.LogError(message);
                 throw new GenericDbQueryException(GenericDbQueryExceptionCode.DBQUERY, message);
             }
         }
 
+        public void CheckContainsOrderBy(string sql)
+        {
+            if (!QueryParamsParser.ContainsOrderBy(sql))
+            {
+                var message = $"Error: SQL statement: ''{sql}' does not contain the mandatory ORDER BY clause";
+                logger.LogError(message);
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.DBQUERY, message);
+            }
+        }
 
+        public QueryItemExt LoadQueryItemExt(string queryName)
+        {
+            var queryItems = GetAll();
+
+            var topItem = queryItems.Find(i => i.Name.Equals(queryName, StringComparison.InvariantCultureIgnoreCase));
+            if (topItem == null)
+            {
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.QUERY_NOTFOUND, $"No query repository entry with name {queryName} found");
+            }
+
+            var ret = CreateItemFromRow(topItem, queryItems, new List<string>());
+            return ret;
+        }
+
+        private void RecurseChildItems(QueryItemExt currentItem, List<QueryItem> queryItems, List<string> parentsList)
+        {
+            var childRows = from a in queryItems where SafeCompare(a.Parent, currentItem.Name) orderby a.Pos select a;
+
+            if (childRows.Any())
+            {
+                currentItem.Children = new List<QueryItemExt>();
+
+                foreach (var childRow in childRows)
+                {
+                    currentItem.Children.Add(CreateItemFromRow(childRow, queryItems, parentsList));
+                }
+            }
+        }
+
+        private QueryItemExt CreateItemFromRow(QueryItem queryItem, List<QueryItem> queryItems, List<string> parentsList)
+        {
+            var ret = new QueryItemExt()
+            {
+                Name = queryItem.Name,
+                Label = queryItem.Label,
+                Description = queryItem.Description,
+                Sql = queryItem.Sql,
+            };
+
+            if (!QueryParamsParser.ContainsOrderBy(ret.Sql))
+            {
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.SQL_MUST_HAVE_ORDER_BY,
+                                                  $"Error in SQL \"{ret.Sql}\": All SQL statements in query item table must have an order by clause");
+            }
+
+            if (parentsList.Contains(ret.Name))
+            {
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.RECURSION, $"Loop recursion detected for item {ret.Name}, please correct setup");
+            }
+            parentsList.Add(ret.Name);
+
+            // todo: wrong DB, move to QueryRepository
+            ret.Columns = genericSqlHelper.QueryResultColumns(ret.Sql);
+            RecurseChildItems(ret, queryItems, new List<string>() { ret.Name });
+
+            return ret;
+        }
+
+        private bool SafeCompare(object a, object b)
+        {
+            if (a == null && b == null)
+                return true;
+            else if (a == null || b == null)
+                return false;
+
+            return a.ToString().Equals(b.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
+    
         private string ConsolidateNull(string value)
         {
             return string.IsNullOrWhiteSpace(value) ? null : value;
@@ -157,7 +235,7 @@ namespace RestlessDb.Repositories
                 Name = ((string)row["Name"]).ToLowerInvariant(),
                 Label = (string)row["Label"],
                 Description = (string)row["Description"],
-                Parent = ((string)row["Parent"]).ToLowerInvariant(),
+                Parent = ((string)row["Parent"])?.ToLowerInvariant(),
                 Pos = (int)row["Pos"],
                 Sql = (string)row["Sql"]
             };

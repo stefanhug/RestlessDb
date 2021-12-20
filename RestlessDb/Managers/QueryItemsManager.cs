@@ -30,6 +30,9 @@ namespace RestlessDb.Managers
 
         public QueryItem Insert(QueryItem queryItem)
         {
+            queryItemsRepository.CheckValidSql(queryItem.Sql);
+            queryItemsRepository.CheckContainsOrderBy(queryItem.Sql);
+
             if (queryItemsRepository.Get(queryItem.Name) != null)
             {
                 throw new GenericDbQueryException(GenericDbQueryExceptionCode.DUPLICATE_KEY, $"Cannot insert item {queryItem.Name}: Key already exists");
@@ -40,13 +43,14 @@ namespace RestlessDb.Managers
                 throw new GenericDbQueryException(GenericDbQueryExceptionCode.DML_ERROR, $"Error insert item {queryItem.Name}: Inserted rows != 1");
             }
 
-            queryItemsRepository.CheckValidSql(queryItem.Sql);
-
             return queryItemsRepository.Get(queryItem.Name);
         }
 
         public QueryItem Update(QueryItem queryItem)
         {
+            queryItemsRepository.CheckValidSql(queryItem.Sql);
+            queryItemsRepository.CheckContainsOrderBy(queryItem.Sql);
+
             if (queryItemsRepository.Get(queryItem.Name) == null)
             {
                 throw new GenericDbQueryException(GenericDbQueryExceptionCode.ITEM_NOTFOUND, $"Cannot update item {queryItem.Name}: Item not found");
@@ -58,6 +62,7 @@ namespace RestlessDb.Managers
             }
 
             queryItemsRepository.CheckValidSql(queryItem.Sql);
+            queryItemsRepository.CheckContainsOrderBy(queryItem.Sql);
 
             return queryItemsRepository.Get(queryItem.Name);
         }

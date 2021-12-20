@@ -2,6 +2,7 @@
 using RestlessDb.Common.Types;
 using Moq;
 using System.Collections.Generic;
+using RestlessDb.Repositories;
 
 namespace GenericDbRestApi.Test.DataLayer
 {
@@ -12,9 +13,7 @@ namespace GenericDbRestApi.Test.DataLayer
             var genericSqlHelperMoq = new Mock<IGenericSqlHelper>();
 
             genericSqlHelperMoq.Setup(
-                p => p.QueryAsDictList(QueryItemProvider.QRY_QRY_REPOSITORY,
-                                       0, QueryItemProvider.MAXCHILDQUERIES,
-                                       new Dictionary<string, object> { { "NAME", "salesorders" } }))
+                p => p.QueryAsDictList(QueryItemsRepository.SQL_GET_ALL, 0, IGenericSqlHelper.MAX_QRY_ROWS, null))
                      .Returns((qryQueryItemReturnValue, false));
 
             genericSqlHelperMoq.Setup(
@@ -32,6 +31,7 @@ namespace GenericDbRestApi.Test.DataLayer
             {
                 new Dictionary<string, object>()
                 {
+                    { "Id", 1234 },
                     { "Name", "SalesOrders" },
                     { "Label", "Sales Orders" },
                     { "Description", "Query of some fields from the the Adventureworks table Sales.SalesOrderHeader" },
@@ -41,6 +41,7 @@ namespace GenericDbRestApi.Test.DataLayer
                 },
                 new Dictionary<string, object>()
                 {
+                    { "Id", 5678 },
                     { "Name", "SalesOrderDetails" },
                     { "Label", "Sales Order Details" },
                     { "Description", "Query of some fields from the the Adventureworks table Sales.SalesOrderDetail as detail query" },

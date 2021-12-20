@@ -13,7 +13,7 @@ namespace RestlessDb.Common.Types
         public string Sql { get; set; }
 
         public List<QueryColumn> Columns { get; set; }
-        public List<QueryItemExt> ChildItems { get; set; }
+        public List<QueryItemExt> Children { get; set; }
 
         public QueryMetaData AsQueryMetaData()
         {
@@ -22,9 +22,9 @@ namespace RestlessDb.Common.Types
             ret.Label = Label;
             ret.Description = Description;
             ret.Columns = Columns;
-            if (ChildItems != null)
+            if (Children != null)
             {
-                ret.Children = (from a in ChildItems select a.AsQueryMetaData()).ToList();
+                ret.Children = (from a in Children select a.AsQueryMetaData()).ToList();
             }
 
             return ret;

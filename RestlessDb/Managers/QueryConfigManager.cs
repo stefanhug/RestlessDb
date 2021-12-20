@@ -7,6 +7,7 @@ using System.Text;
 
 namespace RestlessDb.Managers
 {
+    //Todo: remove this class, consolidate with QueryItemsManager 
     public class QueryConfigManager
     {
         private readonly ILogger<QueryConfigManager> logger;

@@ -34,7 +34,6 @@ namespace RestlessDb.Services
                 return conn;
             });
             services.AddScoped<IGenericSqlHelper, GenericSqlHelper>();
-            services.AddScoped<QueryItemProvider, QueryItemProvider>();
             services.AddScoped<QueryParamsProvider, QueryParamsProvider>();
             services.AddScoped<QueryRepository, QueryRepository>();
             services.AddScoped<GenericQueryManager, GenericQueryManager>();
