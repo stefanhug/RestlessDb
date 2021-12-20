@@ -38,7 +38,13 @@ namespace RestlessDb.Client.Model
             {
                 return;
             }
-            queryConfigItems = (await GatewayRestlessDb.GetQueryConfigAsync();
+            queryConfigItems = (await GatewayRestlessDb.GetQueryConfigAsync());
+        }
+
+        public async Task<QueryConfigItem> GetConfigItemAsync(string name)
+        {
+            await CheckInitAsync();
+            return queryConfigItems.Find(i => i.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         }
 
         public void InvalidateCaches()

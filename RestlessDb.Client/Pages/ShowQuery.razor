@@ -60,7 +60,7 @@ else
         QueryContent = "Loading...";
         try
         {
-            QueryContent = await ClientModel.FetchQueryContentAsync(QueryItem, "html", Offset, MaxRows);
+            QueryContent = await ClientModel.GatewayRestlessDb.FetchQueryContentAsync(QueryItem, "html", Offset, MaxRows);
         }
         catch (HttpRequestException e)
         {

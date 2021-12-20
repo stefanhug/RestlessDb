@@ -94,6 +94,12 @@ namespace RestlessDb.Common.Gateway
         {
             return (await httpClient.GetFromJsonAsync<QueryConfigResult>(EP_ALLQUERIES)).QueryConfigItems;
         }
+        
+        public async Task<HttpResponseMessage> GetClientResponse(string pathAndQuery)
+        {
+            var response = await httpClient.GetAsync(pathAndQuery);
+            return response;
+        }
     }
 }
 

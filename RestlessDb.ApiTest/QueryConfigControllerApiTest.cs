@@ -8,13 +8,13 @@ namespace RestlessDb.ApiTest
 {
     public class QueryConfigControllerApiTest
     {
-        [Theory]
-        [InlineData("dbapiconfig/allqueries")]
-        public async void WhenSimpleQueryItemRequestedThenCorrectNumberOfRowsReturned(string pathAndQuery)
+        [Fact]
+        public async void WhenSimpleQueryItemRequestedThenCorrectNumberOfRowsReturned()
         {
-            var ret = await new ApiTestRequestHandler().GetJson<QueryConfigResult>(pathAndQuery);
-
-            Assert.True(ret.QueryConfigItems.Count > 2);
+            var gw = TestGatewayBuilder.GetGateway();
+            var ret = await gw.GetQueryConfigAsync();
+            
+            Assert.True(ret.Count > 2);
         }
     }
 }
