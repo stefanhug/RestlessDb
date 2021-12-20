@@ -94,6 +94,7 @@ else
         if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete the query '{qryItemName}' ?"))
         {
             await clientModel.GatewayRestlessDb.DeleteQueryItemAsync(qryItemName);
+            clientModel.InvalidateCaches();
             await js.InvokeVoidAsync("alert", $"Query item '{qryItemName}' successfully deleted");
         }
     }

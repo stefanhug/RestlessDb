@@ -95,10 +95,12 @@ else
         if (IsUpdate())
         {
             await clientModel.GatewayRestlessDb.UpdateQueryItemAsync(queryItemEdit);
+            clientModel.InvalidateCaches();
         }
         else
         {
             await clientModel.GatewayRestlessDb.InsertQueryItemAsync(queryItemEdit);
+            clientModel.InvalidateCaches();
         }
 
         uriHelper.NavigateTo("/queryadmin");
