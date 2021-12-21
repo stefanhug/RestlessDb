@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using RestlessDb.DataLayer;
 using RestlessDb.Common.Types;
+using RestlessDb.DataLayer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,13 +19,11 @@ namespace RestlessDb.Repositories
 
         private readonly IGenericSqlHelper genericSqlHelper;
         private readonly ILogger<QueryConfigRepository> logger;
-        private readonly QueryItemProvider queryItemProvider;
-
-        public QueryConfigRepository(IGenericSqlHelper genericSqlHelper, QueryItemProvider queryItemProvider, ILogger<QueryConfigRepository> logger)
+        
+        public QueryConfigRepository(IGenericSqlHelper genericSqlHelper, ILogger<QueryConfigRepository> logger)
         {
             this.genericSqlHelper = genericSqlHelper ?? throw new Exception("not found");
             this.logger = logger;
-            this.queryItemProvider = queryItemProvider;
         }
 
         public QueryConfigResult GetAllQueries()

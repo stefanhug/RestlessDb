@@ -81,7 +81,7 @@ else
 
         if (IsUpdate())
         {
-            queryItemEdit = await clientModel.FetchQueryItemAsync(QryItemName);  
+            queryItemEdit = await clientModel.GatewayRestlessDb.FetchQueryItemAsync(QryItemName);  
         }
         else
         {
@@ -94,11 +94,13 @@ else
     {
         if (IsUpdate())
         {
-            await clientModel.UpdateQueryItemAsync(queryItemEdit);
+            await clientModel.GatewayRestlessDb.UpdateQueryItemAsync(queryItemEdit);
+            clientModel.InvalidateCaches();
         }
         else
         {
-            await clientModel.InsertQueryItemAsync(queryItemEdit);
+            await clientModel.GatewayRestlessDb.InsertQueryItemAsync(queryItemEdit);
+            clientModel.InvalidateCaches();
         }
 
         uriHelper.NavigateTo("/queryadmin");

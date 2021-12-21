@@ -18,8 +18,10 @@ namespace RestlessDb.Common.Types
     {
         [DataMember]
         public string Name { get; set; }
+
         [DataMember]
         public string Label { get; set; }
+
         [DataMember]
         public string Description { get; set; }
 

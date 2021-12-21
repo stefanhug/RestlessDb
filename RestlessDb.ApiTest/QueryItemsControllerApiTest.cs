@@ -8,31 +8,32 @@ namespace RestlessDb.ApiTest
 {
     public class QueryItemsControllerApiTest
     {
-        [Theory]
+        [Fact]
         [Trait("Category", "ApiTest")]
-        [InlineData("dbapi/admin/queryitems")]
-        public async void WhenAllGetQueryItemsThenItemsReturned(string pathAndQuery)
+        public async void WhenAllGetQueryItemsThenItemsReturned()
         {
-            var ret = await new ApiTestRequestHandler().GetJson<List<QueryItem>>(pathAndQuery);
+            var gw = TestGatewayBuilder.GetGateway();
+            var ret = await gw.FetchQueryItemsAsync();
             Assert.True(ret.Count > 2);
         }
 
-        [Theory]
+        [Fact]
         [Trait("Category", "ApiTest")]
         [InlineData("dbapi/admin/queryitems/Persons")]
-        public async void WhenSingleGetQueryItemsThenItemReturned(string pathAndQuery)
+        public async void WhenSingleGetQueryItemsThenItemReturned()
         {
-            var ret = await new ApiTestRequestHandler().GetJson<QueryItem>(pathAndQuery);
+            var gw = TestGatewayBuilder.GetGateway();
+            var ret = await gw.FetchQueryItemAsync("Persons");
             Assert.Equal("Persons", ret.Label);
         }
 
-        [Theory]
+        [Fact]
         [Trait("Category", "ApiTest")]
-        [InlineData("dbapi/admin/queryitems")]
         // still not convinced that only one assert and one action per integration test. How to test insert/update/delete then?
-        public async void WhenDoingCreateDeleteThenItemNumberIsTheSame(string pathAndQuery)
+        public async void WhenDoingCreateDeleteThenItemNumberIsTheSame()
         {
-            var ret = await new ApiTestRequestHandler().GetJson<List<QueryItem>>(pathAndQuery);
+            var gw = TestGatewayBuilder.GetGateway();
+            var ret = await gw.FetchQueryItemsAsync();
             var numberofitems = ret.Count;
             var newQueryItem = new QueryItem()
             {
@@ -40,31 +41,26 @@ namespace RestlessDb.ApiTest
                 Name = "TestPutRequestQryItem_271",
                 Label = "TestPutRequestQryItem_271_Lbl",
                 Description = "TestPutRequestQryItem_271_Description",
-                Sql = "select * from dual",
+                Sql = "select * from INFORMATION_SCHEMA.Tables order by TABLE_NAME",
                 Pos = 0,
                 Parent = null
             };
             
             // ins
-            var retItem = await new ApiTestRequestHandler().PostJson<QueryItem>(pathAndQuery, newQueryItem);
+            var retItem = await gw.InsertQueryItemAsync(newQueryItem);
             Assert.NotNull(retItem.Id);
-            var newNumberOfItems = (await new ApiTestRequestHandler().GetJson<List<QueryItem>>(pathAndQuery)).Count;
+            var newNumberOfItems = (await gw.FetchQueryItemsAsync()).Count;
             Assert.Equal(numberofitems + 1, newNumberOfItems);
-
-
 
             //upd
             newQueryItem.Label += "UPD";
-            retItem = await new ApiTestRequestHandler().PutJson<QueryItem>(pathAndQuery, newQueryItem);
+            retItem = await gw.UpdateQueryItemAsync(newQueryItem);
             Assert.Equal(newQueryItem.Label, retItem.Label);
 
             //del
-            await new ApiTestRequestHandler().Delete($"{pathAndQuery}/{newQueryItem.Name}");
-            newNumberOfItems = (await new ApiTestRequestHandler().GetJson<List<QueryItem>>(pathAndQuery)).Count;
+            await gw.DeleteQueryItemAsync(newQueryItem.Name);
+            newNumberOfItems = (await gw.FetchQueryItemsAsync()).Count;
             Assert.Equal(numberofitems, newNumberOfItems);
         }
-
-
-
     }
 }

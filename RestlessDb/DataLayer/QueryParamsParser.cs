@@ -23,7 +23,7 @@ namespace RestlessDb.DataLayer
 
         public static bool ContainsOrderBy(string sql)
         {
-            string pattern = @"order\W+by";
+            string pattern = @"\Worder\W+by\W";
             Regex rgx = new Regex(pattern, RegexOptions.IgnoreCase);
 
             return rgx.Matches(sql).Any();

@@ -30,6 +30,9 @@ namespace RestlessDb.Managers
 
         public QueryItem Insert(QueryItem queryItem)
         {
+            queryItemsRepository.CheckValidSql(queryItem.Sql);
+            queryItemsRepository.CheckContainsOrderBy(queryItem.Sql);
+
             if (queryItemsRepository.Get(queryItem.Name) != null)
             {
                 throw new GenericDbQueryException(GenericDbQueryExceptionCode.DUPLICATE_KEY, $"Cannot insert item {queryItem.Name}: Key already exists");
@@ -45,6 +48,9 @@ namespace RestlessDb.Managers
 
         public QueryItem Update(QueryItem queryItem)
         {
+            queryItemsRepository.CheckValidSql(queryItem.Sql);
+            queryItemsRepository.CheckContainsOrderBy(queryItem.Sql);
+
             if (queryItemsRepository.Get(queryItem.Name) == null)
             {
                 throw new GenericDbQueryException(GenericDbQueryExceptionCode.ITEM_NOTFOUND, $"Cannot update item {queryItem.Name}: Item not found");
@@ -52,8 +58,11 @@ namespace RestlessDb.Managers
 
             if (queryItemsRepository.Update(queryItem) != 1)
             {
-                throw new GenericDbQueryException(GenericDbQueryExceptionCode.ITEM_NOTFOUND, $"Error update item {queryItem.Name}: Updated rows != 1");
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.DML_ERROR, $"Error update item {queryItem.Name}: Updated rows != 1");
             }
+
+            queryItemsRepository.CheckValidSql(queryItem.Sql);
+            queryItemsRepository.CheckContainsOrderBy(queryItem.Sql);
 
             return queryItemsRepository.Get(queryItem.Name);
         }
@@ -63,6 +72,13 @@ namespace RestlessDb.Managers
             if (queryItemsRepository.Get(name) == null)
             {
                 throw new GenericDbQueryException(GenericDbQueryExceptionCode.ITEM_NOTFOUND, $"Cannot delete item {name}: Item not found");
+            }
+
+            var children = queryItemsRepository.GetChildren(name);
+
+            if (children.Count > 0)
+            {
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.CHILDREN_EXIST, $"Cannot delete item '{name}', because child queries exist: {string.Join(", ", children)}");
             }
 
             if (queryItemsRepository.Delete(name) != 1)

@@ -41,4 +41,8 @@
     <ProjectReference Include="..\RestlessDb\RestlessDb.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Managers\" />
+  </ItemGroup>
+
 </Project>

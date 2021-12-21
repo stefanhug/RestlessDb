@@ -44,11 +44,14 @@ namespace RestlessDb.DataLayer
 
             try
             {
-                string sqlWithRange = $"{sqlStatement} offset {offset} rows fetch next {maxRows + 1} rows only";
+                // adding range clause is only possible for queries with ORDER BY clause
+                string effectiveSql = QueryParamsParser.ContainsOrderBy(sqlStatement) ?
+                                      $"{sqlStatement} offset {offset} rows fetch next {maxRows + 1} rows only" :
+                                      sqlStatement;
 
                 Logger.LogInformation("QueryAsDictList SQL start");
 
-                SqlCommand command = new SqlCommand(sqlStatement, SqlConnection);
+                SqlCommand command = new SqlCommand(effectiveSql, SqlConnection);
                 AddParamsToCommand(command, parameters);
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
@@ -72,7 +75,7 @@ namespace RestlessDb.DataLayer
                     command.Cancel(); //Otherwise we get a timeout in the dispose if more rows available
                 }
                 
-                Logger.LogInformation("QueryAsDictList SQL: {0} ({1} ms)", sqlWithRange, Environment.TickCount - start);
+                Logger.LogInformation("QueryAsDictList SQL: {0} ({1} ms)", effectiveSql, Environment.TickCount - start);
 
 
                 return (data, hasMoreRows);
