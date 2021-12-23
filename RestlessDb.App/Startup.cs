@@ -31,7 +31,7 @@ namespace RestlessDb.App
 
             // DbRestApi registration
             var connectionString = Configuration.GetSection("AppSettings").GetValue<string>("ConnectionString");
-            services.AddDbRestApiAddDbRestApi(connectionString);
+            services.AddDbRestApi(connectionString);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

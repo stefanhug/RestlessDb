@@ -9,7 +9,7 @@ namespace RestlessDb.Services
 {
     public static class RestlessDbServiceCollectionExtensions
     {
-        public static void AddDbRestApiAddDbRestApi(this IServiceCollection services, string dbConnectionString)
+        public static void AddDbRestApi(this IServiceCollection services, string dbConnectionString)
         {
             AddDependencies(services, dbConnectionString);
             AddFormatters(services);
