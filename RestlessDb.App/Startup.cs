@@ -1,10 +1,10 @@
-using RestlessDb.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json.Serialization;
+using RestlessDb.Services;
 
 namespace RestlessDb.App
 {
@@ -31,7 +31,7 @@ namespace RestlessDb.App
 
             // DbRestApi registration
             var connectionString = Configuration.GetSection("AppSettings").GetValue<string>("ConnectionString");
-            services.AddDbRestApi(connectionString);
+            services.AddDbRestApiAddDbRestApi(connectionString);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

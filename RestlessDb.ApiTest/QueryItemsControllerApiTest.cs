@@ -1,7 +1,4 @@
 ﻿using RestlessDb.Common.Types;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace RestlessDb.ApiTest
@@ -19,7 +16,6 @@ namespace RestlessDb.ApiTest
 
         [Fact]
         [Trait("Category", "ApiTest")]
-        [InlineData("dbapi/admin/queryitems/Persons")]
         public async void WhenSingleGetQueryItemsThenItemReturned()
         {
             var gw = TestGatewayBuilder.GetGateway();

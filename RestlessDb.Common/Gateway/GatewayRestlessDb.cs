@@ -43,10 +43,7 @@ namespace RestlessDb.Common.Gateway
 
             var response = await httpClient.PostAsync(EP_QUERYITEM, data);
 
-            if (response.StatusCode != HttpStatusCode.Created)
-            {
-                throw new Exception($"Unexpected HTTP returncode {response.StatusCode} for POST message");
-            }
+            var dummy = await CheckReturnCode(HttpStatusCode.Created, "POST", response);
 
             string result = response.Content.ReadAsStringAsync().Result;
             var ret = JsonConvert.DeserializeObject<QueryItem>(result);
@@ -61,10 +58,7 @@ namespace RestlessDb.Common.Gateway
 
             var response = await httpClient.PutAsync(EP_QUERYITEM, data);
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new Exception($"Unexpected HTTP returncode {response.StatusCode} for PUT message");
-            }
+            var dummy = await CheckReturnCode(HttpStatusCode.OK, "PUT", response);
 
             string result = response.Content.ReadAsStringAsync().Result;
             var ret = JsonConvert.DeserializeObject<QueryItem>(result);
@@ -76,10 +70,7 @@ namespace RestlessDb.Common.Gateway
         {
             var response = await httpClient.DeleteAsync($"{EP_QUERYITEM}/{itemName}");
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new Exception($"Unexpected HTTP returncode {response.StatusCode} for POST message");
-            }
+            var dummy = await CheckReturnCode(HttpStatusCode.OK, "DELETE", response);
 
             return true;
         }
@@ -99,6 +90,17 @@ namespace RestlessDb.Common.Gateway
         {
             var response = await httpClient.GetAsync(pathAndQuery);
             return response;
+        }
+
+        private async Task<bool> CheckReturnCode(HttpStatusCode expectedHttpStatusCode, string actionName, HttpResponseMessage message)
+        {
+            if (message.StatusCode != expectedHttpStatusCode)
+            {
+                throw new HttpRequestException($"Unexpected HTTP returncode {message.StatusCode} for {actionName} message.\r\n{await message.Content.ReadAsStringAsync()}", null, message.StatusCode);
+            }
+
+            // to make it awaitable
+            return true;
         }
     }
 }

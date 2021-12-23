@@ -1,16 +1,15 @@
-﻿using RestlessDb.DataLayer;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.DependencyInjection;
+using RestlessDb.DataLayer;
+using RestlessDb.Formatters;
 using RestlessDb.Managers;
 using RestlessDb.Repositories;
-using RestlessDb.Formatters;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace RestlessDb.Services
 {
     public static class RestlessDbServiceCollectionExtensions
     {
-        public static void AddDbRestApi(this IServiceCollection services, string dbConnectionString)
+        public static void AddDbRestApiAddDbRestApi(this IServiceCollection services, string dbConnectionString)
         {
             AddDependencies(services, dbConnectionString);
             AddFormatters(services);

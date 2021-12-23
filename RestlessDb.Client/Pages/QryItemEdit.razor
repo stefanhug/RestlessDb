@@ -6,7 +6,7 @@
 
 @if (QryItemName == null)
 {
-    <div class="alert alert-danger">
+    <div class="alert">
         Add a new qry item @(QryItemParent ?? "with parent {QryItemParent}")
     </div>
 }
@@ -15,9 +15,14 @@ else
     <div class="alert alert-danger">
         Edit query item @QryItemName
     </div>
-
 }
 
+@if (ErrorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@ErrorMessage</pre>
+    </div>
+}
 <EditForm Model="@queryItemEdit" OnValidSubmit="@HandleSubmitAsync">
     <label>Query Name:</label>
     <div>
@@ -54,12 +59,11 @@ else
     <button type="submit" class="btn btn-success">
         Submit
     </button>
-    <button type="cancel" class="btn-success" @onclick="() =>HandleCancelAsync()">
+    <button type="cancel" class="btn-success" @onclick="() =>HandleCancel()">
         Cancel
     </button>
 
 </EditForm>
-
 
 @code
 {
@@ -67,7 +71,8 @@ else
     public string QryItemName { get; set; }
     public string QryItemParent { get; set; }
 
-    private QueryItem queryItemEdit;
+    public string ErrorMessage;
+    private QueryItem queryItemEdit = new QueryItem();
 
     bool IsUpdate() => QryItemName != null;
 
@@ -79,34 +84,47 @@ else
             QryItemParent = parentTmp;
         }
 
-        if (IsUpdate())
+        try
         {
-            queryItemEdit = await clientModel.GatewayRestlessDb.FetchQueryItemAsync(QryItemName);  
+            if (IsUpdate())
+            {
+                queryItemEdit = await clientModel.GatewayRestlessDb.FetchQueryItemAsync(QryItemName);
+            }
+            else
+            {
+                queryItemEdit = new() { Parent = QryItemParent };
+            }
         }
-        else
+        catch (HttpRequestException e)
         {
-            queryItemEdit = new() { Parent = QryItemParent };
+            ErrorMessage = e.Message;
         }
 
     }
 
     private async Task HandleSubmitAsync()
     {
-        if (IsUpdate())
+        try
         {
-            await clientModel.GatewayRestlessDb.UpdateQueryItemAsync(queryItemEdit);
-            clientModel.InvalidateCaches();
+            if (IsUpdate())
+            {
+                await clientModel.GatewayRestlessDb.UpdateQueryItemAsync(queryItemEdit);
+                clientModel.InvalidateCaches();
+            }
+            else
+            {
+                await clientModel.GatewayRestlessDb.InsertQueryItemAsync(queryItemEdit);
+                clientModel.InvalidateCaches();
+            }
+            uriHelper.NavigateTo("/queryadmin");
         }
-        else
+        catch (HttpRequestException e)
         {
-            await clientModel.GatewayRestlessDb.InsertQueryItemAsync(queryItemEdit);
-            clientModel.InvalidateCaches();
+            ErrorMessage = e.Message;
         }
-
-        uriHelper.NavigateTo("/queryadmin");
     }
 
-    private async Task HandleCancelAsync()
+    private void HandleCancel()
     {
         uriHelper.NavigateTo("/queryadmin");
     }
