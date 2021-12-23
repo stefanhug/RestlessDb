@@ -38,7 +38,16 @@ namespace RestlessDb.Client.Model
             {
                 return;
             }
-            queryConfigItems = (await GatewayRestlessDb.GetQueryConfigAsync());
+            try
+            {
+                ErrorMessage = null;
+                queryConfigItems = (await GatewayRestlessDb.GetQueryConfigAsync());
+            }
+            catch(Exception e)
+            {
+                ErrorMessage = $"Failed to fetch query configuration: {e.Message}";
+            }
+            
         }
 
         public async Task<QueryConfigItem> GetConfigItemAsync(string name)

@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
+using System;
+using System.Reflection;
 
 namespace RestlessDb.App
 {
@@ -21,6 +20,14 @@ namespace RestlessDb.App
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+                .UseSerilog((hostingContext, loggerConfiguration) =>
+                    loggerConfiguration
+                    //TODO: Reading configuration from appsettings.json does not work
+                    .ReadFrom.Configuration(hostingContext.Configuration)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console(theme: AnsiConsoleTheme.Code)
+                    .WriteTo.File($"logs/{Assembly.GetEntryAssembly().GetName().Name}-{DateTime.Now.ToString("yyy-MM-dd")}.log")
+                );
     }
 }

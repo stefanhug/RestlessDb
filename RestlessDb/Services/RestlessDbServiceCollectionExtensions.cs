@@ -1,10 +1,9 @@
-﻿using RestlessDb.DataLayer;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.DependencyInjection;
+using RestlessDb.DataLayer;
+using RestlessDb.Formatters;
 using RestlessDb.Managers;
 using RestlessDb.Repositories;
-using RestlessDb.Formatters;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace RestlessDb.Services
 {
