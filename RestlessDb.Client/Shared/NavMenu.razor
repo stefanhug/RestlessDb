@@ -14,18 +14,18 @@
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
         </li>
-        @if (ClientModel.QueryConfigItems != null)
+        @if (ClientModel.QueryMetaDatas != null)
         {
             <li class="nav-item px-3 nav-link">
                 <NavLink class="nav-link">
                     <span class="oi oi-magnifying-glass" aria-hidden="true">Queries</span>
                 </NavLink>
                 <ul>
-                    @foreach (var configItem in ClientModel.QueryConfigItems)
+                    @foreach (var queryMetaData in ClientModel.QueryMetaDatas)
                     {
                         <li class="nav-item px-3">
-                            <NavLink class="nav-link" href=@("showquery/" + configItem.Name)>
-                                <span class="oi oi-share" aria-hidden="true">@configItem.Label</span>
+                            <NavLink class="nav-link" href=@("showquery/" + queryMetaData.Name)>
+                                <span class="oi oi-share" aria-hidden="true">@queryMetaData.Label</span>
                             </NavLink>
                         </li>
                     }

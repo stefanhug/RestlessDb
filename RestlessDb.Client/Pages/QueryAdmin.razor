@@ -19,7 +19,7 @@ else
         <hr />
     </div>
 
-    @if (queryItems == null)
+    @if (queryMetaDatas == null)
     {
         <p><em>Loading...</em></p>
     }
@@ -36,48 +36,30 @@ else
                     <th>Name</th>
                     <th>Label</th>
                     <th>Description</th>
-                    <th>Sql Statement</th>
+                    <th>Columns</th>
+                    <th>Params</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var itm in queryItems)
-                {
-                    <tr>
-                        <td>@itm.Name</td>
-                        <td>@itm.Label</td>
-                        <td>@itm.Description</td>
-                        <td>@itm.Sql</td>
-                        <td>
-                            <button class="btn btn-primary" @onclick="() => EditQuery(itm.Name)">
-                                <span class="oi oi-pencil" aria-hidden="true"/>Edit
-                            </button>
-                            <button class="btn btn-primary" @onclick="() => CreateNewQuery(itm.Name)">
-                                <span class="oi oi-plus" aria-hidden="true"/>New child query
-                            </button>
-                            <button class="btn btn-primary" @onclick="() => Delete(itm.Name)">
-                                <span class="oi oi-delete" aria-hidden="true"/>Delete
-                            </button>
-                            
-                        </td>
-                    </tr>
-                }
+                @((MarkupString)RecurseQueryMetaData(queryMetaDatas, 0))
             </tbody>
         </table>
     }
-
 }
 
-@code {
+@code 
+{
     private string ErrorMessage { get; set; }
-    private List<QueryItem> queryItems;
-
+    private List<QueryMetaData> queryMetaDatas = null;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            queryItems = await clientModel.GatewayRestlessDb.FetchQueryItemsAsync();
+            await clientModel.CheckInitAsync();
+            queryMetaDatas = clientModel.QueryMetaDatas;
+
         }
         catch (HttpRequestException e)
         {
@@ -107,13 +89,49 @@ else
         }
     }
 
-    void CreateNewQuery(string parentQuery)
+    private void CreateNewQuery(string parentQuery)
     {
         uriHelper.NavigateTo($"/qryitemnew?parent={parentQuery}");
     }
 
-    void EditQuery(string queryName)
+    private void EditQuery(string queryName)
     {
         uriHelper.NavigateTo($"/qryitemedit/{queryName}");
+    }
+
+    private string RecurseQueryMetaData(List<QueryMetaData> queryMetaDatas, int level)
+    {
+        string ret = string.Empty;
+        foreach (var queryMeta in queryMetaDatas)
+        {
+            var cols = string.Join(", ", from col in queryMeta.Columns select col.Label);
+            var parameters = string.Join(", ", queryMeta.Parameters);
+
+            ret += $@"
+    <tr>
+    <td>{queryMeta.Name}</td>
+    <td>{queryMeta.Label}</td>
+    <td>{queryMeta.Description}</td>
+    <td>{cols}</td>
+    <td>{parameters}</td>
+    <td>
+        <button class=""btn btn-primary"" @onclick=""() => EditQuery({queryMeta.Name})"">
+            <span class=""oi oi-pencil"" aria-hidden=""true""/>Edit
+        </button>
+        <button class=""btn btn-primary"" @onclick=""() => CreateNewQuery({queryMeta.Name})"">
+            <span class=""oi oi-plus"" aria-hidden=""true"" />New child query
+        </button>
+        <button class=""btn btn-primary"" @onclick=""() => Delete({queryMeta.Name})"">
+            <span class=""oi oi-delete"" aria-hidden=""true"" />Delete
+        </button>
+    </td>
+    </tr>";
+            if (queryMeta.Children != null)
+            {
+                ret += RecurseQueryMetaData(queryMeta.Children, level + 1);
+            }
+        }
+        
+        return ret;
     }
 }

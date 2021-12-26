@@ -15,10 +15,7 @@ namespace RestlessDb.Common.Gateway
     {
         private const string EP_QUERYITEM = "/dbapi/admin/queryitems";
         private const string EP_ALLQUERIES = "/dbapiconfig/allqueries";
-        private const string EP_QUERIES = "/dbapi";
-
-
-
+        
         private readonly HttpClient httpClient;
 
         public GatewayRestlessDb(HttpClient httpClient)
@@ -43,7 +40,7 @@ namespace RestlessDb.Common.Gateway
 
             var response = await httpClient.PostAsync(EP_QUERYITEM, data);
 
-            var dummy = await CheckReturnCode(HttpStatusCode.Created, "POST", response);
+            await CheckReturnCode(HttpStatusCode.Created, "POST", response);
 
             string result = response.Content.ReadAsStringAsync().Result;
             var ret = JsonConvert.DeserializeObject<QueryItem>(result);
@@ -55,10 +52,9 @@ namespace RestlessDb.Common.Gateway
         {
             var json = JsonConvert.SerializeObject(queryItem);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
-
             var response = await httpClient.PutAsync(EP_QUERYITEM, data);
 
-            var dummy = await CheckReturnCode(HttpStatusCode.OK, "PUT", response);
+            await CheckReturnCode(HttpStatusCode.OK, "PUT", response);
 
             string result = response.Content.ReadAsStringAsync().Result;
             var ret = JsonConvert.DeserializeObject<QueryItem>(result);
@@ -69,9 +65,7 @@ namespace RestlessDb.Common.Gateway
         public async Task<bool> DeleteQueryItemAsync(string itemName)
         {
             var response = await httpClient.DeleteAsync($"{EP_QUERYITEM}/{itemName}");
-
-            var dummy = await CheckReturnCode(HttpStatusCode.OK, "DELETE", response);
-
+            await CheckReturnCode(HttpStatusCode.OK, "DELETE", response);
             return true;
         }
 
@@ -81,9 +75,12 @@ namespace RestlessDb.Common.Gateway
             return content;
         }
 
-        public async Task<List<QueryConfigItem>> GetQueryConfigAsync()
+        public async Task<List<QueryMetaData>> GetQueryConfigAsync()
         {
-            return (await httpClient.GetFromJsonAsync<QueryConfigResult>(EP_ALLQUERIES)).QueryConfigItems;
+            var response = await httpClient.GetAsync(EP_ALLQUERIES);
+            string result = response.Content.ReadAsStringAsync().Result;
+            var ret = JsonConvert.DeserializeObject<List<QueryMetaData>>(result);
+            return ret;
         }
         
         public async Task<HttpResponseMessage> GetClientResponse(string pathAndQuery)
@@ -92,15 +89,14 @@ namespace RestlessDb.Common.Gateway
             return response;
         }
 
-        private async Task<bool> CheckReturnCode(HttpStatusCode expectedHttpStatusCode, string actionName, HttpResponseMessage message)
+        private static async Task CheckReturnCode(HttpStatusCode expectedHttpStatusCode, string actionName, HttpResponseMessage message)
         {
             if (message.StatusCode != expectedHttpStatusCode)
             {
                 throw new HttpRequestException($"Unexpected HTTP returncode {message.StatusCode} for {actionName} message.\r\n{await message.Content.ReadAsStringAsync()}", null, message.StatusCode);
             }
 
-            // to make it awaitable
-            return true;
+            return;
         }
     }
 }
