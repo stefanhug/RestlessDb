@@ -1,5 +1,4 @@
-﻿using RestlessDb.Formatters;
-using RestlessDb.Common.Types;
+﻿using RestlessDb.Common.Types;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
@@ -10,6 +9,10 @@ namespace RestlessDb.Formatters
     {
         public string ContentType => "text/csv";
         public string OutputFormat => "csv";
+        public string Label => "Csv file";
+        public string Description => "Data export in comma separated value format";
+        public string FileExtension => "csv";
+        public Disposition Disposition => Disposition.STANDALONE;
 
         public ActionResult GetActionResult(QueryResult queryResult)
         {

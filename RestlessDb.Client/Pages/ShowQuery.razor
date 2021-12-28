@@ -1,6 +1,8 @@
 ﻿@page "/showquery/{queryitem}"
+@using System.IO
+@using System.Text
+@inject IJSRuntime JS
 @inject ClientModel ClientModel
-
 
 @if (Error != null)
 {
@@ -18,18 +20,26 @@ else
     <h1>@QueryMetaData.Label</h1>
     <h2>@QueryMetaData.Description</h2>
 
-
     <p>
-        Offset: <input @bind="Offset" />Maxrows: <input @bind="MaxRows" />
+        Output format: <select name="outputformat" @bind="OutputFormat">
+                            @foreach(var format in ClientModel.FormatterInfos)
+                            {
+                                <option value="@format.OutputFormat">@format.Name</option>
+                            }
+                        </select>
+
+    </p>
+    <p>
+        Offset: <input type="number" @bind="Offset" />Maxrows: <input type="number" @bind="MaxRows" />
     </p>
     <p>
         <button @onclick="ShowQueryResultsAsync">Show query results</button>
     </p>
     <hr />
 </div>
-    @if (QueryContent != null)
+    @if (PageDataContent != null)
     {
-        @((MarkupString)QueryContent)
+        @((MarkupString)PageDataContent)
     }
 }
 
@@ -39,28 +49,50 @@ else
 
     public int Offset { get; set; } = 0;
     public int MaxRows { get; set; } = 500;
+    public string OutputFormat { get; set; } 
 
 
     public string Error { get; set; }
 
     public QueryMetaData QueryMetaData { get; set; }
 
-    public string QueryContent { get; set; }
+    public string PageDataContent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ClientModel.CheckInitAsync();
+        OutputFormat = ClientModel.FormatterInfos.FirstOrDefault(f => f.Disposition == Disposition.EMBEDDED).OutputFormat;
+    }
 
     protected override async Task OnParametersSetAsync()
     {
         Error = null;
         QueryMetaData = await ClientModel.GetConfigItemAsync(QueryItem);
-        QueryContent = null;
+        PageDataContent = null;
     }
 
     public async Task ShowQueryResultsAsync()
     {
         Error = null;
-        QueryContent = "Loading...";
+        PageDataContent = "Loading...";
         try
         {
-            QueryContent = await ClientModel.GatewayRestlessDb.FetchQueryContentAsync(QueryItem, "html", Offset, MaxRows);
+            var httpResponseMessage = await ClientModel.GatewayRestlessDb.FetchQueryContentAsync(QueryItem, OutputFormat, Offset, MaxRows);
+            var formatterInfo = ClientModel.FormatterInfos.First(f => f.OutputFormat == OutputFormat);
+            if (formatterInfo.Disposition == Disposition.EMBEDDED)
+            {
+                PageDataContent = await httpResponseMessage.Content.ReadAsStringAsync(); 
+            }
+            else
+            {
+                var fileName = $"{QueryMetaData.Name}.{formatterInfo.FileExtension}";
+                var stream = await httpResponseMessage.Content.ReadAsStreamAsync();
+                PageDataContent = $"File {fileName} downloaded";
+                using (var streamRef = new DotNetStreamReference(stream: stream))
+                {
+                     await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+                }
+            }
         }
         catch (HttpRequestException e)
         {

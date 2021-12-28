@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RestlessDb.Common\RestlessDb.Common.csproj" />
+  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="ClosedXML" Version="0.95.4" />
+		<PackageReference Include="RazorLight" Version="2.0.0-rc.3" />
+	</ItemGroup>
+
+</Project>

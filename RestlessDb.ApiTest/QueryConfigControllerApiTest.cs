@@ -16,5 +16,14 @@ namespace RestlessDb.ApiTest
             
             Assert.True(ret.Count > 2);
         }
+
+        [Fact]
+        public async void WhenAllFormattersRequestedThenCorrectFormattersReturned()
+        {
+            var gw = TestGatewayBuilder.GetGateway();
+            var ret = await gw.GetAllFormatters();
+
+            Assert.Equal(6, ret.Count);
+        }
     }
 }

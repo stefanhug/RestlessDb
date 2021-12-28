@@ -11,6 +11,10 @@ namespace RestlessDb.Formatters
     {
         public string ContentType => "application/xml ";
         public string OutputFormat => "xml";
+        public string Label => "Xml file";
+        public string Description => "Data export as XML file";
+        public string FileExtension => "xml";
+        public Disposition Disposition => Disposition.STANDALONE;
 
         public ActionResult GetActionResult(QueryResult queryResult)
         {

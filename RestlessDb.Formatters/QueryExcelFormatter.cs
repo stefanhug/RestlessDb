@@ -1,6 +1,4 @@
-﻿using ClosedXML.Excel;
-using RestlessDb.Formatters;
-using RestlessDb.Common.Types;
+﻿using RestlessDb.Common.Types;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
@@ -11,6 +9,10 @@ namespace RestlessDb.Formatters
     {
         public string ContentType => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         public string OutputFormat => "excel";
+        public string Label => "Excel file";
+        public string Description => "Data export in MS Excel format";
+        public string FileExtension => "xlsx";
+        public Disposition Disposition => Disposition.STANDALONE;
 
         public ActionResult GetActionResult(QueryResult queryResult)
         {
