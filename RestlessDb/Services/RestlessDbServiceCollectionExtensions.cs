@@ -36,7 +36,6 @@ namespace RestlessDb.Services
             services.AddScoped<QueryParamsProvider, QueryParamsProvider>();
             services.AddScoped<QueryRepository, QueryRepository>();
             services.AddScoped<GenericQueryManager, GenericQueryManager>();
-            services.AddScoped<QueryConfigRepository, QueryConfigRepository>();
             services.AddScoped<QueryConfigManager, QueryConfigManager>();
             services.AddScoped<QueryItemsManager, QueryItemsManager>();
             services.AddScoped<QueryItemsRepository, QueryItemsRepository>();

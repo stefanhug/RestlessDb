@@ -10,10 +10,8 @@ namespace RestlessDb.Controllers
     [ApiController]
     public class QueryConfigController : ControllerBase
     {
-
         private readonly ILogger<QueryConfigController> logger;
         private readonly QueryConfigManager manager;
-
 
         public QueryConfigController(ILogger<QueryConfigController> logger, QueryConfigManager manager)
         {
@@ -27,8 +25,7 @@ namespace RestlessDb.Controllers
         {
             try
             {
-                var queryResult = manager.GetQueryResults();
-
+                var queryResult = manager.GetAllQueryMetaData();
                 return new JsonResult(queryResult);
             }
             catch (Exception e)

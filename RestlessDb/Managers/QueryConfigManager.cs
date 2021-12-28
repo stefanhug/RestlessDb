@@ -4,6 +4,7 @@ using RestlessDb.Common.Types;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace RestlessDb.Managers
 {
@@ -11,17 +12,19 @@ namespace RestlessDb.Managers
     public class QueryConfigManager
     {
         private readonly ILogger<QueryConfigManager> logger;
-        private readonly QueryConfigRepository queryConfigRepository;
+        private readonly QueryItemsRepository queryItemsRepository;
 
-        public QueryConfigManager(QueryConfigRepository queryConfigRepository, ILogger<QueryConfigManager> logger)
+        public QueryConfigManager(QueryItemsRepository queryConfigRepository, ILogger<QueryConfigManager> logger)
         {
             this.logger = logger;
-            this.queryConfigRepository = queryConfigRepository;
+            this.queryItemsRepository = queryConfigRepository;
         }
 
-        public QueryConfigResult GetQueryResults()
+        public List<QueryMetaData> GetAllQueryMetaData()
         {
-            return queryConfigRepository.GetAllQueries();
+            var queryItemsExt = queryItemsRepository.GetAllQueryItemsExt();
+            var ret = (from queryItemExt in queryItemsExt select QueryMetaData.BuildFromQueryItemExt(queryItemExt)).ToList();
+            return ret;
         }
     }
 }

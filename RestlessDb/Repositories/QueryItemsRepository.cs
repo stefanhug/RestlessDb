@@ -154,7 +154,22 @@ namespace RestlessDb.Repositories
             }
         }
 
-        public QueryItemExt LoadQueryItemExt(string queryName)
+        public List<QueryItemExt> GetAllQueryItemsExt()
+        {
+            var ret = new List<QueryItemExt>();
+            var queryItems = GetAll();
+
+            var topItems = queryItems.FindAll(qryItem => string.IsNullOrWhiteSpace(qryItem.Parent));
+            
+            foreach (var topItem in topItems)
+            {
+                ret.Add(CreateItemFromRow(topItem, queryItems, new List<string>()));
+            }
+            
+            return ret;
+        }
+
+        public QueryItemExt GetQueryItemExt(string queryName)
         {
             var queryItems = GetAll();
 
@@ -170,7 +185,7 @@ namespace RestlessDb.Repositories
 
         private void RecurseChildItems(QueryItemExt currentItem, List<QueryItem> queryItems, List<string> parentsList)
         {
-            var childRows = from a in queryItems where SafeCompare(a.Parent, currentItem.Name) orderby a.Pos select a;
+            var childRows = from a in queryItems where SafeCompare(a.Parent, currentItem.QueryItem.Name) orderby a.Pos select a;
 
             if (childRows.Any())
             {
@@ -183,31 +198,30 @@ namespace RestlessDb.Repositories
             }
         }
 
-        private QueryItemExt CreateItemFromRow(QueryItem queryItem, List<QueryItem> queryItems, List<string> parentsList)
+        private QueryItemExt CreateItemFromRow(QueryItem queryItem, List<QueryItem> allQueryItems, List<string> parentsList)
         {
             var ret = new QueryItemExt()
             {
-                Name = queryItem.Name,
-                Label = queryItem.Label,
-                Description = queryItem.Description,
-                Sql = queryItem.Sql,
+                QueryItem = queryItem
             };
 
-            if (!QueryParamsParser.ContainsOrderBy(ret.Sql))
+            if (!QueryParamsParser.ContainsOrderBy(ret.QueryItem.Sql))
             {
                 throw new GenericDbQueryException(GenericDbQueryExceptionCode.SQL_MUST_HAVE_ORDER_BY,
-                                                  $"Error in SQL \"{ret.Sql}\": All SQL statements in query item table must have an order by clause");
+                                                  $"Error in SQL \"{ret.QueryItem.Sql}\": All SQL statements in query item table must have an order by clause");
             }
 
-            if (parentsList.Contains(ret.Name))
+            if (parentsList.Contains(ret.QueryItem.Name))
             {
-                throw new GenericDbQueryException(GenericDbQueryExceptionCode.RECURSION, $"Loop recursion detected for item {ret.Name}, please correct setup");
+                throw new GenericDbQueryException(GenericDbQueryExceptionCode.RECURSION, $"Loop recursion detected for item {ret.QueryItem.Name}, please correct setup");
             }
-            parentsList.Add(ret.Name);
+            parentsList.Add(ret.QueryItem.Name);
 
             // todo: wrong DB, move to QueryRepository
-            ret.Columns = genericSqlHelper.QueryResultColumns(ret.Sql);
-            RecurseChildItems(ret, queryItems, new List<string>() { ret.Name });
+            ret.Columns = genericSqlHelper.QueryResultColumns(ret.QueryItem.Sql);
+            ret.Parameters = QueryParamsParser.GetQueryParams(ret.QueryItem.Sql);
+
+            RecurseChildItems(ret, allQueryItems, new List<string>() { ret.QueryItem.Name });
 
             return ret;
         }

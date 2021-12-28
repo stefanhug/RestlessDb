@@ -25,12 +25,12 @@ namespace RestlessDb.Repositories
 
         public (List<Dictionary<string, object>> data, bool hasMoreRows) GetQueryItemData(QueryItemExt queryItemExt, Dictionary<string, object> effectiveQueryParams)
         {
-            return genericSqlHelper.QueryAsDictList(queryItemExt.Sql, 0, MAX_CHILD_ROWS, effectiveQueryParams);
+            return genericSqlHelper.QueryAsDictList(queryItemExt.QueryItem.Sql, 0, MAX_CHILD_ROWS, effectiveQueryParams);
         }
 
         public (List<Dictionary<string, object>> data, bool hasMoreRows) GetQueryItemData(QueryItemExt queryItemExt, int offset, int maxRows, Dictionary<string, object> effectiveQueryParams)
         {
-            return genericSqlHelper.QueryAsDictList(queryItemExt.Sql, 0, maxRows, effectiveQueryParams);
+            return genericSqlHelper.QueryAsDictList(queryItemExt.QueryItem.Sql, 0, maxRows, effectiveQueryParams);
         }
     }
 }

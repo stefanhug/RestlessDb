@@ -8,15 +8,15 @@
     <pre>@Error</pre>
 </div>
 }
-else if (ConfigItem == null)
+else if (QueryMetaData == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
 <div class="top-row">
-    <h1>@ConfigItem.Label</h1>
-    <h2>@ConfigItem.Description</h2>
+    <h1>@QueryMetaData.Label</h1>
+    <h2>@QueryMetaData.Description</h2>
 
 
     <p>
@@ -43,14 +43,14 @@ else
 
     public string Error { get; set; }
 
-    public QueryConfigItem ConfigItem { get; set; }
+    public QueryMetaData QueryMetaData { get; set; }
 
     public string QueryContent { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
         Error = null;
-        ConfigItem = await ClientModel.GetConfigItemAsync(QueryItem);
+        QueryMetaData = await ClientModel.GetConfigItemAsync(QueryItem);
         QueryContent = null;
     }
 

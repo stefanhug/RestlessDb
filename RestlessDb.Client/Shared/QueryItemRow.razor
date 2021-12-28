@@ -1,0 +1,89 @@
+﻿@inject ClientModel clientModel
+@inject NavigationManager uriHelper
+
+        @if (ErrorMessage != null)
+        {
+            <div class="alert alert-danger" role="alert">
+                <pre>@ErrorMessage</pre>
+            </div>
+        }
+
+        <tr class="@GetRowClassForLevel()">
+            <td>@decoratedName</td>
+            <td>@QueryMeta.Label</td>
+            <td>@QueryMeta.Description</td>
+            <td>@cols</td>
+            <td>@parameters</td>
+            <td>
+                <button class="btn btn-primary" @onclick="() => EditQuery(QueryMeta.Name)">
+                    <span class="oi oi-pencil" aria-hidden="true" />Edit
+                </button>
+                <button class="btn btn-primary" @onclick="() => CreateNewQuery(QueryMeta.Name)">
+                    <span class="oi oi-plus" aria-hidden="true" />New child query
+                </button>
+                <button class="btn btn-primary" @onclick="() => DeleteQuery(QueryMeta.Name)">
+                    <span class="oi oi-delete" aria-hidden="true" />Delete
+                </button>
+            </td>
+        </tr>
+        @if (QueryMeta.Children != null)
+        {
+            foreach (var childMeta in QueryMeta.Children)
+            {
+                <QueryItemRow QueryMeta=@childMeta Level=@(Level + 1)/>
+            }
+        }
+        
+
+@code
+{
+    [Parameter]
+    [EditorRequired]
+    public QueryMetaData QueryMeta { get; set; }
+    [Parameter]
+    [EditorRequired]
+    public int Level { get; set; }
+
+    public string ErrorMessage { get; set; }
+
+    private string cols;
+    private string parameters;
+    private string decoratedName;
+
+    protected override void OnParametersSet()
+    {
+        cols = string.Join(", ", from col in QueryMeta.Columns select col.Label);
+        parameters = string.Join(", ", QueryMeta.Parameters);
+        decoratedName = string.Concat(Enumerable.Repeat(" >> ", Level)) + QueryMeta.Name;
+    }
+
+    private void CreateNewQuery(string parentQuery)
+    {
+        uriHelper.NavigateTo($"/qryitemnew?parent={parentQuery}");
+    }
+
+    private void EditQuery(string queryName)
+    {
+        uriHelper.NavigateTo($"/qryitemedit/{queryName}");
+    }
+
+    private void DeleteQuery(string queryName)
+    {
+        uriHelper.NavigateTo($"/qryitemdelete/{queryName}");
+    }
+
+    private string GetRowClassForLevel()
+    {
+        switch(Level)
+        {
+            case 0:
+                return "bg-info";
+            case 1:
+                return "bg-light";
+            case 2:
+            default:
+                return "bg-white";
+        }
+    }
+
+}

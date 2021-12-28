@@ -15,7 +15,7 @@ namespace GenericDbRestApi.Test.DataLayer
             var moqHelper = new GenericSqlHelperMoq();
             var genericSqlHelperMoq = moqHelper.SetupMoq4GenericSqlHelper();
             var sut = new QueryItemsRepository(genericSqlHelperMoq, new Mock<ILogger<QueryItemsRepository>>().Object);
-            var queryItemExt = sut.LoadQueryItemExt("salesorders");
+            var queryItemExt = sut.GetQueryItemExt("salesorders");
 
             Assert.True(queryItemExt.Children.Count == 1);
             Assert.Equal(moqHelper.SalesOrderColumns, queryItemExt.Columns);

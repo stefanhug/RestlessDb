@@ -15,11 +15,8 @@ namespace RestlessDb.Client.Model
     {
         private readonly GatewayRestlessDb gatewayRestlessDb;
 
-        private List<QueryConfigItem> queryConfigItems;
-        public List<QueryConfigItem> QueryConfigItems
-        {
-            get => queryConfigItems;
-        }
+        public List<QueryMetaData> QueryMetaDatas { get; private set; }
+       
         public GatewayRestlessDb GatewayRestlessDb
         {
             get => gatewayRestlessDb;
@@ -34,14 +31,14 @@ namespace RestlessDb.Client.Model
 
         public async Task CheckInitAsync()
         {
-            if (queryConfigItems != null)
+            if (QueryMetaDatas != null)
             {
                 return;
             }
             try
             {
                 ErrorMessage = null;
-                queryConfigItems = (await GatewayRestlessDb.GetQueryConfigAsync());
+                QueryMetaDatas = (await GatewayRestlessDb.GetQueryConfigAsync());
             }
             catch(Exception e)
             {
@@ -50,15 +47,15 @@ namespace RestlessDb.Client.Model
             
         }
 
-        public async Task<QueryConfigItem> GetConfigItemAsync(string name)
+        public async Task<QueryMetaData> GetConfigItemAsync(string name)
         {
             await CheckInitAsync();
-            return queryConfigItems.Find(i => i.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return QueryMetaDatas.Find(i => i.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         }
 
         public void InvalidateCaches()
         {
-            queryConfigItems = null;
+            QueryMetaDatas = null;
         }
     }
 }

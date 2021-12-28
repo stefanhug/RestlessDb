@@ -1,6 +1,5 @@
 ﻿@page "/queryadmin"
 @inject ClientModel clientModel
-@inject IJSRuntime js
 @inject NavigationManager uriHelper
 
 
@@ -19,7 +18,7 @@ else
         <hr />
     </div>
 
-    @if (queryItems == null)
+    @if (queryMetaDatas == null)
     {
         <p><em>Loading...</em></p>
     }
@@ -30,54 +29,39 @@ else
             <span class="oi oi-plus" aria-hidden="true">Create New</span>
         </button>
 
-        <table class="table table-striped">
+        <table class="table">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th width="20%">Name</th>
                     <th>Label</th>
                     <th>Description</th>
-                    <th>Sql Statement</th>
+                    <th>Columns</th>
+                    <th>Params</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var itm in queryItems)
+                @foreach(var qryMeta in queryMetaDatas)
                 {
-                    <tr>
-                        <td>@itm.Name</td>
-                        <td>@itm.Label</td>
-                        <td>@itm.Description</td>
-                        <td>@itm.Sql</td>
-                        <td>
-                            <button class="btn btn-primary" @onclick="() => EditQuery(itm.Name)">
-                                <span class="oi oi-pencil" aria-hidden="true"/>Edit
-                            </button>
-                            <button class="btn btn-primary" @onclick="() => CreateNewQuery(itm.Name)">
-                                <span class="oi oi-plus" aria-hidden="true"/>New child query
-                            </button>
-                            <button class="btn btn-primary" @onclick="() => Delete(itm.Name)">
-                                <span class="oi oi-delete" aria-hidden="true"/>Delete
-                            </button>
-                            
-                        </td>
-                    </tr>
+                    <QueryItemRow QueryMeta=qryMeta Level="0"/>
                 }
             </tbody>
         </table>
     }
-
 }
 
-@code {
+@code 
+{
     private string ErrorMessage { get; set; }
-    private List<QueryItem> queryItems;
-
+    private List<QueryMetaData> queryMetaDatas = null;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            queryItems = await clientModel.GatewayRestlessDb.FetchQueryItemsAsync();
+            await clientModel.CheckInitAsync();
+            queryMetaDatas = clientModel.QueryMetaDatas;
+
         }
         catch (HttpRequestException e)
         {
@@ -89,31 +73,8 @@ else
         }
     }
 
-    async Task Delete(string qryItemName)
-    {
-        if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete the query '{qryItemName}' ?"))
-        {
-            try
-            {
-                ErrorMessage = null;
-                await clientModel.GatewayRestlessDb.DeleteQueryItemAsync(qryItemName);
-                clientModel.InvalidateCaches();
-                await js.InvokeVoidAsync("alert", $"Query item '{qryItemName}' successfully deleted");
-            }
-            catch (HttpRequestException e)
-            {
-                ErrorMessage = e.Message;
-            }
-        }
-    }
-
-    void CreateNewQuery(string parentQuery)
+    private void CreateNewQuery(string parentQuery)
     {
         uriHelper.NavigateTo($"/qryitemnew?parent={parentQuery}");
-    }
-
-    void EditQuery(string queryName)
-    {
-        uriHelper.NavigateTo($"/qryitemedit/{queryName}");
     }
 }
