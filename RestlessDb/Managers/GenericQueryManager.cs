@@ -34,10 +34,12 @@ namespace RestlessDb.Managers
         public QueryResult GetQueryResults(string queryName, int offset, int maxRows,
             Dictionary<string, object> queryParameters)
         {
-            var ret = new QueryResult();
-            ret.Offset = offset;
-            ret.MaxRows = maxRows;
-            ret.QueryParameters = queryParameters;
+            var ret = new QueryResult
+            {
+                Offset = offset,
+                MaxRows = maxRows,
+                QueryParameters = queryParameters
+            };
 
             var queryItemExt = queryItemsRepository.GetQueryItemExt(queryName);
 

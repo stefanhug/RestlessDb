@@ -6,13 +6,13 @@
 
 @if (QryItemName == null)
 {
-    <div class="alert">
-        Add a new qry item @(QryItemParent ?? "with parent {QryItemParent}")
+    <div class="alert alert-primary">
+        Add a new qry item @(QryItemParent ?? " for parent {QryItemParent}")
     </div>
 }
 else
 {
-    <div class="alert alert-danger">
+    <div class="alert alert-primary">
         Edit query item @QryItemName
     </div>
 }

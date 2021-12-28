@@ -1,0 +1,95 @@
+﻿@page "/qryitemdelete/{qryitemname}"
+
+@inject ClientModel clientModel
+@inject NavigationManager uriHelper
+
+
+<div class="alert alert-primary">
+    Confirm: Delete query item @QryItemName
+</div>
+
+@if (ErrorMessage != null)
+{
+    <div class="alert alert-danger" role="alert">
+        <pre>@ErrorMessage</pre>
+    </div>
+}
+
+<EditForm Model="@queryItemEdit" OnValidSubmit="@HandleSubmitAsync">
+    <label>Query Name:</label>
+    <div>
+        <InputText @bind-Value="@queryItemEdit.Name" disabled="true"/>
+    </div>
+    <label>Parent:</label>
+    <div>
+        @(queryItemEdit.Parent ?? "--top level--")
+    </div>
+    <label>Label:</label>
+    <div>
+        <InputText @bind-Value="@queryItemEdit.Label" disabled="true"/>
+    </div>
+    <label>Description:</label>
+    <div>
+        <InputText @bind-Value="@queryItemEdit.Description" disabled="true"/>
+    </div>
+    <label>Pos:</label>
+    <div>
+        <InputNumber @bind-Value="@queryItemEdit.Pos" disabled="true"/>
+    </div>
+    <label>Sql:</label>
+    <div>
+        <InputTextArea @bind-Value="@queryItemEdit.Sql" disabled="true"/>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Delete
+    </button>
+    <button type="cancel" class="btn-success" @onclick="() =>HandleCancel()">
+        Cancel
+    </button>
+
+</EditForm>
+
+@code
+{
+    [Parameter]
+    public string QryItemName { get; set; }
+    public string QryItemParent { get; set; }
+
+    public string ErrorMessage;
+    private QueryItem queryItemEdit = new QueryItem();
+
+    bool IsUpdate() => QryItemName != null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            queryItemEdit = await clientModel.GatewayRestlessDb.FetchQueryItemAsync(QryItemName);
+        }
+        catch (HttpRequestException e)
+        {
+            ErrorMessage = e.Message;
+        }
+
+    }
+
+    private async Task HandleSubmitAsync()
+    {
+        try
+        {
+            await clientModel.GatewayRestlessDb.DeleteQueryItemAsync(QryItemName);
+            clientModel.InvalidateCaches();
+            uriHelper.NavigateTo("/queryadmin");
+        }
+        catch (HttpRequestException e)
+        {
+            ErrorMessage = e.Message;
+        }
+    }
+
+    private void HandleCancel()
+    {
+        uriHelper.NavigateTo("/queryadmin");
+    }
+}
