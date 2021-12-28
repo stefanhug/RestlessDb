@@ -15,7 +15,9 @@ namespace RestlessDb.Common.Gateway
     {
         private const string EP_QUERYITEM = "/dbapi/admin/queryitems";
         private const string EP_ALLQUERIES = "/dbapiconfig/allqueries";
-        
+        private const string EP_ALLFORMATTERS = "/dbapiconfig/formatters";
+
+
         private readonly HttpClient httpClient;
 
         public GatewayRestlessDb(HttpClient httpClient)
@@ -69,15 +71,17 @@ namespace RestlessDb.Common.Gateway
             return true;
         }
 
-        public async Task<string> FetchQueryContentAsync(string queryItemName, string format, int offset, int maxRows)
+        public async Task<HttpResponseMessage> FetchQueryContentAsync(string queryItemName, string format, int offset, int maxRows)
         {
-            var content = await httpClient.GetStringAsync($"dbapi/{queryItemName}?outputformat={format}&offset={offset}&maxrows={maxRows}");
-            return content;
+            var response = await httpClient.GetAsync($"dbapi/{queryItemName}?outputformat={format}&offset={offset}&maxrows={maxRows}");
+            await CheckReturnCode(HttpStatusCode.OK, "FetchQueryContentAsync", response);
+            return response;
         }
 
         public async Task<List<QueryMetaData>> GetQueryConfigAsync()
         {
             var response = await httpClient.GetAsync(EP_ALLQUERIES);
+            await CheckReturnCode(HttpStatusCode.OK, "GetQueryConfigAsync", response);
             string result = response.Content.ReadAsStringAsync().Result;
             var ret = JsonConvert.DeserializeObject<List<QueryMetaData>>(result);
             return ret;
@@ -87,6 +91,16 @@ namespace RestlessDb.Common.Gateway
         {
             var response = await httpClient.GetAsync(pathAndQuery);
             return response;
+        }
+
+        public async Task<List<FormatterInfo>> GetAllFormatters()
+        {
+            //the System.Text json deserializer needs special handling for ENUMS, Newtonsoft does it OOB
+            var response = await httpClient.GetAsync(EP_ALLFORMATTERS);
+            await CheckReturnCode(HttpStatusCode.OK, "GetAllFormatters", response);
+            string result = response.Content.ReadAsStringAsync().Result;
+            var ret = JsonConvert.DeserializeObject<List<FormatterInfo>>(result);
+            return ret;
         }
 
         private static async Task CheckReturnCode(HttpStatusCode expectedHttpStatusCode, string actionName, HttpResponseMessage message)

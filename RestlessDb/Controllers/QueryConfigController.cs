@@ -33,5 +33,20 @@ namespace RestlessDb.Controllers
                 return ControllerHelper.HandleException(e, logger);
             };
         }
+
+        [Route("/dbapiconfig/formatters")]
+        [HttpGet]
+        public IActionResult GetFormatters()
+        {
+            try
+            {
+                var res = manager.GetAllFormatters();
+                return new JsonResult(res);
+            }
+            catch (Exception e)
+            {
+                return ControllerHelper.HandleException(e, logger);
+            };
+        }
     }
 }

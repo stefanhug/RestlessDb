@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestlessDb.Common", "Restle
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestlessDb.Client", "RestlessDb.Client\RestlessDb.Client.csproj", "{5AA76152-44BD-45DB-B089-516FC17ECEF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestlessDb.Formatters", "RestlessDb.Formatters\RestlessDb.Formatters.csproj", "{D98B3585-3DD5-4F43-B67C-CB3AD0F9E761}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{5AA76152-44BD-45DB-B089-516FC17ECEF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AA76152-44BD-45DB-B089-516FC17ECEF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AA76152-44BD-45DB-B089-516FC17ECEF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D98B3585-3DD5-4F43-B67C-CB3AD0F9E761}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D98B3585-3DD5-4F43-B67C-CB3AD0F9E761}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D98B3585-3DD5-4F43-B67C-CB3AD0F9E761}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D98B3585-3DD5-4F43-B67C-CB3AD0F9E761}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

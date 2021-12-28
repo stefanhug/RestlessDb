@@ -22,6 +22,7 @@ namespace RestlessDb.Services
             services.AddSingleton<IQueryFormatter, QueryCsvFormatter>();
             services.AddSingleton<IQueryFormatter, QueryExcelFormatter>();
             services.AddSingleton<IQueryFormatter, QueryHtmlFormatter>();
+            services.AddSingleton<IQueryFormatter, QueryHtmlEmbeddedFormatter>();
         }
 
         private static void AddDependencies(IServiceCollection services, string dbConnectionString)

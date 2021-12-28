@@ -7,7 +7,7 @@
 @if (QryItemName == null)
 {
     <div class="alert alert-primary">
-        Add a new qry item @(QryItemParent ?? " for parent {QryItemParent}")
+        Add a new qry item @((MarkupString)(QryItemParent != null ? $" for parent <i>{QryItemParent}</i>" : " (top level)"))
     </div>
 }
 else

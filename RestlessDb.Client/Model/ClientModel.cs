@@ -16,7 +16,8 @@ namespace RestlessDb.Client.Model
         private readonly GatewayRestlessDb gatewayRestlessDb;
 
         public List<QueryMetaData> QueryMetaDatas { get; private set; }
-       
+        public List<FormatterInfo> FormatterInfos { get; private set; }
+
         public GatewayRestlessDb GatewayRestlessDb
         {
             get => gatewayRestlessDb;
@@ -31,14 +32,16 @@ namespace RestlessDb.Client.Model
 
         public async Task CheckInitAsync()
         {
-            if (QueryMetaDatas != null)
+            if (QueryMetaDatas != null && FormatterInfos != null)
             {
                 return;
             }
             try
             {
                 ErrorMessage = null;
-                QueryMetaDatas = (await GatewayRestlessDb.GetQueryConfigAsync());
+                QueryMetaDatas = await GatewayRestlessDb.GetQueryConfigAsync();
+                FormatterInfos = await GatewayRestlessDb.GetAllFormatters();
+
             }
             catch(Exception e)
             {

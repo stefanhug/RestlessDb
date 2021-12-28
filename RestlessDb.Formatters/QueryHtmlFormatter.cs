@@ -1,8 +1,5 @@
-﻿using RestlessDb.Formatters;
+﻿using Microsoft.AspNetCore.Mvc;
 using RestlessDb.Common.Types;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
@@ -11,12 +8,16 @@ namespace RestlessDb.Formatters
 {
     public class QueryHtmlFormatter : IQueryFormatter
     {
-        private static readonly string DEFAULT_TEMPLATE_NAME = Path.Combine("templates", "DefaultRazorTemplate.cshtml");
+        protected static readonly string DEFAULT_TEMPLATE_NAME = Path.Combine("templates", "DefaultRazorTemplate.cshtml");
 
-        public string ContentType => "text/html";
-        public string OutputFormat => "html";
+        public virtual string ContentType => "text/html";
+        public virtual string OutputFormat => "html";
+        public virtual string Label => "Html file";
+        public virtual string Description => "Data export as HTML file";
+        public virtual string FileExtension => "html";
+        public virtual Disposition Disposition => Disposition.STANDALONE;
 
-        public ActionResult GetActionResult(QueryResult queryResult)
+        public virtual ActionResult GetActionResult(QueryResult queryResult)
         {
             var templateString = GetDefaultTemplateAsString();
             var generator = new DbQueryHtml(queryResult, templateString);
@@ -28,7 +29,7 @@ namespace RestlessDb.Formatters
             };
         }
 
-        private string GetDefaultTemplateAsString()
+        protected string GetDefaultTemplateAsString()
         {
             string executionDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string templatePath = Path.Combine(executionDirectory, DEFAULT_TEMPLATE_NAME);
