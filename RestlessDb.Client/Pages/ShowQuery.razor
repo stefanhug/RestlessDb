@@ -6,9 +6,9 @@
 
 @if (Error != null)
 {
-<div class="alert alert-danger" role="alert">
-    <pre>@Error</pre>
-</div>
+    <div class="alert alert-danger" role="alert">
+        <pre>@Error</pre>
+    </div>
 }
 else if (QueryMetaData == null)
 {
@@ -16,27 +16,42 @@ else if (QueryMetaData == null)
 }
 else
 {
-<div class="top-row">
-    <h1>@QueryMetaData.Label</h1>
-    <h2>@QueryMetaData.Description</h2>
+    <div class="top-row">
+        <h1>@QueryMetaData.Label</h1>
+        <h2>@QueryMetaData.Description</h2>
 
-    <p>
-        Output format: <select name="outputformat" @bind="OutputFormat">
-                            @foreach(var format in ClientModel.FormatterInfos)
-                            {
-                                <option value="@format.OutputFormat">@format.Name</option>
-                            }
-                        </select>
+        <fieldset>
+            <legend>Size and config</legend>
+            Output format:
+            <select name="outputformat" @bind="OutputFormat">
+                @foreach (var format in ClientModel.FormatterInfos)
+                {
+                    <option value="@format.OutputFormat">@format.Name</option>
+                }
+            </select>
 
-    </p>
-    <p>
-        Offset: <input type="number" @bind="Offset" />Maxrows: <input type="number" @bind="MaxRows" />
-    </p>
-    <p>
+            Offset:
+            <input type="number" @bind="Offset" />Maxrows:
+            <input type="number" @bind="MaxRows" />
+        </fieldset>
+
+        @if (QueryMetaData.Parameters?.Count > 0)
+        {
+            <fieldset>
+                <legend>Query Parameters</legend>
+                @{
+                    foreach (var kvp in ParamValuesDict)
+                    {
+                        @($"{kvp.Key}: ")  
+                        <input type="text" @bind="@ParamValuesDict[kvp.Key]" />
+                    }
+                }
+            </fieldset>
+        }
         <button @onclick="ShowQueryResultsAsync">Show query results</button>
-    </p>
-    <hr />
-</div>
+
+        <hr />
+    </div>
     @if (PageDataContent != null)
     {
         @((MarkupString)PageDataContent)
@@ -47,16 +62,14 @@ else
     [Parameter]
     public string QueryItem { get; set; }
 
-    public int Offset { get; set; } = 0;
-    public int MaxRows { get; set; } = 500;
-    public string OutputFormat { get; set; } 
-
-
-    public string Error { get; set; }
-
-    public QueryMetaData QueryMetaData { get; set; }
-
-    public string PageDataContent { get; set; }
+    private int Offset { get; set; } = 0;
+    private int MaxRows { get; set; } = 500;
+    private string OutputFormat { get; set; }
+    private string Error { get; set; }
+    private QueryMetaData QueryMetaData { get; set; }
+    
+    private  Dictionary<string, string> ParamValuesDict = new();
+    private string PageDataContent { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -67,8 +80,17 @@ else
     protected override async Task OnParametersSetAsync()
     {
         Error = null;
-        QueryMetaData = await ClientModel.GetConfigItemAsync(QueryItem);
         PageDataContent = null;
+        QueryMetaData = await ClientModel.GetConfigItemAsync(QueryItem);
+        if (QueryMetaData.Parameters?.Count > 0)
+        {
+            int numParams = QueryMetaData.Parameters.Count;
+            ParamValuesDict.Clear();
+            foreach(var param in QueryMetaData.Parameters)
+            {
+                ParamValuesDict.Add(param, string.Empty);
+            }
+        }
     }
 
     public async Task ShowQueryResultsAsync()
@@ -77,11 +99,12 @@ else
         PageDataContent = "Loading...";
         try
         {
-            var httpResponseMessage = await ClientModel.GatewayRestlessDb.FetchQueryContentAsync(QueryItem, OutputFormat, Offset, MaxRows);
+            var httpResponseMessage = await ClientModel.GatewayRestlessDb.FetchQueryContentAsync(QueryItem, OutputFormat,
+                                                                                                 Offset, MaxRows, ParamValuesDict);
             var formatterInfo = ClientModel.FormatterInfos.First(f => f.OutputFormat == OutputFormat);
             if (formatterInfo.Disposition == Disposition.EMBEDDED)
             {
-                PageDataContent = await httpResponseMessage.Content.ReadAsStringAsync(); 
+                PageDataContent = await httpResponseMessage.Content.ReadAsStringAsync();
             }
             else
             {
@@ -90,7 +113,7 @@ else
                 PageDataContent = $"File {fileName} downloaded";
                 using (var streamRef = new DotNetStreamReference(stream: stream))
                 {
-                     await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+                    await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
                 }
             }
         }

@@ -71,9 +71,16 @@ namespace RestlessDb.Common.Gateway
             return true;
         }
 
-        public async Task<HttpResponseMessage> FetchQueryContentAsync(string queryItemName, string format, int offset, int maxRows)
+        public async Task<HttpResponseMessage> FetchQueryContentAsync(string queryItemName, string format, int offset, int maxRows, Dictionary<string, string> parameters)
         {
-            var response = await httpClient.GetAsync($"dbapi/{queryItemName}?outputformat={format}&offset={offset}&maxrows={maxRows}");
+            var paramsQueryString = string.Empty;
+
+            if (parameters?.Count > 0)
+            {
+                paramsQueryString = string.Join("",parameters.Select(kvp => $"&{kvp.Key}={kvp.Value}"));
+            }
+
+            var response = await httpClient.GetAsync($"dbapi/{queryItemName}?outputformat={format}&offset={offset}&maxrows={maxRows}{paramsQueryString}");
             await CheckReturnCode(HttpStatusCode.OK, "FetchQueryContentAsync", response);
             return response;
         }
