@@ -3,52 +3,33 @@
 @inject ClientModel clientModel
 @inject NavigationManager uriHelper
 
-
-<div class="alert alert-primary">
+<MudAlert Severity="Severity.Normal">
     Confirm: Delete query item @QryItemName
-</div>
+</MudAlert>
 
-@if (ErrorMessage != null)
+@if (!string.IsNullOrEmpty(ErrorMessage) )
 {
-    <div class="alert alert-danger" role="alert">
-        <pre>@ErrorMessage</pre>
-    </div>
+    <MudAlert Severity="Severity.Error">
+        <MudText Color="@Color.Error">@ErrorMessage</MudText>
+    </MudAlert>
 }
 
-<EditForm Model="@queryItemEdit" OnValidSubmit="@HandleSubmitAsync">
-    <label>Query Name:</label>
-    <div>
-        <InputText @bind-Value="@queryItemEdit.Name" disabled="true"/>
-    </div>
-    <label>Parent:</label>
-    <div>
-        @(queryItemEdit.Parent ?? "--top level--")
-    </div>
-    <label>Label:</label>
-    <div>
-        <InputText @bind-Value="@queryItemEdit.Label" disabled="true"/>
-    </div>
-    <label>Description:</label>
-    <div>
-        <InputText @bind-Value="@queryItemEdit.Description" disabled="true"/>
-    </div>
-    <label>Pos:</label>
-    <div>
-        <InputNumber @bind-Value="@queryItemEdit.Pos" disabled="true"/>
-    </div>
-    <label>Sql:</label>
-    <div>
-        <InputTextArea @bind-Value="@queryItemEdit.Sql" disabled="true"/>
-    </div>
-
-    <button type="submit" class="btn btn-success">
-        Delete
-    </button>
-    <button type="cancel" class="btn-success" @onclick="() =>HandleCancel()">
-        Cancel
-    </button>
-
-</EditForm>
+<MudCard>
+    <MudCardContent>
+        <MudForm >
+            <MudTextField T="string" @bind-Value="@queryItemEdit.Name" Label="Query name" Disabled="true" />
+            <MudTextField T="string" @bind-Value="@queryItemEdit.Parent" Label="Parent" Disabled="true" />
+            <MudTextField T="string" @bind-Value="@queryItemEdit.Label" Label="Label" Disabled="true" />
+            <MudTextField T="string" @bind-Value="@queryItemEdit.Description" Label="Description" Lines="3" Disabled="true" />
+            <MudTextField T="int" @bind-Value="@queryItemEdit.Pos" Label="Pos" InputType="InputType.Number" Disabled="true" />
+            <MudTextField T="string" @bind-Value="@queryItemEdit.Sql" Label="Sql statement" Lines="10" Disabled="true" />
+        </MudForm>
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-1" OnClick="@HandleCancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-1" OnClick="@HandleSubmitAsync">Delete</MudButton>
+    </MudCardActions>
+</MudCard>
 
 @code
 {
@@ -58,8 +39,6 @@
 
     public string ErrorMessage;
     private QueryItem queryItemEdit = new QueryItem();
-
-    bool IsUpdate() => QryItemName != null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -71,7 +50,6 @@
         {
             ErrorMessage = e.Message;
         }
-
     }
 
     private async Task HandleSubmitAsync()

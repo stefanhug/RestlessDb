@@ -1,39 +1,28 @@
 ﻿@inject ClientModel clientModel
 @inject NavigationManager uriHelper
 
-        @if (ErrorMessage != null)
-        {
-            <div class="alert alert-danger" role="alert">
-                <pre>@ErrorMessage</pre>
-            </div>
-        }
+<tr class="@GetRowClassForLevel()">
+    <td>@decoratedName</td>
+    <td>@QueryMeta.Label</td>
+    <td>@QueryMeta.Description</td>
+    <td>@cols</td>
+    <td>@parameters</td>
+    <td>
+        <MudButtonGroup Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small" VerticalAlign="true">
+            <MudButton OnClick="() => EditQuery(QueryMeta.Name)">Edit</MudButton>
+            <MudButton OnClick="() => CreateNewQuery(QueryMeta.Name)" Style="white-space:nowrap;">New child query</MudButton>
+            <MudButton OnClick="() => DeleteQuery(QueryMeta.Name)">Delete</MudButton>
+        </MudButtonGroup>
+    </td>
+</tr>
+@if (QueryMeta.Children != null)
+{
+    foreach (var childMeta in QueryMeta.Children)
+    {
+        <QueryItemRow QueryMeta=@childMeta Level=@(Level + 1) />
+    }
+}
 
-        <tr class="@GetRowClassForLevel()">
-            <td>@decoratedName</td>
-            <td>@QueryMeta.Label</td>
-            <td>@QueryMeta.Description</td>
-            <td>@cols</td>
-            <td>@parameters</td>
-            <td>
-                <button class="btn btn-primary" @onclick="() => EditQuery(QueryMeta.Name)">
-                    <span class="oi oi-pencil" aria-hidden="true" />Edit
-                </button>
-                <button class="btn btn-primary" @onclick="() => CreateNewQuery(QueryMeta.Name)">
-                    <span class="oi oi-plus" aria-hidden="true" />New child query
-                </button>
-                <button class="btn btn-primary" @onclick="() => DeleteQuery(QueryMeta.Name)">
-                    <span class="oi oi-delete" aria-hidden="true" />Delete
-                </button>
-            </td>
-        </tr>
-        @if (QueryMeta.Children != null)
-        {
-            foreach (var childMeta in QueryMeta.Children)
-            {
-                <QueryItemRow QueryMeta=@childMeta Level=@(Level + 1)/>
-            }
-        }
-        
 
 @code
 {
@@ -74,15 +63,15 @@
 
     private string GetRowClassForLevel()
     {
-        switch(Level)
+        switch (Level)
         {
             case 0:
-                return "bg-info";
+                return string.Empty;
             case 1:
-                return "bg-light";
+                return string.Empty;
             case 2:
             default:
-                return "bg-white";
+                return string.Empty;
         }
     }
 

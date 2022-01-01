@@ -4,54 +4,58 @@
 @inject IJSRuntime JS
 @inject ClientModel ClientModel
 
-@if (Error != null)
+
+<MudText Typo="Typo.h1">Query execution</MudText>
+<MudText Typo="Typo.h2">Execute queries and download results in different formats</MudText>
+@if (!string.IsNullOrEmpty(ErrorMessage))
 {
-    <div class="alert alert-danger" role="alert">
-        <pre>@Error</pre>
-    </div>
+    <MudAlert Severity="Severity.Error">
+        <MudText Color="@Color.Error">@ErrorMessage</MudText>
+    </MudAlert>
 }
-else if (QueryMetaData == null)
+<MudDivider DividerType="DividerType.Middle" Class="my-6" />
+
+@if (QueryMetaData == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <div class="top-row">
-        <h1>@QueryMetaData.Label</h1>
-        <h2>@QueryMetaData.Description</h2>
-
-        <fieldset>
-            <legend>Size and config</legend>
-            Output format:
-            <select name="outputformat" @bind="OutputFormat">
-                @foreach (var format in ClientModel.FormatterInfos)
-                {
-                    <option value="@format.OutputFormat">@format.Name</option>
-                }
-            </select>
-
-            Offset:
-            <input type="number" @bind="Offset" />Maxrows:
-            <input type="number" @bind="MaxRows" />
-        </fieldset>
-
-        @if (QueryMetaData.Parameters?.Count > 0)
-        {
+    <MudCard>
+        <MudCardContent>
+            <MudText Typo="Typo.subtitle1">@QueryMetaData.Label</MudText>
+            <MudText Typo="Typo.subtitle2">@QueryMetaData.Description</MudText>
             <fieldset>
-                <legend>Query Parameters</legend>
-                @{
-                    foreach (var kvp in ParamValuesDict)
+                <legend>Size and config</legend>
+                <MudSelect T="string" Label="Output format" AnchorOrigin="Origin.BottomCenter" @bind-Value="@OutputFormat">
+                    @foreach (var format in ClientModel.FormatterInfos)
                     {
-                        @($"{kvp.Key}: ")  
-                        <input type="text" @bind="@ParamValuesDict[kvp.Key]" />
+                        <MudSelectItem Value="@format.OutputFormat">@format.Name</MudSelectItem>
                     }
-                }
+                </MudSelect>
+                <MudTextField T="int" @bind-Value="@Offset" Label="Offset" InputType="InputType.Number" />
+                <MudTextField T="int" @bind-Value="@MaxRows" Label="Max Rows" InputType="InputType.Number" />
             </fieldset>
-        }
-        <button @onclick="ShowQueryResultsAsync">Show query results</button>
+            @if (QueryMetaData.Parameters?.Count > 0)
+            {
+                <fieldset>
+                    <legend>Query Parameters</legend>
+                    @{
+                        foreach (var kvp in ParamValuesDict)
+                        {
+                            <MudTextField T="string" @bind-Value="@ParamValuesDict[kvp.Key]" Label="@kvp.Key"/>
+                        }
+                    }
+                </fieldset>
+            }
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-1" OnClick=@(()=>@ShowQueryResultsAsync())>Execute Query</MudButton>
+        </MudCardActions>
+    </MudCard>
+    <MudDivider DividerType="DividerType.Middle" Class="my-6" />
+    
 
-        <hr />
-    </div>
     @if (PageDataContent != null)
     {
         @((MarkupString)PageDataContent)
@@ -65,10 +69,10 @@ else
     private int Offset { get; set; } = 0;
     private int MaxRows { get; set; } = 500;
     private string OutputFormat { get; set; }
-    private string Error { get; set; }
+    private string ErrorMessage { get; set; }
     private QueryMetaData QueryMetaData { get; set; }
-    
-    private  Dictionary<string, string> ParamValuesDict = new();
+
+    private Dictionary<string, string> ParamValuesDict = new();
     private string PageDataContent { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -79,14 +83,15 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        Error = null;
+        ErrorMessage = null;
         PageDataContent = null;
         QueryMetaData = await ClientModel.GetConfigItemAsync(QueryItem);
+        ParamValuesDict.Clear();
         if (QueryMetaData.Parameters?.Count > 0)
         {
             int numParams = QueryMetaData.Parameters.Count;
-            ParamValuesDict.Clear();
-            foreach(var param in QueryMetaData.Parameters)
+            
+            foreach (var param in QueryMetaData.Parameters)
             {
                 ParamValuesDict.Add(param, string.Empty);
             }
@@ -95,7 +100,7 @@ else
 
     public async Task ShowQueryResultsAsync()
     {
-        Error = null;
+        ErrorMessage = null;
         PageDataContent = "Loading...";
         try
         {
@@ -119,11 +124,11 @@ else
         }
         catch (HttpRequestException e)
         {
-            Error = $"HttpRequestException: httpstatus: {e.StatusCode}\nMessage:{e.Message}\n=====\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
+            ErrorMessage = $"HttpRequestException: httpstatus: {e.StatusCode}\nMessage:{e.Message}\n=====\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
         }
         catch (Exception e)
         {
-            Error = $"{e.Message}\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
+            ErrorMessage = $"{e.Message}\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
         }
     }
 }

@@ -2,52 +2,43 @@
 @inject ClientModel clientModel
 @inject NavigationManager uriHelper
 
-
-@if (ErrorMessage != null)
+<MudText Typo="Typo.h1">Query administration</MudText>
+<MudText Typo="Typo.h2">Configure and modify queries</MudText>
+@if (!string.IsNullOrEmpty(ErrorMessage) )
 {
-    <div class="alert alert-danger" role="alert">
-        <pre>@ErrorMessage</pre>
-    </div>
+    <MudAlert Severity="Severity.Error">
+        <MudText Color="@Color.Error">@ErrorMessage</MudText>
+    </MudAlert>
+}
+<MudDivider DividerType="DividerType.Middle" Class="my-6"/>
+
+@if (queryMetaDatas == null)
+{
+    <p><em>Loading...</em></p>
 }
 else
 {
-    <div class="top-row">
-        <h1> Query administration </h1>
-        <h2>Configure and modify queries</h2>
-
-        <hr />
-    </div>
-
-    @if (queryMetaDatas == null)
-    {
-        <p><em>Loading...</em></p>
-    }
-    else
-    {
-        <h2>Add new top level query</h2>
-        <button class="btn btn-primary" @onclick="() => CreateNewQuery(null)">
-            <span class="oi oi-plus" aria-hidden="true">Create New</span>
-        </button>
-
-        <table class="table">
-            <thead>
-                <tr>
-                    <th width="20%">Name</th>
-                    <th>Label</th>
-                    <th>Description</th>
-                    <th>Columns</th>
-                    <th>Params</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach(var qryMeta in queryMetaDatas)
-                {
-                    <QueryItemRow QueryMeta=qryMeta Level="0"/>
-                }
-            </tbody>
-        </table>
-    }
+    <MudText Typo="Typo.caption">Add new top level query</MudText>
+    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Class="ml-1" OnClick="@(() => CreateNewQuery(null))">Add new</MudButton>
+    
+    <MudSimpleTable Style="overflow-x: auto;" Bordered="true">
+        <thead>
+            <tr>
+                <th width="20%">Name</th>
+                <th>Label</th>
+                <th>Description</th>
+                <th>Columns</th>
+                <th>Params</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var qryMeta in queryMetaDatas)
+            {
+                <QueryItemRow QueryMeta=qryMeta Level="0"/>
+            }
+        </tbody>
+    </MudSimpleTable>
 }
 
 @code 

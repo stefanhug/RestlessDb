@@ -4,66 +4,40 @@
 @inject ClientModel clientModel
 @inject NavigationManager uriHelper
 
-@if (QryItemName == null)
-{
-    <div class="alert alert-primary">
-        Add a new qry item @((MarkupString)(!string.IsNullOrEmpty(QryItemParent) ? $" for parent <i>{QryItemParent}</i>" : " (top level)"))
-    </div>
-}
-else
-{
-    <div class="alert alert-primary">
-        Edit query item @QryItemName
-    </div>
-}
+<MudAlert Severity="Severity.Normal">
+    @GetHeaderText()
+</MudAlert>
 
-@if (ErrorMessage != null)
+@if (!string.IsNullOrEmpty(serverErrorMessage) || errors.Count() > 0)
 {
-    <div class="alert alert-danger" role="alert">
-        <pre>@ErrorMessage</pre>
-    </div>
-}
-<EditForm Model="@queryItemEdit" OnValidSubmit="@HandleSubmitAsync">
-    <label>Query Name:</label>
-    <div>
-        @if (QryItemName == null)
+    <MudAlert Severity="Severity.Error">
+        @foreach(var error in errors)
         {
-            <InputText @bind-Value="@queryItemEdit.Name" />
+            <MudText Color="@Color.Error">@error</MudText>
         }
-        else
-        {
-            @queryItemEdit.Name
-        }
-    </div>
-    <label>Parent:</label>
-    <div>
-        @(queryItemEdit.Parent ?? "--top level--")
-    </div>
-    <label>Label:</label>
-    <div>
-        <InputText @bind-Value="@queryItemEdit.Label" />
-    </div>
-    <label>Description:</label>
-    <div>
-        <InputText @bind-Value="@queryItemEdit.Description" />
-    </div>
-    <label>Pos:</label>
-    <div>
-        <InputNumber @bind-Value="@queryItemEdit.Pos" />
-    </div>
-    <label>Sql:</label>
-    <div>
-        <InputTextArea @bind-Value="@queryItemEdit.Sql" />
-    </div>
+        <MudText Color="@Color.Error">@serverErrorMessage</MudText>
+    </MudAlert>
+}
 
-    <button type="submit" class="btn btn-success">
-        Submit
-    </button>
-    <button type="cancel" class="btn-success" @onclick="() =>HandleCancel()">
-        Cancel
-    </button>
-
-</EditForm>
+<MudCard>
+    <MudCardContent>
+        <MudForm @ref="form" @bind-Errors="@errors" >
+            <MudTextField T="string" @bind-Value="@queryItemEdit.Name" Label="Query name" 
+                          Required="true" RequiredError="Query name is required" MaxLength="256"/>
+            <MudTextField T="string" @bind-Value="@queryItemEdit.Parent" Label="Parent" Disabled="true" />
+            <MudTextField T="string" @bind-Value="@queryItemEdit.Label" Label="Label" 
+                          Required="true" RequiredError="Label is required" MaxLength="256"/>
+            <MudTextField T="string" @bind-Value="@queryItemEdit.Description" Label="Description" MaxLength="2048" Lines="3"/>
+            <MudTextField T="int" @bind-Value="@queryItemEdit.Pos" Label="Pos" InputType="InputType.Number" />
+            <MudTextField T="string" @bind-Value="@queryItemEdit.Sql" Label="Sql statement" 
+                          Required="true" RequiredError="Sql statement name is required"MaxLength="2048" Lines="10"/>
+        </MudForm>
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-1" OnClick="@HandleCancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-1" OnClick="@HandleSubmitAsync">Save</MudButton>
+    </MudCardActions>
+</MudCard>
 
 @code
 {
@@ -71,10 +45,12 @@ else
     public string QryItemName { get; set; }
     public string QryItemParent { get; set; }
 
-    public string ErrorMessage;
+    MudForm form;
+    string[] errors = { };
+    public string serverErrorMessage;
     private QueryItem queryItemEdit = new QueryItem();
 
-    bool IsUpdate() => QryItemName != null;
+    bool isUpdate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -84,9 +60,11 @@ else
             QryItemParent = parentTmp;
         }
 
+        isUpdate = QryItemName != null;
+
         try
         {
-            if (IsUpdate())
+            if (isUpdate)
             {
                 queryItemEdit = await clientModel.GatewayRestlessDb.FetchQueryItemAsync(QryItemName);
             }
@@ -97,16 +75,38 @@ else
         }
         catch (HttpRequestException e)
         {
-            ErrorMessage = e.Message;
+            serverErrorMessage = e.Message;
         }
 
     }
 
+    private MarkupString GetHeaderText()
+    {
+        if (isUpdate)
+        {
+            return (MarkupString)$"Edit query item <i>{QryItemName}</i>";
+        }
+        else if (string.IsNullOrEmpty(QryItemParent))
+        {
+            return (MarkupString)"Add new query item (top level)";
+        }
+        else
+        {
+            return (MarkupString)$"Add new query item for parent <i>{QryItemParent}</i>";
+        }
+    }
+
     private async Task HandleSubmitAsync()
     {
+        await form.Validate();
+
+        if (!form.IsValid)
+        {
+            return;
+        }
         try
         {
-            if (IsUpdate())
+            if (isUpdate)
             {
                 await clientModel.GatewayRestlessDb.UpdateQueryItemAsync(queryItemEdit);
                 clientModel.InvalidateCaches();
@@ -120,7 +120,7 @@ else
         }
         catch (HttpRequestException e)
         {
-            ErrorMessage = e.Message;
+            serverErrorMessage = e.Message;
         }
     }
 
