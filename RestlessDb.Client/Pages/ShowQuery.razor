@@ -1,6 +1,7 @@
 ﻿@page "/showquery/{queryitem}"
 @using System.IO
 @using System.Text
+@using Newtonsoft.Json
 @inject IJSRuntime JS
 @inject ClientModel ClientModel
 
@@ -56,10 +57,7 @@ else
     <MudDivider DividerType="DividerType.Middle" Class="my-6" />
     
 
-    @if (PageDataContent != null)
-    {
-        @((MarkupString)PageDataContent)
-    }
+    <QueryResultTable QueryResult=@QueryResult/>
 }
 
 @code {
@@ -71,6 +69,8 @@ else
     private string OutputFormat { get; set; }
     private string ErrorMessage { get; set; }
     private QueryMetaData QueryMetaData { get; set; }
+    private QueryResult QueryResult { get; set; }
+
 
     private Dictionary<string, string> ParamValuesDict = new();
     private string PageDataContent { get; set; }
@@ -90,7 +90,7 @@ else
         if (QueryMetaData.Parameters?.Count > 0)
         {
             int numParams = QueryMetaData.Parameters.Count;
-            
+
             foreach (var param in QueryMetaData.Parameters)
             {
                 ParamValuesDict.Add(param, string.Empty);
@@ -101,6 +101,7 @@ else
     public async Task ShowQueryResultsAsync()
     {
         ErrorMessage = null;
+        QueryResult = null;
         PageDataContent = "Loading...";
         try
         {
@@ -109,7 +110,8 @@ else
             var formatterInfo = ClientModel.FormatterInfos.First(f => f.OutputFormat == OutputFormat);
             if (formatterInfo.Disposition == Disposition.EMBEDDED)
             {
-                PageDataContent = await httpResponseMessage.Content.ReadAsStringAsync();
+                var content = await httpResponseMessage.Content.ReadAsStringAsync();
+                QueryResult = JsonConvert.DeserializeObject<QueryResult>(content);
             }
             else
             {

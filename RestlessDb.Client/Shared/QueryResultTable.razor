@@ -1,0 +1,18 @@
+﻿@using Newtonsoft.Json.Linq;
+
+<MudCard>
+    <MudCardContent>
+        @if (QueryResult != null)
+        {
+            <MudText Typo="Typo.subtitle1">@TableLabel</MudText>
+            <MudText Typo="Typo.subtitle2">@TableDescription</MudText>
+            <QueryResultInnerTable MetaData=@QueryResult.MetaData Data=@(QueryResult.Data) />
+        }
+        else
+        {
+            <MudText Typo="Typo.subtitle1">No data to display</MudText>
+        }
+    </MudCardContent>
+</MudCard>
+
+

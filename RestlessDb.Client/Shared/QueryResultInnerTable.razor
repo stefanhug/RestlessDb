@@ -1,0 +1,33 @@
+﻿@using Newtonsoft.Json.Linq;
+
+<MudTable Items=@Data Hover="true" Breakpoint="Breakpoint.Sm">
+    <HeaderContent>
+        @foreach (var col in MetaData.Columns)
+        {
+            <MudTh>@col.Label</MudTh>
+        }
+        @if (MetaData.Children != null)
+        {
+            foreach (var child in MetaData.Children)
+            {
+                <MudTh>@child.Label</MudTh>
+            }
+        }
+    </HeaderContent>
+    <RowTemplate>
+        @foreach (var col in MetaData.Columns)
+        {
+            <MudTd DataLabel=@col.Label>@context[col.Label]</MudTd>
+        }
+        @if (MetaData.Children != null)
+        {
+            foreach (var child in MetaData.Children)
+            {
+                <MudTh>
+                   <QueryResultInnerTable MetaData=@child Data=@(CastDataToListOfDicts(context[child.Name])) /> 
+                </MudTh>
+            }
+        }
+    </RowTemplate>
+</MudTable>
+
