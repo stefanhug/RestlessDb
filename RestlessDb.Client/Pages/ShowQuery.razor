@@ -1,19 +1,11 @@
 ﻿@page "/showquery/{queryitem}"
 @using System.IO
 @using System.Text
+@using Newtonsoft.Json
 @inject IJSRuntime JS
 @inject ClientModel ClientModel
 
-
-<MudText Typo="Typo.h1">Query execution</MudText>
-<MudText Typo="Typo.h2">Execute queries and download results in different formats</MudText>
-@if (!string.IsNullOrEmpty(ErrorMessage))
-{
-    <MudAlert Severity="Severity.Error">
-        <MudText Color="@Color.Error">@ErrorMessage</MudText>
-    </MudAlert>
-}
-<MudDivider DividerType="DividerType.Middle" Class="my-6" />
+<HeaderRow Header="Query execution" SubHeader="Execute queries and download results in different formats" ErrorMessage=@ErrorMessage />
 
 @if (QueryMetaData == null)
 {
@@ -36,6 +28,7 @@ else
                 <MudTextField T="int" @bind-Value="@Offset" Label="Offset" InputType="InputType.Number" />
                 <MudTextField T="int" @bind-Value="@MaxRows" Label="Max Rows" InputType="InputType.Number" />
             </fieldset>
+
             @if (QueryMetaData.Parameters?.Count > 0)
             {
                 <fieldset>
@@ -43,92 +36,27 @@ else
                     @{
                         foreach (var kvp in ParamValuesDict)
                         {
-                            <MudTextField T="string" @bind-Value="@ParamValuesDict[kvp.Key]" Label="@kvp.Key"/>
+                            <MudTextField T="string" @bind-Value="@ParamValuesDict[kvp.Key]" Label="@kvp.Key" />
                         }
                     }
                 </fieldset>
             }
+
+            <fieldset>
+                <legend>Table display</legend>
+                <MudSwitch @bind-Checked="@TableDisplayOptions.Hover" Color="Color.Primary">Hover</MudSwitch>
+                <MudSwitch @bind-Checked="@TableDisplayOptions.Dense" Color="Color.Secondary">Dense</MudSwitch>
+                <MudSwitch @bind-Checked="@TableDisplayOptions.Striped" Color="Color.Tertiary">Striped</MudSwitch>
+                <MudSwitch @bind-Checked="@TableDisplayOptions.Bordered" Color="Color.Warning">Bordered</MudSwitch>
+            </fieldset>
         </MudCardContent>
         <MudCardActions>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-1" OnClick=@(()=>@ShowQueryResultsAsync())>Execute Query</MudButton>
         </MudCardActions>
     </MudCard>
-    <MudDivider DividerType="DividerType.Middle" Class="my-6" />
     
+    <MudDivider DividerType="DividerType.Middle" Class="my-6" />
 
-    @if (PageDataContent != null)
-    {
-        @((MarkupString)PageDataContent)
-    }
-}
 
-@code {
-    [Parameter]
-    public string QueryItem { get; set; }
-
-    private int Offset { get; set; } = 0;
-    private int MaxRows { get; set; } = 500;
-    private string OutputFormat { get; set; }
-    private string ErrorMessage { get; set; }
-    private QueryMetaData QueryMetaData { get; set; }
-
-    private Dictionary<string, string> ParamValuesDict = new();
-    private string PageDataContent { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await ClientModel.CheckInitAsync();
-        OutputFormat = ClientModel.FormatterInfos.FirstOrDefault(f => f.Disposition == Disposition.EMBEDDED).OutputFormat;
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        ErrorMessage = null;
-        PageDataContent = null;
-        QueryMetaData = await ClientModel.GetConfigItemAsync(QueryItem);
-        ParamValuesDict.Clear();
-        if (QueryMetaData.Parameters?.Count > 0)
-        {
-            int numParams = QueryMetaData.Parameters.Count;
-            
-            foreach (var param in QueryMetaData.Parameters)
-            {
-                ParamValuesDict.Add(param, string.Empty);
-            }
-        }
-    }
-
-    public async Task ShowQueryResultsAsync()
-    {
-        ErrorMessage = null;
-        PageDataContent = "Loading...";
-        try
-        {
-            var httpResponseMessage = await ClientModel.GatewayRestlessDb.FetchQueryContentAsync(QueryItem, OutputFormat,
-                                                                                                 Offset, MaxRows, ParamValuesDict);
-            var formatterInfo = ClientModel.FormatterInfos.First(f => f.OutputFormat == OutputFormat);
-            if (formatterInfo.Disposition == Disposition.EMBEDDED)
-            {
-                PageDataContent = await httpResponseMessage.Content.ReadAsStringAsync();
-            }
-            else
-            {
-                var fileName = $"{QueryMetaData.Name}.{formatterInfo.FileExtension}";
-                var stream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                PageDataContent = $"File {fileName} downloaded";
-                using (var streamRef = new DotNetStreamReference(stream: stream))
-                {
-                    await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
-                }
-            }
-        }
-        catch (HttpRequestException e)
-        {
-            ErrorMessage = $"HttpRequestException: httpstatus: {e.StatusCode}\nMessage:{e.Message}\n=====\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
-        }
-        catch (Exception e)
-        {
-            ErrorMessage = $"{e.Message}\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
-        }
-    }
+    <QueryResultTable QueryResult=@QueryResult TableDisplayOptions=@TableDisplayOptions />
 }

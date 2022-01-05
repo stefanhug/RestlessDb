@@ -7,12 +7,12 @@ namespace RestlessDb.Formatters
 {
     public class QueryJsonFormatter : IQueryFormatter
     {
-        public string ContentType => "application/json";
-        public string OutputFormat => "json";
-        public string Label => "JSON file";
-        public string Description => "Data export in JSON value format";
-        public string FileExtension => "json";
-        public Disposition Disposition => Disposition.STANDALONE;
+        public virtual string ContentType => "application/json";
+        public virtual string OutputFormat => "json";
+        public virtual string Label => "JSON file";
+        public virtual string Description => "Data export in JSON value format";
+        public virtual string FileExtension => "json";
+        public virtual Disposition Disposition => Disposition.STANDALONE;
 
         public ActionResult GetActionResult(QueryResult queryResult)
         {

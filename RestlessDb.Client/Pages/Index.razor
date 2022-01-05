@@ -1,16 +1,9 @@
 ﻿@page "/"
 @inject ClientModel ClientModel
 
-<MudText Typo="Typo.h1">RestlessDb</MudText>
-<MudText Typo="Typo.h2">UI for the Restless Db .net Core Api Service</MudText>
-<MudText Typo="Typo.body1">Execute and configure queries and display the result</MudText>
-
-@if(ClientModel.ErrorMessage != null)
-{
-    <MudAlert Severity="Severity.Error">
-        <MudText Color="@Color.Error">@ClientModel.ErrorMessage</MudText>
-    </MudAlert>    
-}
+<HeaderRow Header="RestlessDb: UI for the Restless Db .net Core Api Service" 
+           SubHeader="Execute and configure queries and display the result" 
+           ErrorMessage=@ClientModel.ErrorMessage/>
 
 @code {
     protected override async Task OnInitializedAsync()

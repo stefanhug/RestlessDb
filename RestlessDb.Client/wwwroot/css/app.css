@@ -1,7 +1,1 @@
-.app {
-    margin: 10px;
-}
-
-:root {
-    --mud-typography-h1-size: 3rem;
-}
+fieldset { padding-inline-start: 2em;}

@@ -19,6 +19,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
     <PackageReference Include="MudBlazor" Version="6.0.2" />
+    <PackageReference Include="MudBlazor.ThemeManager" Version="1.0.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
 	<PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="6.0.0" />
@@ -27,6 +28,13 @@
   
   <ItemGroup>
     <ProjectReference Include="..\RestlessDb.Common\RestlessDb.Common.csproj" />
+  </ItemGroup>
+
+  
+  <ItemGroup>
+    <Content Update="wwwroot\css\app.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
