@@ -6,7 +6,7 @@
         {
             <MudText Typo="Typo.subtitle1">@TableLabel</MudText>
             <MudText Typo="Typo.subtitle2">@TableDescription</MudText>
-            <QueryResultInnerTable MetaData=@QueryResult.MetaData Data=@(QueryResult.Data) />
+            <QueryResultInnerTable MetaData=@QueryResult.MetaData Data=@(QueryResult.Data) TableDisplayOptions=@TableDisplayOptions/>
         }
         else
         {

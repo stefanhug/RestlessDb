@@ -1,6 +1,10 @@
 ﻿@using Newtonsoft.Json.Linq;
 
-<MudTable Items=@Data Hover="true" Breakpoint="Breakpoint.Sm">
+<MudTable Items=@Data Breakpoint="Breakpoint.Sm"
+          Hover=@TableDisplayOptions.Hover
+          Dense=@TableDisplayOptions.Dense
+          Striped=@TableDisplayOptions.Striped
+          Bordered=@TableDisplayOptions.Bordered>
     <HeaderContent>
         @foreach (var col in MetaData.Columns)
         {
@@ -24,7 +28,7 @@
             foreach (var child in MetaData.Children)
             {
                 <MudTh>
-                   <QueryResultInnerTable MetaData=@child Data=@(CastDataToListOfDicts(context[child.Name])) /> 
+                    <QueryResultInnerTable MetaData=@child Data=@(CastDataToListOfDicts(context[child.Name])) TableDisplayOptions=@TableDisplayOptions />
                 </MudTh>
             }
         }

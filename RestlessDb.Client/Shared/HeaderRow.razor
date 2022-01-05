@@ -1,0 +1,9 @@
+﻿<MudText Typo="Typo.h1">@Header</MudText>
+<MudText Typo="Typo.h2">@SubHeader</MudText>
+@if (!string.IsNullOrEmpty(@ErrorMessage) )
+{
+    <MudAlert Severity="Severity.Error">
+        <MudText Color="@Color.Error">@ErrorMessage</MudText>
+    </MudAlert>
+}
+<MudDivider DividerType="DividerType.Middle" Class="my-6"/>

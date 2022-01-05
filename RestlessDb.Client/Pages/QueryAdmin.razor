@@ -2,15 +2,7 @@
 @inject ClientModel clientModel
 @inject NavigationManager uriHelper
 
-<MudText Typo="Typo.h1">Query administration</MudText>
-<MudText Typo="Typo.h2">Configure and modify queries</MudText>
-@if (!string.IsNullOrEmpty(ErrorMessage) )
-{
-    <MudAlert Severity="Severity.Error">
-        <MudText Color="@Color.Error">@ErrorMessage</MudText>
-    </MudAlert>
-}
-<MudDivider DividerType="DividerType.Middle" Class="my-6"/>
+<HeaderRow Header="Query administration" SubHeader="Configure and modify queries" ErrorMessage=@ErrorMessage/>
 
 @if (queryMetaDatas == null)
 {
@@ -39,33 +31,4 @@ else
             }
         </tbody>
     </MudSimpleTable>
-}
-
-@code 
-{
-    private string ErrorMessage { get; set; }
-    private List<QueryMetaData> queryMetaDatas = null;
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            await clientModel.CheckInitAsync();
-            queryMetaDatas = clientModel.QueryMetaDatas;
-
-        }
-        catch (HttpRequestException e)
-        {
-            ErrorMessage = $"HttpRequestException: httpstatus: {e.StatusCode}\nMessage:{e.Message}\n=====\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
-        }
-        catch (Exception e)
-        {
-            ErrorMessage = $"{e.Message}\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
-        }
-    }
-
-    private void CreateNewQuery(string parentQuery)
-    {
-        uriHelper.NavigateTo($"/qryitemnew?parent={parentQuery}");
-    }
 }

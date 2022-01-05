@@ -30,23 +30,24 @@ namespace RestlessDb.Client.Model
             this.gatewayRestlessDb = new GatewayRestlessDb(httpClient);
         }
 
-        public async Task CheckInitAsync()
+        public async Task<bool> CheckInitAsync()
         {
             if (QueryMetaDatas != null && FormatterInfos != null)
             {
-                return;
+                return true;
             }
             try
             {
                 ErrorMessage = null;
                 QueryMetaDatas = await GatewayRestlessDb.GetQueryConfigAsync();
                 FormatterInfos = await GatewayRestlessDb.GetAllFormatters();
-
+                return true;
             }
             catch(Exception e)
             {
                 ErrorMessage = $"Failed to fetch query configuration: {e.Message}";
             }
+            return false;
             
         }
 

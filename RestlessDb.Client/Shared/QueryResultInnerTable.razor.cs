@@ -7,13 +7,23 @@ using System.Linq;
 
 namespace RestlessDb.Client.Shared
 {
+    public class TableDisplayOptions
+    {
+        public bool Hover { get; set; }
+        public bool Dense { get; set; }
+        public bool Striped { get; set; }
+        public bool Bordered { get; set; }
+
+    }
     public partial class QueryResultInnerTable
     {
         [Parameter]
         public QueryMetaData MetaData { get; set; }
         [Parameter]
         public IEnumerable<IDictionary<string, object>> Data { get; set; }
-    
+        [Parameter]
+        public TableDisplayOptions TableDisplayOptions { get; set; } = new();
+
         /// <summary>
         /// This is a dirty hack to resolve the problem of the Newtonsoft Deserialization. Due to the definition of 
         /// QueryResult Newtonsoft cannot determine the correct type List<Dictionary<string,object> and deserializes as JArray

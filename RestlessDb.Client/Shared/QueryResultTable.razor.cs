@@ -6,8 +6,10 @@ namespace RestlessDb.Client.Shared
 {
     public partial class QueryResultTable
     {
-        [Parameter]
+        [Parameter, EditorRequired]
         public QueryResult QueryResult { get; set; }
+        [Parameter, EditorRequired]
+        public TableDisplayOptions TableDisplayOptions { get; set; }
 
         public string TableLabel { get => QueryResult == null ? string.Empty : $"{QueryResult.MetaData.Label} - {QueryResult.MetaData.Description}"; }
         public string TableDescription
