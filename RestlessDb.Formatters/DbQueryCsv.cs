@@ -73,7 +73,7 @@ namespace RestlessDb.Formatters
 
         private string EscapeValue(object value)
         {
-            var ret = value.ToString();
+            var ret = value != null ? value.ToString() : string.Empty;
             bool escape = ret.IndexOf(SeparatorChar) >= 0 || ret.IndexOf(EscapeChar) >= 0;
             ret = ret.Replace(EscapeChar.ToString(), EscapeChar.ToString() + EscapeChar);
 

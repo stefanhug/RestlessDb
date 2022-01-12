@@ -51,12 +51,16 @@ namespace RestlessDb.DataLayer
                 throw new GenericDbQueryException(GenericDbQueryExceptionCode.PARAMS_MISSING, $"Needed parameter(s) '{string.Join(", ", stillMissing)}' not provided in parent rows nor in query parameters");
             }
 
-            var notNeededParams = new HashSet<string>(commandParams.Keys);
-            notNeededParams.ExceptWith(neededParams);
-
-            if (notNeededParams.Count > 0)
+            // omit this check for child queries, commandParams need not to be used in child queries
+            if (parentRows == null || parentRows.Count == 0)
             {
-                throw new GenericDbQueryException(GenericDbQueryExceptionCode.PARAMS_NOTNEEDED, $"Not needed parameter(s) >{string.Join(", ", notNeededParams)},< provided to query. Remove not needed query parameters");
+                var notNeededParams = new HashSet<string>(commandParams.Keys);
+                notNeededParams.ExceptWith(neededParams);
+
+                if (notNeededParams.Count > 0)
+                {
+                    throw new GenericDbQueryException(GenericDbQueryExceptionCode.PARAMS_NOTNEEDED, $"Not needed parameter(s) >{string.Join(", ", notNeededParams)},< provided to query. Remove not needed query parameters");
+                }
             }
 
             return resultParams;

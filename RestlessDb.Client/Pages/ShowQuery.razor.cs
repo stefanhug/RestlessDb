@@ -24,9 +24,8 @@ namespace RestlessDb.Client.Pages
         private QueryMetaData QueryMetaData { get; set; }
         private QueryResult QueryResult { get; set; }
 
-
         private Dictionary<string, string> ParamValuesDict = new();
-        private string PageDataContent { get; set; }
+        private QueryResultTable queryResultTable { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -37,7 +36,8 @@ namespace RestlessDb.Client.Pages
         protected override async Task OnParametersSetAsync()
         {
             ErrorMessage = null;
-            PageDataContent = null;
+            QueryResult = null;
+           
             QueryMetaData = await ClientModel.GetConfigItemAsync(QueryItem);
             ParamValuesDict.Clear();
             if (QueryMetaData.Parameters?.Count > 0)
@@ -55,9 +55,9 @@ namespace RestlessDb.Client.Pages
         {
             ErrorMessage = null;
             QueryResult = null;
-            PageDataContent = "Loading...";
             try
             {
+                queryResultTable.Loading = true;
                 var httpResponseMessage = await ClientModel.GatewayRestlessDb.FetchQueryContentAsync(QueryItem, OutputFormat,
                                                                                                      Offset, MaxRows, ParamValuesDict);
                 var formatterInfo = ClientModel.FormatterInfos.First(f => f.OutputFormat == OutputFormat);
@@ -70,7 +70,6 @@ namespace RestlessDb.Client.Pages
                 {
                     var fileName = $"{QueryMetaData.Name}.{formatterInfo.FileExtension}";
                     var stream = await httpResponseMessage.Content.ReadAsStreamAsync();
-                    PageDataContent = $"File {fileName} downloaded";
                     using (var streamRef = new DotNetStreamReference(stream: stream))
                     {
                         await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
@@ -84,6 +83,10 @@ namespace RestlessDb.Client.Pages
             catch (Exception e)
             {
                 ErrorMessage = $"{e.Message}\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
+            }
+            finally
+            {
+                queryResultTable.Loading = false;
             }
         }
     }
