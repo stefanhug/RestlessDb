@@ -1,5 +1,5 @@
 @inherits LayoutComponentBase
-@using MudBlazor.ThemeManager;
+
 
 <MudThemeProvider Theme="restlessDbTheme" />
 <MudDialogProvider />
@@ -14,7 +14,7 @@
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" aria-label="github" Edge="Edge.End" Target="_blank" Link="https://github.com/stefanhug/RestlessDb"/>
         <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+    <MudDrawer @bind-Open="drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
     </MudDrawer>
     <MudMainContent>
@@ -25,11 +25,11 @@
 </MudLayout>
 
 @code {
-    bool _drawerOpen = true;
+    bool drawerOpen = true;
 
     private void DrawerToggle()
     {
-        _drawerOpen = !_drawerOpen;
+        drawerOpen = !drawerOpen;
     }
 
     public RestlessDbTheme restlessDbTheme = new RestlessDbTheme();

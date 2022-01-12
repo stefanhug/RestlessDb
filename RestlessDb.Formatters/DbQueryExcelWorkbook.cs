@@ -108,28 +108,36 @@ namespace RestlessDb.Formatters
             {
                 var cell = worksheet.Cell(currentRowIndex, startColIndex);
                 var val = row[col.Label];
-                switch (col.ColumnType)
+                if (val == null)
                 {
-                    case QueryColumnType.DATETIME:
-                        cell.SetValue<DateTime>((DateTime)val);
-                        break;
-                    case QueryColumnType.DOUBLE:
-                        cell.SetValue<double>((double)val);
-                        break;
-                    case QueryColumnType.INT:
-                        cell.SetValue<int>((int)val);
-                        break;
-                    case QueryColumnType.SHORT:
-                        cell.SetValue<short>((short)val);
-                        break;
-                    case QueryColumnType.DECIMAL:
-                        cell.SetValue<decimal>((decimal)val);
-                        break;
-                    case QueryColumnType.STRING:
-                    default:
-                        cell.SetValue<string>(val.ToString());
-                        break;
+                    cell.Clear();
                 }
+                else
+                {
+                    switch (col.ColumnType)
+                    {
+                        case QueryColumnType.DATETIME:
+                            cell.SetValue<DateTime>((DateTime)val);
+                            break;
+                        case QueryColumnType.DOUBLE:
+                            cell.SetValue<double>((double)val);
+                            break;
+                        case QueryColumnType.INT:
+                            cell.SetValue<int>((int)val);
+                            break;
+                        case QueryColumnType.SHORT:
+                            cell.SetValue<short>((short)val);
+                            break;
+                        case QueryColumnType.DECIMAL:
+                            cell.SetValue<decimal>((decimal)val);
+                            break;
+                        case QueryColumnType.STRING:
+                        default:
+                            cell.SetValue<string>(val.ToString());
+                            break;
+                    }
+                }
+                
                 startColIndex++;
             }
             currentRowIndex++;

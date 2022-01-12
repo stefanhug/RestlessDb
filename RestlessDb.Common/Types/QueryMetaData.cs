@@ -6,7 +6,7 @@ using System.Text;
 
 namespace RestlessDb.Common.Types
 {
-    public enum QueryColumnType { STRING, INT, DOUBLE, DATETIME, DECIMAL, SHORT }
+    public enum QueryColumnType { STRING, INT, DOUBLE, DATETIME, DECIMAL, SHORT, BYTEARRAY }
 
     public class QueryColumn
     {
