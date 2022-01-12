@@ -11,6 +11,8 @@ namespace RestlessDb.Client.Shared
         [Parameter, EditorRequired]
         public TableDisplayOptions TableDisplayOptions { get; set; }
 
+        public bool Loading { get; set; }
+
         public string TableLabel { get => QueryResult == null ? string.Empty : $"{QueryResult.MetaData.Label} - {QueryResult.MetaData.Description}"; }
         public string TableDescription
         {

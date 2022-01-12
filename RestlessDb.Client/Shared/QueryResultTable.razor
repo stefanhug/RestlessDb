@@ -1,12 +1,14 @@
-﻿@using Newtonsoft.Json.Linq;
-
-<MudCard>
+﻿<MudCard>
     <MudCardContent>
         @if (QueryResult != null)
         {
             <MudText Typo="Typo.subtitle1">@TableLabel</MudText>
             <MudText Typo="Typo.subtitle2">@TableDescription</MudText>
-            <QueryResultInnerTable MetaData=@QueryResult.MetaData Data=@(QueryResult.Data) TableDisplayOptions=@TableDisplayOptions/>
+            <QueryResultInnerTable MetaData=@QueryResult.MetaData Data=@(QueryResult.Data) TableDisplayOptions=@TableDisplayOptions />
+        }
+        else if (Loading)
+        {
+            <MudText Typo="Typo.subtitle1">Loading...</MudText>
         }
         else
         {

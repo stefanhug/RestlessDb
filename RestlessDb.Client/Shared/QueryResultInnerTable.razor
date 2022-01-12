@@ -21,15 +21,15 @@
     <RowTemplate>
         @foreach (var col in MetaData.Columns)
         {
-            <MudTd DataLabel=@col.Label>@context[col.Label]</MudTd>
+            <MudTd Style="vertical-align:top" DataLabel=@col.Label>@context[col.Label]</MudTd>
         }
         @if (MetaData.Children != null)
         {
             foreach (var child in MetaData.Children)
             {
-                <MudTh>
+                <MudTd>
                     <QueryResultInnerTable MetaData=@child Data=@(CastDataToListOfDicts(context[child.Name])) TableDisplayOptions=@TableDisplayOptions />
-                </MudTh>
+                </MudTd>
             }
         }
     </RowTemplate>

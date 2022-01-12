@@ -9,6 +9,7 @@ namespace RestlessDb.Formatters
 {
     public class DbQueryExcelWorkbook : XLWorkbook
     {
+        const int MAXWORKSHEET_LABEL_LENGTH = 31;
         private readonly QueryResult queryResult;
         private readonly Dictionary<string, int> metaStartColumnMap;
 
@@ -31,7 +32,9 @@ namespace RestlessDb.Formatters
         public MemoryStream GetAsStream()
         {
             var memStream = new MemoryStream();
-            var workSheet = Worksheets.Add(queryResult.MetaData.Label);
+
+            // worksheet name may not be longer than 31 characters
+            var workSheet = Worksheets.Add(queryResult.MetaData.Label.Substring(0, Math.Min(queryResult.MetaData.Label.Length, MAXWORKSHEET_LABEL_LENGTH)));
             
             var combinedColumns = FormatterHelper.CombineColHeaders(queryResult.MetaData);
 
