@@ -22,6 +22,7 @@ namespace RestlessDb.DataLayer
             { typeof(double), QueryColumnType.DOUBLE },
             { typeof(DateTime), QueryColumnType.DATETIME },
             { typeof(decimal), QueryColumnType.DECIMAL },
+            { typeof(byte[]), QueryColumnType.BYTEARRAY },
             { typeof(string), QueryColumnType.STRING }
         };
 
@@ -74,13 +75,13 @@ namespace RestlessDb.DataLayer
 
                     command.Cancel(); //Otherwise we get a timeout in the dispose if more rows available
                 }
-                
+
                 Logger.LogInformation("QueryAsDictList SQL: {0} ({1} ms)", effectiveSql, Environment.TickCount - start);
 
 
                 return (data, hasMoreRows);
             }
-            catch(SqlException e)
+            catch (SqlException e)
             {
                 var message = $"SqlException: '{e.Message}'\r\n" +
                               $"Errors: {e.Errors}\r\n" +
@@ -159,7 +160,7 @@ namespace RestlessDb.DataLayer
             {
                 ret.Add(reader.GetName(i), NormalizeValue(reader.GetValue(i)));
             }
-            
+
             return ret;
         }
 
@@ -176,8 +177,21 @@ namespace RestlessDb.DataLayer
 
         private static object NormalizeValue(object value)
         {
-            return GetColumnTypeOfType(value.GetType()) == QueryColumnType.STRING ? value.ToString() : value;
-        } 
+            if (value is DBNull)
+            {
+                return null;
+            }
+
+            switch (GetColumnTypeOfType(value.GetType()))
+            {
+                case QueryColumnType.STRING:
+                    return value.ToString();
+                case QueryColumnType.BYTEARRAY:
+                    return Convert.ToBase64String((byte[])value);
+                default:
+                    return value;
+            }
+        }
 
         private static QueryColumnType GetColumnTypeOfType(Type type)
         {
