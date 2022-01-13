@@ -17,6 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestlessDb.Client", "Restle
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestlessDb.Formatters", "RestlessDb.Formatters\RestlessDb.Formatters.csproj", "{D98B3585-3DD5-4F43-B67C-CB3AD0F9E761}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E3A591AE-D69B-47F2-ACD0-1184C3EBEE2C}"
+	ProjectSection(SolutionItems) = preProject
+		restlessdbpublish.ps1 = restlessdbpublish.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

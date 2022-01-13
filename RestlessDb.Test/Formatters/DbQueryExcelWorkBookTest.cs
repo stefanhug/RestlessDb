@@ -37,7 +37,7 @@ namespace GenericDbRestApi.Test.Formatters
             var workBook = new XLWorkbook(xlsxStream);
             var workSheet = workBook.Worksheets.First();
             var excelColHeaderRow = workSheet.Row(4);
-            
+
             for (int i = 0; i < inputData.MetaData.Columns.Count; i++)
             {
                 Assert.Equal(inputData.MetaData.Columns[i].Label, excelColHeaderRow.Cell(i + 1).GetString());
@@ -53,8 +53,6 @@ namespace GenericDbRestApi.Test.Formatters
             var workBook = new XLWorkbook(xlsxStream);
             var workSheet = workBook.Worksheets.First();
 
-            //workBook.SaveAs(@"c:\temp\test.xlsx");
-         
             var columns = inputData.MetaData.Columns;
 
             for (int row = 0; row < inputData.Data.Count; row++)
@@ -74,6 +72,30 @@ namespace GenericDbRestApi.Test.Formatters
                         default:
                             Assert.Equal(inputData.Data[row][columns[col].Label].ToString(), workSheet.Cell(row + FIRSTDATAROW_OFFSET, col + 1).GetString());
                             break;
+                    }
+                }
+            }
+        }
+
+        [Fact]
+        public void WhenSimpleQueryResultWithNullValuesThenDataInsertedCorrectly()
+        {
+            var inputData = new QueryResultTestProvider().CreateBasicQueryResultWithNullValues();
+            var sut = new DbQueryExcelWorkbook(inputData);
+            var xlsxStream = sut.GetAsStream();
+            var workBook = new XLWorkbook(xlsxStream);
+            var workSheet = workBook.Worksheets.First();
+
+            var columns = inputData.MetaData.Columns;
+
+            for (int row = 0; row < inputData.Data.Count; row++)
+            {
+                for (int col = 0; col < columns.Count; col++)
+                {
+                    var cellData = inputData.Data[row][columns[col].Label];
+                    if (cellData == null)
+                    {
+                        Assert.True(workSheet.Cell(row + FIRSTDATAROW_OFFSET, col + 1).IsEmpty());
                     }
                 }
             }
@@ -148,7 +170,7 @@ namespace GenericDbRestApi.Test.Formatters
                                    inputData.MetaData.Children[0].Columns.Count +
                                    inputData.MetaData.Children[1].Columns.Count +
                                    inputData.MetaData.Children[0].Children[0].Columns.Count;
-            
+
             int row;
 
             for (row = FIRSTDATAROW_OFFSET; row < filledRows + FIRSTDATAROW_OFFSET; row++)
@@ -156,7 +178,7 @@ namespace GenericDbRestApi.Test.Formatters
                 if (!RowHasContent(workSheet.Row(row), maxFilledColumns))
                     break;
             }
-                
+
             Assert.Equal(filledRows + FIRSTDATAROW_OFFSET, row);
         }
 

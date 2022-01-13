@@ -27,8 +27,13 @@
         {
             foreach (var child in MetaData.Children)
             {
+                var data = CastDataToListOfDicts(context[child.Name]);
+                var nextLevel = NestingLevel + 1;
                 <MudTd>
-                    <QueryResultInnerTable MetaData=@child Data=@(CastDataToListOfDicts(context[child.Name])) TableDisplayOptions=@TableDisplayOptions />
+                    @if(data.Count() > 0)
+                    {
+                        <QueryResultInnerTable MetaData=@child Data=@data TableDisplayOptions=@TableDisplayOptions NestingLevel=@nextLevel />
+                    }
                 </MudTd>
             }
         }
