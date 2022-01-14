@@ -11,13 +11,13 @@ namespace RestlessDb.App
     {
         public static void Main(string[] args)
         {
-            var logger = CustomizeLogger(new LoggerConfiguration()).CreateLogger();
             try
             {
                 CreateHostBuilder(args).Build().Run();
             }
             catch(Exception ex) 
             {
+                var logger = CustomizeLogger(new LoggerConfiguration()).CreateLogger();
                 logger.Error(ex, "Exception in Program.Main");
             }
         }
