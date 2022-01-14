@@ -15,7 +15,14 @@ namespace RestlessDb.Client.Pages
     {
         [Parameter]
         public string QueryItem { get; set; }
-        public TableDisplayOptions TableDisplayOptions { get; } = new();
+        public TableDisplayOptions TableDisplayOptions { get; } =
+            new()
+            {
+                Bordered = true,
+                Dense = true,
+                Hover = true,
+                Striped = true
+            };
 
         private int Offset { get; set; } = 0;
         private int MaxRows { get; set; } = 500;
@@ -37,7 +44,7 @@ namespace RestlessDb.Client.Pages
         {
             ErrorMessage = null;
             QueryResult = null;
-           
+
             QueryMetaData = await ClientModel.GetConfigItemAsync(QueryItem);
             ParamValuesDict.Clear();
             if (QueryMetaData.Parameters?.Count > 0)
