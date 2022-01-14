@@ -14,34 +14,8 @@ namespace GenericDbRestApi.Test.Formatters
         public QueryResult CreateBasicQueryResult()
         {
             var ret = new QueryResult();
-            ret.MetaData = new QueryMetaData();
-            ret.MetaData.Name = "TestName";
-            ret.MetaData.Label = "Test Label";
-            ret.MetaData.Description = "Test Description";
-            ret.MetaData.Columns = new List<QueryColumn>()
-            {
-                new QueryColumn()
-                {
-                    Label = "Column 1",
-                    ColumnType = QueryColumnType.STRING
-                },
-                new QueryColumn()
-                {
-                    Label = "Double Col",
-                    ColumnType = QueryColumnType.DOUBLE
-                },
-                new QueryColumn()
-                {
-                    Label = "Integer",
-                    ColumnType = QueryColumnType.INT
-                },
-                new QueryColumn()
-                {
-                    Label = "DateTime Col",
-                    ColumnType = QueryColumnType.DATETIME
-                }
+            ret.MetaData = CreateBasicMetaData();
 
-            };
 
             ret.Data = new List<Dictionary<string, object>>();
 
@@ -54,6 +28,30 @@ namespace GenericDbRestApi.Test.Formatters
                         { ret.MetaData.Columns[1].Label, i * 0.1 },
                         { ret.MetaData.Columns[2].Label, i },
                         { ret.MetaData.Columns[3].Label, new DateTime(2020, 1, 1).AddDays(i) }
+                    }
+                );
+            }
+
+            return ret;
+        }
+
+        public QueryResult CreateBasicQueryResultWithNullValues()
+        {
+            var ret = new QueryResult();
+            ret.MetaData = CreateBasicMetaData();
+
+
+            ret.Data = new List<Dictionary<string, object>>();
+
+            for (int i = 0; i < MAXROWS; i++)
+            {
+                ret.Data.Add(
+                    new Dictionary<string, object>()
+                    {
+                        { ret.MetaData.Columns[0].Label, i % 2 == 0 ? null : $"String {i}" },
+                        { ret.MetaData.Columns[1].Label, i % 3 == 0 ? null : i * 0.1 },
+                        { ret.MetaData.Columns[2].Label, i % 5 == 0 ? null : i },
+                        { ret.MetaData.Columns[3].Label, i % 7 == 0 ? null : new DateTime(2020, 1, 1).AddDays(i) }
                     }
                 );
             }
@@ -190,6 +188,41 @@ namespace GenericDbRestApi.Test.Formatters
                 }
                 ret.Add(row);
             }
+            return ret;
+        }
+
+        private QueryMetaData CreateBasicMetaData()
+        {
+            var ret = new QueryMetaData
+            {
+                Name = "TestName",
+                Label = "Test Label",
+                Description = "Test Description",
+                Columns = new List<QueryColumn>()
+                {
+                    new QueryColumn()
+                    {
+                        Label = "Column 1",
+                        ColumnType = QueryColumnType.STRING
+                    },
+                    new QueryColumn()
+                    {
+                        Label = "Double Col",
+                        ColumnType = QueryColumnType.DOUBLE
+                    },
+                    new QueryColumn()
+                    {
+                        Label = "Integer",
+                        ColumnType = QueryColumnType.INT
+                    },
+                    new QueryColumn()
+                    {
+                        Label = "DateTime Col",
+                        ColumnType = QueryColumnType.DATETIME
+                    }
+
+                }
+            };
             return ret;
         }
     }

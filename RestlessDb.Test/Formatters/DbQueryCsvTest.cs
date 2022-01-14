@@ -87,6 +87,23 @@ namespace GenericDbRestApi.Test.Formatters
         }
 
         [Fact]
+        public void WhenQueryResultWithNullValuesIsGivenThenCorrectCsvIsCreated()
+        {
+            QueryResult inputData = new QueryResultTestProvider().CreateBasicQueryResultWithNullValues();
+            var sut = new DbQueryCsv(inputData);
+            var csvStream = sut.GetAsStream();
+            var reader = new StreamReader(csvStream);
+
+            var headerRow = reader.ReadLine();
+            var colHeaderRow = reader.ReadLine();
+            SkipLines(reader, inputData.Data.Count -1);
+            var lastLine = reader.ReadLine();
+            Assert.NotNull(lastLine);
+            var beyondLast = reader.ReadLine();
+            Assert.Null(beyondLast);
+        }
+
+        [Fact]
         public void WhenHierarchicalQueryResultThenHeaderAndDescriptionInFirstLineIsCorrect()
         {
             var inputData = new QueryResultTestProvider().CreateHierarchicalQueryResult();

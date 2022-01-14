@@ -17,12 +17,14 @@ namespace RestlessDb.Client.Shared
     }
     public partial class QueryResultInnerTable
     {
-        [Parameter]
+        [Parameter, EditorRequired]
         public QueryMetaData MetaData { get; set; }
-        [Parameter]
+        [Parameter, EditorRequired]
         public IEnumerable<IDictionary<string, object>> Data { get; set; }
         [Parameter]
         public TableDisplayOptions TableDisplayOptions { get; set; } = new();
+        [Parameter]
+        public int NestingLevel { get; set; } = 0;
 
         /// <summary>
         /// This is a dirty hack to resolve the problem of the Newtonsoft Deserialization. Due to the definition of 
@@ -31,7 +33,7 @@ namespace RestlessDb.Client.Shared
         /// <param name="objectToConvert"></param>
         public static IEnumerable<IDictionary<string, object>> CastDataToListOfDicts(object objectToConvert)
         {
-            List<IDictionary<string, object>> ret = new List<IDictionary<string, object>>();
+            List<IDictionary<string, object>> ret = new();
             try
             {
                 var enumerable = (IEnumerable<object>)objectToConvert;
