@@ -1,1 +1,2 @@
-fieldset { padding-inline-start: 2em;}
+fieldset { padding: 2em;}
+.fillparent {width:100%; height:100%;}

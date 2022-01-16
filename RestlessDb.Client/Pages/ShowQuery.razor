@@ -13,48 +13,80 @@
 }
 else
 {
-    <MudCard>
-        <MudCardContent>
-            <MudText Typo="Typo.subtitle1">@QueryMetaData.Label</MudText>
-            <MudText Typo="Typo.subtitle2">@QueryMetaData.Description</MudText>
-            <fieldset>
-                <legend>Size and config</legend>
-                <MudSelect T="string" Label="Output format" AnchorOrigin="Origin.BottomCenter" @bind-Value="@OutputFormat">
-                    @foreach (var format in ClientModel.FormatterInfos)
-                    {
-                        <MudSelectItem Value="@format.OutputFormat">@format.Name</MudSelectItem>
-                    }
-                </MudSelect>
-                <MudTextField T="int" @bind-Value="@Offset" Label="Offset" InputType="InputType.Number" />
-                <MudTextField T="int" @bind-Value="@MaxRows" Label="Max Rows" InputType="InputType.Number" />
-            </fieldset>
+    <MudGrid Class="d-flex flex-row py-8 px-8">
+        <MudItem xs="12">
+            <MudPaper Class="d-flex flex-column fillparent">
+                <MudText Typo="Typo.subtitle1">@QueryMetaData.Label</MudText>
+                <MudText Typo="Typo.subtitle2">@QueryMetaData.Description</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem sm="3" xs="12" Class="d-flex">
+            <MudPaper Class="d-flex fillparent">
+                <fieldset Class="fillparent">
+                    <legend>Fetch size</legend>
+                    <MudTextField T="int" @bind-Value="@Offset" Label="Offset" InputType="InputType.Number" />
+                    <MudTextField T="int" @bind-Value="@MaxRows" Label="Max Rows" InputType="InputType.Number" />
+                </fieldset>
+            </MudPaper>
+        </MudItem>
 
-            @if (QueryMetaData.Parameters?.Count > 0)
-            {
-                <fieldset>
-                    <legend>Query Parameters</legend>
-                    @{
-                        foreach (var kvp in ParamValuesDict)
-                        {
-                            <MudTextField T="string" @bind-Value="@ParamValuesDict[kvp.Key]" Label="@kvp.Key" />
+        @if (QueryMetaData.Parameters?.Count > 0)
+        {
+            <MudItem sm="3" xs="12" Class="d-flex">
+                <MudPaper Class="d-flex fillparent">
+                    <fieldset Class="fillparent">
+                        <legend>Query Parameters</legend>
+                        @{
+                            foreach (var kvp in ParamValuesDict)
+                            {
+                                <MudTextField T="string" @bind-Value="@ParamValuesDict[kvp.Key]" Label="@kvp.Key" />
+                            }
                         }
+                    </fieldset>
+                </MudPaper>
+            </MudItem>
+
+        }
+        <MudItem sm="2" xs="12" Class="d-flex">
+            <MudPaper Class="d-flex fillparent">
+                <fieldset class="d-flex flex-column fillparent">
+                    <legend>Table display</legend>
+                    <MudSwitch @bind-Checked="@TableDisplayOptions.Hover" Color="Color.Primary">Hover</MudSwitch>
+                    <MudSwitch @bind-Checked="@TableDisplayOptions.Dense" Color="Color.Secondary">Dense</MudSwitch>
+                    <MudSwitch @bind-Checked="@TableDisplayOptions.Striped" Color="Color.Tertiary">Striped</MudSwitch>
+                    <MudSwitch @bind-Checked="@TableDisplayOptions.Bordered" Color="Color.Warning">Bordered</MudSwitch>
+                </fieldset>
+            </MudPaper>
+        </MudItem>
+        <MudItem sm="3" xs="12" Class="d-flex">
+            <MudPaper Class="d-flex fillparent">
+                <fieldset class="d-flex flex-column fillparent">
+                    <legend>Export</legend>
+                    <MudSelect T="string" Label="Export format" AnchorOrigin="Origin.BottomCenter" @bind-Value="@ExportFormat">
+                        @foreach (var format in ClientModel.FormatterInfos)
+                        {
+                            <MudSelectItem Value="@format.OutputFormat">@format.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                    @if (!exporting)
+                    {
+                        <div>
+                            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-1" OnClick=@(()=>@ExportQueryResultsAsync())>Export</MudButton>
+                        </div>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.subtitle2">exporting...</MudText>
                     }
                 </fieldset>
-            }
-
-            <fieldset>
-                <legend>Table display</legend>
-                <MudSwitch @bind-Checked="@TableDisplayOptions.Hover" Color="Color.Primary">Hover</MudSwitch>
-                <MudSwitch @bind-Checked="@TableDisplayOptions.Dense" Color="Color.Secondary">Dense</MudSwitch>
-                <MudSwitch @bind-Checked="@TableDisplayOptions.Striped" Color="Color.Tertiary">Striped</MudSwitch>
-                <MudSwitch @bind-Checked="@TableDisplayOptions.Bordered" Color="Color.Warning">Bordered</MudSwitch>
-            </fieldset>
-        </MudCardContent>
-        <MudCardActions>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-1" OnClick=@(()=>@ShowQueryResultsAsync())>Execute Query</MudButton>
-        </MudCardActions>
-    </MudCard>
-    
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-1" OnClick=@(()=>@ShowQueryResultsAsync())>Fetch results</MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
     <MudDivider DividerType="DividerType.Middle" Class="my-6" />
 
 
