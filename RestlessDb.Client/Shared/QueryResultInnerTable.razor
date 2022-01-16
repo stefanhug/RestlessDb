@@ -10,33 +10,37 @@
         {
             <MudTh>@col.Label</MudTh>
         }
-        @if (MetaData.Children != null)
-        {
-            foreach (var child in MetaData.Children)
-            {
-                <MudTh>@child.Label</MudTh>
-            }
-        }
     </HeaderContent>
     <RowTemplate>
         @foreach (var col in MetaData.Columns)
         {
             <MudTd Style="vertical-align:top" DataLabel=@col.Label>@context[col.Label]</MudTd>
         }
+    </RowTemplate>
+    <ChildRowContent>
         @if (MetaData.Children != null)
         {
             foreach (var child in MetaData.Children)
             {
                 var data = CastDataToListOfDicts(context[child.Name]);
                 var nextLevel = NestingLevel + 1;
-                <MudTd>
-                    @if(data.Count() > 0)
-                    {
-                        <QueryResultInnerTable MetaData=@child Data=@data TableDisplayOptions=@TableDisplayOptions NestingLevel=@nextLevel />
-                    }
-                </MudTd>
+
+                @if (data.Count() > 0)
+                {
+                    <MudTr>
+                        <td colspan=@MetaData.Columns.Count>
+                            <MudCard>
+                                <MudCardContent>
+                                    <MudText>@child.Label</MudText>
+                                    <QueryResultInnerTable MetaData=@child Data=@data TableDisplayOptions=@TableDisplayOptions NestingLevel=@nextLevel />
+                                </MudCardContent>
+                            </MudCard>
+                        </td>
+                    </MudTr>
+                }
             }
         }
-    </RowTemplate>
+    </ChildRowContent>
+
 </MudTable>
 
