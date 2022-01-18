@@ -29,4 +29,10 @@ values('SalesOrderDetails', 'Sales Order Details',
 	'SalesOrders', 0,
     'select SalesOrderDetailID, ProductID, OrderQty, UnitPrice, LineTotal from sales.SalesOrderDetail where SalesOrderID = @SalesOrderID order by SalesOrderDetailID')
 
+insert into GQuery.QueryItem(Name, Label, Description, Pos, Sql)
+values('EMail', 'E-Mails', 
+    'E-Mail adresses in example db', 0,
+    'select EmailAddressid, Emailaddress from person.emailaddress order by EmailAddressid')
 	
+	
+	 

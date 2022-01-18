@@ -34,7 +34,7 @@ namespace RestlessDb.Client.Pages
         private QueryResult QueryResult { get; set; }
         private Dictionary<string, string> ParamValuesDict = new();
         private QueryResultTable queryResultTable { get; set; }
-        private bool exporting { get; set; }
+        private bool loading { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -61,35 +61,30 @@ namespace RestlessDb.Client.Pages
 
         public async Task ShowQueryResultsAsync()
         {
-            ErrorMessage = null;
             QueryResult = null;
-            try
+            var (success, fetchQueryResult) = await FetchJsonData(Offset);
+            if (success)
             {
-                queryResultTable.Loading = true;
-                var httpResponseMessage = await ClientModel.GatewayRestlessDb.FetchQueryContentAsync(QueryItem, JSON,
-                                                                                                     Offset, MaxRows, ParamValuesDict);
-                var content = await httpResponseMessage.Content.ReadAsStringAsync();
-                QueryResult = JsonConvert.DeserializeObject<QueryResult>(content);
-            }
-            catch (HttpRequestException e)
-            {
-                ErrorMessage = $"HttpRequestException: httpstatus: {e.StatusCode}\nMessage:{e.Message}\n=====\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
-            }
-            catch (Exception e)
-            {
-                ErrorMessage = $"{e.Message}\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
-            }
-            finally
-            {
-                queryResultTable.Loading = false;
+                QueryResult = fetchQueryResult;
             }
         }
+
+        public async Task FetchMoreRowsAndShow()
+        {
+            var (success, fetchQueryResult) = await FetchJsonData(QueryResult.Data.Count);
+            if (success)
+            {
+                QueryResult.Data.AddRange(fetchQueryResult.Data);
+                QueryResult.HasMoreRows = fetchQueryResult.HasMoreRows;
+            }
+        }
+
         public async Task ExportQueryResultsAsync()
         {
             ErrorMessage = null;
             try
             {
-                exporting = true;
+                loading = true;
                 var httpResponseMessage = await ClientModel.GatewayRestlessDb.FetchQueryContentAsync(QueryItem, ExportFormat,
                                                                                                      Offset, MaxRows, ParamValuesDict);
                 var formatterInfo = ClientModel.FormatterInfos.First(f => f.OutputFormat == ExportFormat);
@@ -111,8 +106,39 @@ namespace RestlessDb.Client.Pages
             }
             finally
             {
-                exporting = false;
+                loading = false;
             }
+        }
+
+        private async Task<(bool success, QueryResult)> FetchJsonData(int offset)
+        {
+            ErrorMessage = null;
+            QueryResult fetchQueryResult;
+            loading = true;
+            try
+            {
+                queryResultTable.Loading = true;
+                var httpResponseMessage = await ClientModel.GatewayRestlessDb.FetchQueryContentAsync(QueryItem, JSON,
+                                                                                                     offset, MaxRows, ParamValuesDict);
+                var content = await httpResponseMessage.Content.ReadAsStringAsync();
+                fetchQueryResult = JsonConvert.DeserializeObject<QueryResult>(content);
+            }
+            catch (HttpRequestException e)
+            {
+                ErrorMessage = $"HttpRequestException: httpstatus: {e.StatusCode}\nMessage:{e.Message}\n=====\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
+                return (false, null);
+            }
+            catch (Exception e)
+            {
+                ErrorMessage = $"{e.Message}\nType: {e.GetType()}\nStack trace:\n==========\n{e.StackTrace}";
+                return (false, null);
+            }
+            finally
+            {
+                queryResultTable.Loading = false;
+                loading = false;
+            }
+            return (true, fetchQueryResult);
         }
     }
 }

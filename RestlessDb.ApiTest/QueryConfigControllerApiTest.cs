@@ -23,7 +23,7 @@ namespace RestlessDb.ApiTest
             var gw = TestGatewayBuilder.GetGateway();
             var ret = await gw.GetAllFormatters();
 
-            Assert.Equal(6, ret.Count);
+            Assert.Equal(5, ret.Count);
         }
     }
 }

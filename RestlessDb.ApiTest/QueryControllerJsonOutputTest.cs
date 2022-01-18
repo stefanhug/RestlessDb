@@ -58,8 +58,7 @@ namespace RestlessDb.ApiTest
             Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
             Assert.Equal("text/plain", response.Content.Headers.ContentType.MediaType);
         }
-
-        
+                
         [Theory]
         [Trait("Category", "ApiTest")]
         [InlineData("dbapi/salesorders?maxrows=10", 10, 4, 1)]
@@ -86,6 +85,26 @@ namespace RestlessDb.ApiTest
             if (firstLevelChildren.HasValue)
             {
                 Assert.Equal(firstLevelChildren, queryResult.MetaData.Children.Count);
+            }
+        }
+
+        [Theory]
+        [Trait("Category", "ApiTest")]
+        [InlineData("dbapi/email", 0, 10)]
+        [InlineData("dbapi/email", 10, 10)]
+        [InlineData("dbapi/email", 44, 44)]
+        [InlineData("dbapi/email", 4444, 23)]
+        public async void WhenFetchWithOffsetAndMaxRowsThenCorrectRowsReturned(string resourceBasePath, int offset, int maxRows)
+        {
+            var gw = TestGatewayBuilder.GetGateway();
+            var response = await gw.GetClientResponse($"{resourceBasePath}?offset={offset}&maxrows={maxRows}");
+
+            var responseString = await response.Content.ReadAsStringAsync();
+            var queryResult = JsonConvert.DeserializeObject<QueryResult>(responseString);
+            Assert.Equal(maxRows, queryResult.Data.Count);
+            for( int i= 0; i < maxRows; i++) 
+            {
+                Assert.Equal(offset + i + 1, queryResult.Data[i]["EmailAddressid"] as long?);
             }
         }
     }
