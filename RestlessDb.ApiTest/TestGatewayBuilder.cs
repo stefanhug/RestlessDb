@@ -11,7 +11,7 @@ namespace RestlessDb.ApiTest
 {
     public static class TestGatewayBuilder
     {
-        private const string authority = "https://localhost:5001/";
+        private const string authority = "https://localhost:33333/";
 
         public static GatewayRestlessDb GetGateway()
         {

@@ -9,11 +9,11 @@
 
 @if (QueryMetaData == null)
 {
-    <p><em>Loading...</em></p>
+    <p><em>Loading Metadata...</em></p>
 }
 else
 {
-    <MudGrid Class="d-flex flex-row py-8 px-8">
+    <MudGrid Class="d-flex flex-row pa-2">
         <MudItem xs="12">
             <MudPaper Class="d-flex flex-column fillparent">
                 <MudText Typo="Typo.subtitle1">@QueryMetaData.Label</MudText>
@@ -45,7 +45,6 @@ else
                     </fieldset>
                 </MudPaper>
             </MudItem>
-
         }
         <MudItem sm="2" xs="12" Class="d-flex">
             <MudPaper Class="d-flex fillparent">
@@ -68,27 +67,34 @@ else
                             <MudSelectItem Value="@format.OutputFormat">@format.Name</MudSelectItem>
                         }
                     </MudSelect>
-                    @if (!exporting)
-                    {
-                        <div>
-                            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-1" OnClick=@(()=>@ExportQueryResultsAsync())>Export</MudButton>
-                        </div>
-                    }
-                    else
-                    {
-                        <MudText Typo="Typo.subtitle2">exporting...</MudText>
-                    }
+                    <div>
+                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-1" bind-Disabled=@loading
+                               OnClick=@(()=>@ExportQueryResultsAsync())>
+                            @(loading ? "loading..." : "Export")
+                        </MudButton>
+                    </div>
                 </fieldset>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">
             <MudPaper>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-1" OnClick=@(()=>@ShowQueryResultsAsync())>Fetch results</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-1" @bind-Disabled=@loading OnClick=@(()=>@ShowQueryResultsAsync())>@(loading ? "loading..." : "Fetch results")</MudButton>
             </MudPaper>
         </MudItem>
     </MudGrid>
-    <MudDivider DividerType="DividerType.Middle" Class="my-6" />
+    <MudDivider DividerType="DividerType.Middle" Class="my-2" />
 
 
     <QueryResultTable @ref="queryResultTable" QueryResult=@QueryResult TableDisplayOptions=@TableDisplayOptions />
+    @if (!loading)
+    {
+        @if (QueryResult != null && QueryResult.HasMoreRows)
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-1" OnClick=@(()=>@FetchMoreRowsAndShow())>Fetch more</MudButton>
+        }
+        else
+        {
+            <MudText>All result rows fetched</MudText>
+        }
+    }
 }
